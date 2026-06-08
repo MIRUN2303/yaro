@@ -1,0 +1,472 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>YARO Admin</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.cdnfonts.com/css/pilowlava" rel="stylesheet">
+<link href="https://api.fontshare.com/v2/css?f[]=clash-display@200,300,400,500,600,700&display=swap" rel="stylesheet">
+<style>
+  *, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
+  :root { --bg: #050505; --surface: rgba(255,255,255,0.04); --border: rgba(255,255,255,0.06); --text: #f0f0f0; --muted: #666; --accent: #c4b5fd; --accent2: #a78bfa; }
+  html, body { width: 100%; min-height: 100vh; background: var(--bg); font-family: 'Clash Display', sans-serif; color: var(--text); }
+
+  /* ─── LOGIN ─── */
+  #admin-login {
+    display: flex; align-items: center; justify-content: center; min-height: 100vh;
+    background: var(--bg);
+    background-image: radial-gradient(ellipse at 20% 50%, rgba(196,181,253,0.06) 0%, transparent 60%), radial-gradient(ellipse at 80% 50%, rgba(255,255,255,0.03) 0%, transparent 60%);
+  }
+  #admin-login .login-box {
+    background: rgba(20,20,20,0.8); padding: 48px 40px; border-radius: 16px; width: 380px;
+    border: 1px solid var(--border); backdrop-filter: blur(12px); box-shadow: 0 24px 64px rgba(0,0,0,0.4);
+  }
+  #admin-login .brand { font-family: 'Pilowlava', serif; font-size: 32px; letter-spacing: 4px; color: var(--accent); text-align: center; margin-bottom: 4px; }
+  #admin-login .sub { font-size: 11px; color: var(--muted); text-align: center; margin-bottom: 28px; letter-spacing: 2px; text-transform: uppercase; }
+  #admin-login input {
+    width: 100%; padding: 14px 16px; margin-bottom: 12px; background: var(--surface);
+    border: 1px solid var(--border); border-radius: 10px; color: var(--text); font-size: 14px; font-family: 'Clash Display', sans-serif; transition: border-color 0.2s;
+  }
+  #admin-login input:focus { outline: none; border-color: var(--accent); background: rgba(255,255,255,0.06); }
+  #admin-login input::placeholder { color: #555; }
+  #admin-login button {
+    width: 100%; padding: 14px; margin-top: 8px;
+    background: linear-gradient(135deg, var(--accent), var(--accent2)); color: var(--bg);
+    border: none; border-radius: 10px; font-weight: 600; font-size: 14px;
+    font-family: 'Clash Display', sans-serif; cursor: pointer; transition: opacity 0.2s, transform 0.1s;
+  }
+  #admin-login button:hover { opacity: 0.9; transform: translateY(-1px); }
+  #admin-login .err { color: #ef4444; font-size: 13px; margin-top: 12px; text-align: center; }
+
+  /* ─── LAYOUT ─── */
+  #admin-app { display: none; min-height: 100vh; }
+  #admin-app.active { display: flex; }
+  #admin-login.hidden { display: none; }
+  #admin-sidebar {
+    width: 240px; background: rgba(17,17,17,0.95); border-right: 1px solid var(--border);
+    display: flex; flex-direction: column; position: fixed; top: 0; left: 0; height: 100vh; z-index: 100;
+    backdrop-filter: blur(12px);
+  }
+  #admin-sidebar .brand {
+    padding: 24px 20px; font-family: 'Pilowlava', serif; font-size: 20px; letter-spacing: 3px;
+    color: var(--accent); border-bottom: 1px solid var(--border);
+  }
+  #admin-sidebar nav { flex: 1; padding: 16px 0; }
+  #admin-sidebar nav a {
+    display: flex; align-items: center; gap: 10px; padding: 12px 20px; color: #888;
+    text-decoration: none; font-size: 13px; transition: all 0.2s; border-left: 3px solid transparent; cursor: pointer;
+  }
+  #admin-sidebar nav a:hover, #admin-sidebar nav a.active { background: rgba(196,181,253,0.06); color: var(--text); border-left-color: var(--accent); }
+  #admin-sidebar .footer { padding: 16px 20px; border-top: 1px solid var(--border); }
+  #admin-sidebar .footer button {
+    width: 100%; padding: 10px; background: var(--surface); border: 1px solid var(--border);
+    border-radius: 8px; color: #888; cursor: pointer; font-size: 12px; font-family: 'Clash Display', sans-serif;
+    transition: all 0.2s;
+  }
+  #admin-sidebar .footer button:hover { background: rgba(239,68,68,0.15); color: #ef4444; border-color: rgba(239,68,68,0.3); }
+
+  #admin-main { flex: 1; margin-left: 240px; padding: 32px; }
+
+  .page-hdr { display: flex; justify-content: space-between; align-items: center; margin-bottom: 24px; }
+  .page-hdr h2 { font-size: 22px; font-weight: 400; }
+  .btn {
+    padding: 10px 20px; border: none; border-radius: 8px; cursor: pointer;
+    font-size: 12px; font-weight: 500; font-family: 'Clash Display', sans-serif;
+    letter-spacing: 0.5px; transition: all 0.2s;
+  }
+  .btn-pri { background: linear-gradient(135deg, var(--accent), var(--accent2)); color: var(--bg); }
+  .btn-pri:hover { opacity: 0.85; }
+  .btn-del { background: rgba(239,68,68,0.15); color: #ef4444; border: 1px solid rgba(239,68,68,0.2); }
+  .btn-del:hover { background: rgba(239,68,68,0.25); }
+  .btn-sm { padding: 6px 12px; font-size: 11px; }
+
+  .tbl-wrap { overflow-x: auto; background: rgba(17,17,17,0.8); border-radius: 12px; border: 1px solid var(--border); }
+  table { width: 100%; border-collapse: collapse; font-size: 13px; }
+  thead th { padding: 14px 16px; text-align: left; font-weight: 500; color: var(--muted); border-bottom: 1px solid var(--border); white-space: nowrap; font-size: 11px; letter-spacing: 1px; text-transform: uppercase; }
+  tbody td { padding: 12px 16px; border-bottom: 1px solid rgba(255,255,255,0.03); }
+  tbody tr:hover { background: rgba(255,255,255,0.02); }
+  .acts { display: flex; gap: 6px; }
+
+  .badge { display: inline-block; padding: 3px 10px; border-radius: 100px; font-size: 10px; letter-spacing: 0.5px; background: var(--surface); color: #888; border: 1px solid var(--border); }
+  .badge-suc { background: rgba(34,197,94,0.1); color: #22c55e; border-color: rgba(34,197,94,0.2); }
+  .badge-warn { background: rgba(245,158,11,0.1); color: #f59e0b; border-color: rgba(245,158,11,0.2); }
+  .badge-dng { background: rgba(239,68,68,0.1); color: #ef4444; border-color: rgba(239,68,68,0.2); }
+
+  .modal-overlay { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.8); align-items: center; justify-content: center; z-index: 1000; backdrop-filter: blur(4px); }
+  .modal-overlay.open { display: flex; }
+  .modal { background: rgba(20,20,20,0.95); border-radius: 16px; width: 90%; max-width: 560px; max-height: 90vh; overflow-y: auto; padding: 32px; border: 1px solid var(--border); backdrop-filter: blur(12px); box-shadow: 0 24px 64px rgba(0,0,0,0.4); position: relative; }
+  .modal h3 { font-size: 18px; margin-bottom: 20px; font-weight: 400; }
+  .modal .close { position: absolute; top: 12px; right: 16px; background: none; border: none; color: #555; font-size: 24px; cursor: pointer; }
+  .modal .close:hover { color: #fff; }
+  .fg { margin-bottom: 16px; }
+  .fg label { display: block; font-size: 12px; color: var(--muted); margin-bottom: 4px; letter-spacing: 0.5px; }
+  .fg input, .fg textarea, .fg select { width: 100%; padding: 10px 12px; background: var(--surface); border: 1px solid var(--border); border-radius: 8px; color: var(--text); font-size: 13px; font-family: 'Clash Display', sans-serif; }
+  .fg input:focus, .fg textarea:focus { outline: none; border-color: var(--accent); }
+  .fg textarea { min-height: 80px; resize: vertical; }
+  .fg select option { background: #1a1a1a; color: var(--text); }
+  .fr { display: flex; gap: 12px; }
+  .fr .fg { flex: 1; }
+
+  .stat-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 16px; margin-bottom: 32px; }
+  .stat-card { background: rgba(17,17,17,0.8); border: 1px solid var(--border); border-radius: 12px; padding: 24px; }
+  .stat-card .val { font-size: 36px; font-weight: 600; color: var(--accent); }
+  .stat-card .lbl { font-size: 11px; color: var(--muted); margin-top: 4px; letter-spacing: 1px; text-transform: uppercase; }
+
+  img.thumb { width: 48px; height: 48px; object-fit: cover; border-radius: 8px; background: var(--surface); }
+
+  .no-data { text-align: center; color: var(--muted); padding: 32px; }
+</style>
+</head>
+<body>
+
+<!-- LOGIN -->
+<div id="admin-login">
+  <div class="login-box">
+    <div class="brand">YARO</div>
+    <div class="sub">Admin Panel</div>
+    <input type="email" id="adm-email" placeholder="Admin Email" autocomplete="email">
+    <input type="password" id="adm-pass" placeholder="Password" autocomplete="current-password">
+    <button id="adm-login-btn">Sign In</button>
+    <div class="err" id="adm-err"></div>
+  </div>
+</div>
+
+<!-- APP -->
+<div id="admin-app">
+  <aside id="admin-sidebar">
+    <div class="brand">YARO</div>
+    <nav>
+      <a class="active" data-page="dashboard">Dashboard</a>
+      <a data-page="collections">Collections</a>
+      <a data-page="stories">Stories</a>
+      <a data-page="products">Products</a>
+      <a data-page="orders">Orders</a>
+    </nav>
+    <div class="footer"><button id="adm-logout">Sign Out</button></div>
+  </aside>
+  <main id="admin-main"><div id="page-content"></div></main>
+</div>
+
+<!-- MODAL -->
+<div class="modal-overlay" id="modal-overlay">
+  <div class="modal">
+    <button class="close" id="modal-close">&times;</button>
+    <div id="modal-body"></div>
+  </div>
+</div>
+
+<script src="js/api.js"></script>
+<script>
+var TOKEN = localStorage.getItem('admin_token');
+var BASE = (typeof YARO_API !== 'undefined' && typeof YARO_API.getBaseUrl === 'function') ? YARO_API.getBaseUrl() : 'http://localhost:3000/api';
+
+function api(path, opts) {
+  opts = opts || {};
+  return fetch(BASE + path, {
+    headers: {
+      'Content-Type': 'application/json',
+      'Authorization': 'Bearer ' + TOKEN,
+      ...(opts.headers || {})
+    },
+    ...opts
+  }).then(function(r) { return r.json(); });
+}
+
+function esc(s) { var d = document.createElement('div'); d.appendChild(document.createTextNode(s || '')); return d.innerHTML; }
+function fixImg(src) { if (!src) return ''; if (src.indexOf('://') > -1 || src[0] === '/') return src; return '/' + src; }
+
+function openModal(h) {
+  document.getElementById('modal-body').innerHTML = h;
+  document.getElementById('modal-overlay').classList.add('open');
+}
+function closeModal() { document.getElementById('modal-overlay').classList.remove('open'); }
+document.getElementById('modal-close').addEventListener('click', closeModal);
+document.getElementById('modal-overlay').addEventListener('click', function(e) { if (e.target === this) closeModal(); });
+
+// ─── AUTH ───
+if (TOKEN) { showApp(); loadPage('dashboard'); }
+
+document.getElementById('adm-login-btn').addEventListener('click', async function() {
+  var email = document.getElementById('adm-email').value.trim();
+  var pass = document.getElementById('adm-pass').value;
+  var errEl = document.getElementById('adm-err');
+  errEl.textContent = '';
+  try {
+    var res = await fetch(BASE + '/auth/admin/login', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ email: email, password: pass })
+    });
+    var data = await res.json();
+    if (!res.ok) { errEl.textContent = data.error || 'Invalid credentials'; return; }
+    localStorage.setItem('admin_token', data.token);
+    TOKEN = data.token;
+    showApp();
+    loadPage('dashboard');
+  } catch(e) { errEl.textContent = 'Connection error'; }
+});
+
+document.getElementById('adm-logout').addEventListener('click', function() {
+  localStorage.removeItem('admin_token');
+  TOKEN = null;
+  document.getElementById('admin-app').classList.remove('active');
+  document.getElementById('admin-login').classList.remove('hidden');
+});
+
+function showApp() {
+  document.getElementById('admin-login').classList.add('hidden');
+  document.getElementById('admin-app').classList.add('active');
+}
+
+// ─── NAV ───
+document.querySelectorAll('#admin-sidebar nav a').forEach(function(a) {
+  a.addEventListener('click', function() {
+    document.querySelectorAll('#admin-sidebar nav a').forEach(function(x) { x.classList.remove('active'); });
+    this.classList.add('active');
+    loadPage(this.dataset.page);
+  });
+});
+
+function loadPage(page) {
+  var c = document.getElementById('page-content');
+  switch(page) {
+    case 'dashboard': renderDashboard(c); break;
+    case 'collections': renderCollections(c); break;
+    case 'stories': renderStories(c); break;
+    case 'products': renderProducts(c); break;
+    case 'orders': renderOrders(c); break;
+  }
+}
+
+// ─── DASHBOARD ───
+async function renderDashboard(c) {
+  try {
+    var [cols, prods, ords] = await Promise.all([api('/collections'), api('/products'), api('/orders?admin=1')]);
+    c.innerHTML = '<div class="page-hdr"><h2>Dashboard</h2></div><div class="stat-grid">' +
+      '<div class="stat-card"><div class="val">' + (Array.isArray(cols)?cols.length:0) + '</div><div class="lbl">Collections</div></div>' +
+      '<div class="stat-card"><div class="val">' + (Array.isArray(prods)?prods.length:0) + '</div><div class="lbl">Products</div></div>' +
+      '<div class="stat-card"><div class="val">' + (Array.isArray(ords)?ords.length:0) + '</div><div class="lbl">Orders</div></div></div>';
+  } catch(e) { c.innerHTML = '<p>Error loading dashboard</p>'; }
+}
+
+// ─── COLLECTIONS ───
+async function renderCollections(c) {
+  var data = await api('/collections');
+  var items = Array.isArray(data) ? data : [];
+  c.innerHTML = '<div class="page-hdr"><h2>Collections</h2><button class="btn btn-pri" onclick="openColModal()">+ Add</button></div>' +
+    '<div class="tbl-wrap"><table><thead><tr><th>Name</th><th>Slug</th><th>Description</th><th>Actions</th></tr></thead><tbody>' +
+    items.map(function(x) {
+      return '<tr><td>' + esc(x.name) + '</td><td>' + esc(x.slug) + '</td><td>' + esc((x.description||'').slice(0,60)) + '</td><td class="acts"><button class="btn btn-sm btn-pri" onclick="openColModal(\'' + x.id + '\')">Edit</button><button class="btn btn-sm btn-del" onclick="delItem(\'collections\',\'' + x.id + '\')">Delete</button></td></tr>';
+    }).join('') + '</tbody></table></div>';
+}
+
+function openColModal(id) {
+  var h = '<h3>' + (id?'Edit':'Add') + ' Collection</h3><form id="mf">';
+  h += '<div class="fg"><label>Name</label><input type="text" id="f-name" required></div>';
+  h += '<div class="fg"><label>Slug</label><input type="text" id="f-slug" required></div>';
+  h += '<div class="fg"><label>Description</label><textarea id="f-desc"></textarea></div>';
+  h += '<button type="submit" class="btn btn-pri">Save</button></form>';
+  openModal(h);
+  if (id) loadCol(id);
+  document.getElementById('mf').addEventListener('submit', function(e) { e.preventDefault(); saveCol(id); });
+}
+
+async function loadCol(id) {
+  var d = await api('/collections/' + id);
+  if (d.error) return;
+  document.getElementById('f-name').value = d.name || '';
+  document.getElementById('f-slug').value = d.slug || '';
+  document.getElementById('f-desc').value = d.description || '';
+}
+
+async function saveCol(id) {
+  var body = {
+    name: document.getElementById('f-name').value,
+    slug: document.getElementById('f-slug').value,
+    description: document.getElementById('f-desc').value
+  };
+  var r = id ? await api('/collections/' + id, { method: 'PUT', body: JSON.stringify(body) })
+             : await api('/collections', { method: 'POST', body: JSON.stringify(body) });
+  if (r.error) { alert('Error: ' + r.error); return; }
+  closeModal(); loadPage('collections');
+}
+
+// ─── STORIES ───
+async function renderStories(c) {
+  var [stories, cols] = await Promise.all([api('/stories'), api('/collections')]);
+  var items = Array.isArray(stories) ? stories : [];
+  var cm = {}; (Array.isArray(cols)?cols:[]).forEach(function(x) { cm[x.id] = x.name; });
+  c.innerHTML = '<div class="page-hdr"><h2>Stories</h2><button class="btn btn-pri" onclick="openStoryModal()">+ Add</button></div>' +
+    '<div class="tbl-wrap"><table><thead><tr><th>Title</th><th>Slug</th><th>Collection</th><th>Actions</th></tr></thead><tbody>' +
+    items.map(function(s) {
+      return '<tr><td>' + esc(s.title) + '</td><td>' + esc(s.slug) + '</td><td>' + esc(cm[s.collection_id]||'-') + '</td><td class="acts"><button class="btn btn-sm btn-pri" onclick="openStoryModal(\'' + s.id + '\')">Edit</button><button class="btn btn-sm btn-del" onclick="delItem(\'stories\',\'' + s.id + '\')">Delete</button></td></tr>';
+    }).join('') + '</tbody></table></div>';
+}
+
+async function openStoryModal(id) {
+  var cols = await api('/collections');
+  var h = '<h3>' + (id?'Edit':'Add') + ' Story</h3><form id="mf">';
+  h += '<div class="fg"><label>Collection</label><select id="f-collection">';
+  (Array.isArray(cols)?cols:[]).forEach(function(c) { h += '<option value="' + c.id + '">' + esc(c.name) + '</option>'; });
+  h += '</select></div>';
+  h += '<div class="fg"><label>Title</label><input type="text" id="f-title" required></div>';
+  h += '<div class="fg"><label>Slug</label><input type="text" id="f-slug" required></div>';
+  h += '<div class="fg"><label>Description</label><input type="text" id="f-desc"></div>';
+  h += '<div class="fg"><label>Story Content</label><textarea id="f-content"></textarea></div>';
+  h += '<button type="submit" class="btn btn-pri">Save</button></form>';
+  openModal(h);
+  if (id) loadStory(id);
+  document.getElementById('mf').addEventListener('submit', function(e) { e.preventDefault(); saveStory(id); });
+}
+
+async function loadStory(id) {
+  var d = await api('/stories/' + id);
+  if (d.error) return;
+  document.getElementById('f-collection').value = d.collection_id || '';
+  document.getElementById('f-title').value = d.title || '';
+  document.getElementById('f-slug').value = d.slug || '';
+  document.getElementById('f-desc').value = d.description || '';
+  document.getElementById('f-content').value = d.story_content || '';
+}
+
+async function saveStory(id) {
+  var body = {
+    collection_id: document.getElementById('f-collection').value,
+    title: document.getElementById('f-title').value,
+    slug: document.getElementById('f-slug').value,
+    description: document.getElementById('f-desc').value,
+    story_content: document.getElementById('f-content').value
+  };
+  var r = id ? await api('/stories/' + id, { method: 'PUT', body: JSON.stringify(body) })
+             : await api('/stories', { method: 'POST', body: JSON.stringify(body) });
+  if (r.error) { alert('Error: ' + r.error); return; }
+  closeModal(); loadPage('stories');
+}
+
+// ─── PRODUCTS ───
+async function renderProducts(c) {
+  var [prods, cols, stories] = await Promise.all([api('/products'), api('/collections'), api('/stories')]);
+  var items = Array.isArray(prods) ? prods : [];
+  var cm = {}; (Array.isArray(cols)?cols:[]).forEach(function(x) { cm[x.id] = x.name; });
+  c.innerHTML = '<div class="page-hdr"><h2>Products</h2><button class="btn btn-pri" onclick="openProdModal()">+ Add</button></div>' +
+    '<div class="tbl-wrap"><table><thead><tr><th>Image</th><th>Name</th><th>Price</th><th>Stock</th><th>Collection</th><th>Gender</th><th>Status</th><th>Actions</th></tr></thead><tbody>' +
+    items.map(function(p) {
+      return '<tr><td>' + (p.images&&p.images[0]?'<img class="thumb" src="'+fixImg(p.images[0])+'">':'-') + '</td><td>' + esc(p.name) + '</td><td>₹' + p.price + '</td><td>' + (p.stock||0) + '</td><td>' + esc(cm[p.collection_id]||'-') + '</td><td>' + esc(p.gender||'Any') + '</td><td><span class="badge ' + (p.status==='active'?'badge-suc':'badge-warn') + '">' + esc(p.status) + '</span></td><td class="acts"><button class="btn btn-sm btn-pri" onclick="openProdModal(\'' + p.id + '\')">Edit</button><button class="btn btn-sm btn-del" onclick="delItem(\'products\',\'' + p.id + '\')">Delete</button></td></tr>';
+    }).join('') + '</tbody></table></div>';
+}
+
+async function openProdModal(id) {
+  var [cols, stories] = await Promise.all([api('/collections'), api('/stories')]);
+  var h = '<h3>' + (id?'Edit':'Add') + ' Product</h3><form id="mf">';
+  h += '<div class="fr"><div class="fg"><label>Collection</label><select id="f-collection"><option value="">None</option>';
+  (Array.isArray(cols)?cols:[]).forEach(function(c) { h += '<option value="' + c.id + '">' + esc(c.name) + '</option>'; });
+  h += '</select></div><div class="fg"><label>Story</label><select id="f-story"><option value="">None</option>';
+  (Array.isArray(stories)?stories:[]).forEach(function(s) { h += '<option value="' + s.id + '">' + esc(s.title) + '</option>'; });
+  h += '</select></div></div>';
+  h += '<div class="fr"><div class="fg"><label>Name</label><input type="text" id="f-name" required></div>';
+  h += '<div class="fg"><label>Slug</label><input type="text" id="f-slug" required></div></div>';
+  h += '<div class="fg"><label>Description</label><textarea id="f-desc"></textarea></div>';
+  h += '<div class="fr"><div class="fg"><label>Price (₹)</label><input type="number" id="f-price"></div>';
+  h += '<div class="fg"><label>Original Price</label><input type="number" id="f-oprice"></div></div>';
+  h += '<div class="fr"><div class="fg"><label>Stock</label><input type="number" id="f-stock"></div>';
+  h += '<div class="fg"><label>SKU</label><input type="text" id="f-sku"></div></div>';
+  h += '<div class="fg"><label>Images (comma-separated)</label><input type="text" id="f-images"></div>';
+  h += '<div class="fg"><label>Sizes (comma-separated)</label><input type="text" id="f-sizes"></div>';
+  h += '<div class="fg"><label>Gender</label><select id="f-gender"><option value="Any">Any</option><option value="His">His</option><option value="Hers">Hers</option><option value="Mini">Mini</option><option value="Mini-Gent">Mini-Gent</option><option value="Mini-Lady">Mini-Lady</option></select></div>';
+  h += '<div class="fr"><div class="fg"><label>Badge</label><input type="text" id="f-badge"></div>';
+  h += '<div class="fg"><label>Offer Name</label><input type="text" id="f-offer"></div></div>';
+  h += '<div class="fg"><label>Story Text</label><textarea id="f-story-text"></textarea></div>';
+  h += '<div class="fg"><label>Status</label><select id="f-status"><option value="active">Active</option><option value="draft">Draft</option></select></div>';
+  h += '<button type="submit" class="btn btn-pri">Save</button></form>';
+  openModal(h);
+  if (id) loadProd(id);
+  document.getElementById('mf').addEventListener('submit', function(e) { e.preventDefault(); saveProd(id); });
+}
+
+async function loadProd(id) {
+  var d = await api('/products/' + id);
+  if (d.error) return;
+  document.getElementById('f-collection').value = d.collection_id || '';
+  document.getElementById('f-story').value = d.story_id || '';
+  document.getElementById('f-name').value = d.name || '';
+  document.getElementById('f-slug').value = d.slug || '';
+  document.getElementById('f-desc').value = d.description || '';
+  document.getElementById('f-price').value = d.price || '';
+  document.getElementById('f-oprice').value = d.original_price || '';
+  document.getElementById('f-stock').value = d.stock || '';
+  document.getElementById('f-sku').value = d.sku || '';
+  document.getElementById('f-images').value = (d.images||[]).join(', ');
+  document.getElementById('f-sizes').value = (d.sizes||[]).join(', ');
+  document.getElementById('f-gender').value = d.gender || 'Any';
+  document.getElementById('f-badge').value = d.badge || '';
+  document.getElementById('f-offer').value = d.offer_name || '';
+  document.getElementById('f-story-text').value = d.story_text || '';
+  document.getElementById('f-status').value = d.status || 'active';
+}
+
+async function saveProd(id) {
+  var body = {
+    collection_id: document.getElementById('f-collection').value || null,
+    story_id: document.getElementById('f-story').value || null,
+    name: document.getElementById('f-name').value,
+    slug: document.getElementById('f-slug').value,
+    description: document.getElementById('f-desc').value,
+    price: parseInt(document.getElementById('f-price').value) || 0,
+    original_price: parseInt(document.getElementById('f-oprice').value) || null,
+    stock: parseInt(document.getElementById('f-stock').value) || 0,
+    sku: document.getElementById('f-sku').value,
+    images: document.getElementById('f-images').value.split(',').map(function(s){return s.trim()}).filter(Boolean),
+    sizes: document.getElementById('f-sizes').value.split(',').map(function(s){return s.trim()}).filter(Boolean),
+    gender: document.getElementById('f-gender').value,
+    badge: document.getElementById('f-badge').value,
+    offer_name: document.getElementById('f-offer').value,
+    story_text: document.getElementById('f-story-text').value,
+    status: document.getElementById('f-status').value
+  };
+  var r = id ? await api('/products/' + id, { method: 'PUT', body: JSON.stringify(body) })
+             : await api('/products', { method: 'POST', body: JSON.stringify(body) });
+  if (r.error) { alert('Error: ' + r.error); return; }
+  closeModal(); loadPage('products');
+}
+
+// ─── ORDERS ───
+async function renderOrders(c) {
+  var data = await api('/orders?admin=1');
+  var items = Array.isArray(data) ? data : [];
+  c.innerHTML = '<div class="page-hdr"><h2>Orders</h2></div>' +
+    '<div class="tbl-wrap"><table><thead><tr><th>Order</th><th>Customer</th><th>Total</th><th>Payment</th><th>Fulfillment</th><th>Date</th><th>Actions</th></tr></thead><tbody>' +
+    (items.length ? items.map(function(o) {
+      return '<tr><td><strong>' + esc(o.order_number) + '</strong></td><td>' + esc(o.user_id||'-') + '</td><td>₹' + (o.total/100).toFixed(2) + '</td><td><span class="badge ' + (o.payment_status==='confirmed'?'badge-suc':o.payment_status==='failed'?'badge-dng':'badge-warn') + '">' + esc(o.payment_status) + '</span></td><td><span class="badge ' + (o.fulfillment_status==='shipped'||o.fulfillment_status==='delivered'?'badge-suc':'badge-warn') + '">' + esc(o.fulfillment_status) + '</span></td><td>' + (o.created_at?new Date(o.created_at).toLocaleDateString():'-') + '</td><td class="acts"><button class="btn btn-sm btn-pri" onclick="updateOrder(\'' + o.id + '\')">Update</button></td></tr>';
+    }).join('') : '<tr><td colspan="7" class="no-data">No orders yet</td></tr>') + '</tbody></table></div>';
+}
+
+function updateOrder(id) {
+  var h = '<h3>Update Order Status</h3><form id="mf">';
+  h += '<div class="fg"><label>Payment</label><select id="f-pstatus"><option value="pending">Pending</option><option value="confirmed">Confirmed</option><option value="failed">Failed</option><option value="refunded">Refunded</option></select></div>';
+  h += '<div class="fg"><label>Fulfillment</label><select id="f-fstatus"><option value="pending">Pending</option><option value="processing">Processing</option><option value="shipped">Shipped</option><option value="delivered">Delivered</option></select></div>';
+  h += '<button type="submit" class="btn btn-pri">Update</button></form>';
+  openModal(h);
+  document.getElementById('mf').addEventListener('submit', async function(e) {
+    e.preventDefault();
+    var body = {
+      payment_status: document.getElementById('f-pstatus').value,
+      fulfillment_status: document.getElementById('f-fstatus').value
+    };
+    var r = await api('/orders/' + id + '/status', { method: 'PUT', body: JSON.stringify(body) });
+    if (r.error) { alert('Error: ' + r.error); return; }
+    closeModal(); loadPage('orders');
+  });
+}
+
+// ─── DELETE ───
+async function delItem(type, id) {
+  if (!confirm('Delete this ' + type.slice(0,-1) + '?')) return;
+  var r = await api('/' + type + '/' + id, { method: 'DELETE' });
+  if (r.error) { alert('Error: ' + r.error); return; }
+  loadPage(type);
+}
+</script>
+</body>
+</html>
