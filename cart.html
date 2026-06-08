@@ -308,22 +308,16 @@
       width: 100%; height: 100%;
     }
     .loc-map-wrap .leaflet-control-attribution { display: none; }
-    .loc-map-wrap::after {
-      content: ''; position: absolute; top: 0; left: 0; width: 100%; height: 100%;
-      pointer-events: none; z-index: 500;
-      background: linear-gradient(135deg, rgba(139,92,246,0.12), rgba(88,28,135,0.08));
-      mix-blend-mode: overlay;
-    }
     .loc-map-pin-info {
       position: absolute; bottom: 12px; left: 12px; right: 12px;
       padding: 10px 14px; border-radius: 8px;
-      background: rgba(10,5,20,0.85); backdrop-filter: blur(8px);
-      border: 1px solid rgba(139,92,246,0.2);
-      font-size: 10px; color: #c4b5fd; z-index: 1000;
+      background: rgba(5,5,5,0.85); backdrop-filter: blur(8px);
+      border: 1px solid rgba(255,255,255,0.04);
+      font-size: 10px; color: var(--text-very-muted); z-index: 1000;
       display: none; align-items: center; gap: 6px;
     }
     .loc-map-pin-info.show { display: flex; }
-    .loc-map-pin-info svg { width: 12px; height: 12px; color: #a78bfa; flex-shrink: 0; }
+    .loc-map-pin-info svg { width: 12px; height: 12px; color: var(--danger); flex-shrink: 0; }
     .loc-use-btn {
       margin-top: 8px; padding: 10px 20px; border-radius: 8px; border: none;
       background: rgba(255,255,255,0.04); color: var(--text-muted);
@@ -857,7 +851,6 @@
     var mapMarker = null;
     var mapLat = null;
     var mapLng = null;
-    var mapRoute = null;
     var timerInterval = null;
     var timerSeconds = 900; // 15 min
 
@@ -1204,11 +1197,9 @@
             mapLng = latlng.lng;
             document.getElementById('loc-pin-coords').textContent = mapLat.toFixed(6) + ', ' + mapLng.toFixed(6);
             reverseGeocode(mapLat, mapLng);
-            drawVioletRoute(mapLat, mapLng);
           });
           document.getElementById('loc-pin-info').classList.add('show');
           document.getElementById('loc-pin-coords').textContent = mapLat.toFixed(6) + ', ' + mapLng.toFixed(6);
-          drawVioletRoute(mapLat, mapLng);
         }
         reverseGeocode(mapLat, mapLng);
         showToast('📍 Location detected! Address fields updated.', 'success');
@@ -1220,21 +1211,6 @@
         btn.disabled = false;
       }, { enableHighAccuracy: true, timeout: 8000 });
     });
-
-    // ─── ROUTE DRAWING ───
-    function drawVioletRoute(lat, lng) {
-      if (mapRoute) map.removeLayer(mapRoute);
-      if (!lat || !lng) return;
-      var offset = 0.008;
-      var routeCoords = [
-        [lat + offset, lng - offset],
-        [lat + offset*0.5, lng - offset*0.5],
-        [lat, lng]
-      ];
-      mapRoute = L.polyline(routeCoords, {
-        color: '#a78bfa', weight: 3, opacity: 0.7, dashArray: '8,6'
-      }).addTo(map);
-    }
 
     // ─── MAP INIT ───
     function initMap() {
@@ -1253,12 +1229,10 @@
           mapLat = latlng.lat;
           mapLng = latlng.lng;
           document.getElementById('loc-pin-coords').textContent = mapLat.toFixed(6) + ', ' + mapLng.toFixed(6);
-          drawVioletRoute(mapLat, mapLng);
         });
         document.getElementById('loc-pin-info').classList.add('show');
         document.getElementById('loc-pin-coords').textContent = mapLat.toFixed(6) + ', ' + mapLng.toFixed(6);
         reverseGeocode(mapLat, mapLng);
-        drawVioletRoute(mapLat, mapLng);
         showToast('📍 Pin dropped! Address fields updated.', 'success');
       });
 
