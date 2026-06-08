@@ -224,30 +224,28 @@
         padding: 22px 28px;
         font-size: 13px;
         gap: 10px;
-        color: #d8ccff;
-        text-shadow: 0 0 16px rgba(139,92,246,0.7), 0 0 40px rgba(139,92,246,0.4), 0 0 80px rgba(139,92,246,0.2);
-        background: linear-gradient(135deg, rgba(139,92,246,0.12), rgba(139,92,246,0.03));
-        border: 1px solid rgba(139,92,246,0.35);
+        color: #c4b5fd;
+        background: rgba(139,92,246,0.1);
+        border: 1px solid rgba(139,92,246,0.2);
         border-radius: 8px;
-        box-shadow: 0 0 40px rgba(139,92,246,0.12), inset 0 0 50px rgba(139,92,246,0.04);
-        letter-spacing: 0.08em;
+        letter-spacing: 0.1em;
+        text-transform: uppercase;
         position: relative;
         overflow: hidden;
+        transition: all 0.3s ease;
       }
       .desktop-read-story::before {
         content: '✦';
         font-size: 14px;
-        color: #a78bfa;
-        text-shadow: 0 0 10px rgba(139,92,246,0.8);
+        color: #c4b5fd;
       }
       .desktop-read-story .story-emoji {
         display: none;
       }
       .desktop-read-story:hover {
-        background: linear-gradient(135deg, rgba(139,92,246,0.2), rgba(139,92,246,0.06));
-        border-color: rgba(139,92,246,0.55);
-        box-shadow: 0 0 60px rgba(139,92,246,0.2), inset 0 0 40px rgba(139,92,246,0.06);
-        transform: translateY(-1px);
+        background: rgba(139,92,246,0.2);
+        border-color: var(--neon-violet);
+        color: #fff;
       }
     }
 
@@ -1635,12 +1633,18 @@
         font-size: 9px;
         gap: 4px;
         border-radius: 6px;
-        background: linear-gradient(135deg, rgba(139,92,246,0.1), rgba(139,92,246,0.02));
-        border: 1px solid rgba(139, 92, 246, 0.5);
-        box-shadow: 0 0 20px rgba(139, 92, 246, 0.3);
-        color: #d8ccff;
-        text-shadow: 0 0 10px rgba(139,92,246,0.5), 0 0 24px rgba(139,92,246,0.25);
+        background: rgba(139,92,246,0.1);
+        border: 1px solid rgba(139,92,246,0.2);
+        color: #c4b5fd;
+        letter-spacing: 0.1em;
+        text-transform: uppercase;
         margin-top: 0;
+        transition: all 0.3s ease;
+      }
+      .read-story-btn:hover {
+        background: rgba(139,92,246,0.2);
+        border-color: var(--neon-violet);
+        color: #fff;
       }
       .read-story-btn .story-emoji {
         display: none;
