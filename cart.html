@@ -1229,6 +1229,7 @@
           mapLat = latlng.lat;
           mapLng = latlng.lng;
           document.getElementById('loc-pin-coords').textContent = mapLat.toFixed(6) + ', ' + mapLng.toFixed(6);
+          reverseGeocode(mapLat, mapLng);
         });
         document.getElementById('loc-pin-info').classList.add('show');
         document.getElementById('loc-pin-coords').textContent = mapLat.toFixed(6) + ', ' + mapLng.toFixed(6);
@@ -1252,15 +1253,9 @@
           var city = addr.city || addr.town || addr.village || addr.county || '';
           var pincode = addr.postcode || '';
           var state = addr.state || '';
-          if (document.getElementById('loc-address').value === '') {
-            document.getElementById('loc-address').value = street;
-          }
-          if (document.getElementById('loc-city').value === '') {
-            document.getElementById('loc-city').value = city;
-          }
-          if (document.getElementById('loc-pincode').value === '') {
-            document.getElementById('loc-pincode').value = pincode;
-          }
+          document.getElementById('loc-address').value = street;
+          document.getElementById('loc-city').value = city;
+          document.getElementById('loc-pincode').value = pincode;
         })
         .catch(function() {});
     }
