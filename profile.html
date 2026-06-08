@@ -385,13 +385,8 @@
       try {
         var token = YARO_API.getToken();
         if (!token) { showToast('Please sign in first', 'error'); return; }
-        var res = await fetch('/api/auth/profile', {
-          method: 'PUT',
-          headers: { 'Content-Type': 'application/json', 'Authorization': 'Bearer ' + token },
-          body: JSON.stringify({ name: name || undefined, phone: phone || undefined })
-        });
-        var data = await res.json();
-        if (!res.ok) { showToast(data.error || 'Save failed', 'error'); return; }
+        var result = await YARO_API.updateProfile({ name: name || undefined, phone: phone || undefined });
+        if (result.error) { showToast(result.error, 'error'); return; }
         showToast('Profile updated', 'success');
       } catch(e) { showToast('Could not save profile', 'error'); }
     });
