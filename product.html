@@ -220,7 +220,7 @@
         width: 100%;
         justify-content: center;
         align-items: center;
-        margin-top: 24px;
+        margin-bottom: 20px;
         padding: 14px 28px;
         font-size: 12px;
         gap: 10px;
@@ -1781,6 +1781,9 @@
           
           <!-- Right Side: Details, Customize & Actions -->
           <div class="prod-info-wrap" id="prod-info-wrap">
+            <!-- Desktop Read Story (topmost inside frame) -->
+            <button class="read-story-btn desktop-read-story" id="read-story-btn-desktop"><span class="story-emoji">📖</span> Read Story</button>
+
             <div class="prod-meta">
               <span class="prod-category-label" id="category-label"></span>
               <span class="prod-badge" id="product-badge"></span>
@@ -1828,9 +1831,6 @@
               </div>
             </div>
 
-            <!-- Desktop Read Story (hidden on mobile) -->
-            <button class="read-story-btn desktop-read-story" id="read-story-btn-desktop"><span class="story-emoji">📖</span> Read Story</button>
-            
             <!-- Spec Items / Description -->
             <div class="specs-list">
               <div class="spec-item">
