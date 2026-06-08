@@ -174,7 +174,7 @@ async function renderProducts(container) {
     <div class="page-header"><h2>Products</h2><button class="btn btn-primary" onclick="openProductModal()">+ Add Product</button></div>
     <div class="table-wrap"><table>
       <thead><tr><th>Image</th><th>Name</th><th>Slug</th><th>Price</th><th>Stock</th><th>Collection</th><th>Status</th><th>Actions</th></tr></thead>
-      <tbody>${items.map(function(p) { return '<tr><td>' + (p.images && p.images[0] ? '<img class="thumb" src="' + p.images[0] + '">' : '-') + '</td><td>' + esc(p.name) + '</td><td>' + esc(p.slug) + '</td><td>₹' + p.price + '</td><td>' + (p.stock || 0) + '</td><td>' + esc(colMap[p.collection_id] || '-') + '</td><td><span class="badge ' + (p.status === 'active' ? 'badge-success' : 'badge-warning') + '">' + esc(p.status) + '</span></td><td class="actions"><button class="btn btn-sm btn-primary" onclick="openProductModal(\'' + p.id + '\')">Edit</button><button class="btn btn-sm btn-danger" onclick="deleteItem(\'products\',\'' + p.id + '\')">Delete</button></td></tr>'; }).join('')}</tbody>
+      <tbody>${items.map(function(p) { return '<tr><td>' + (p.images && p.images[0] ? '<img class="thumb" src="' + fixImg(p.images[0]) + '">' : '-') + '</td><td>' + esc(p.name) + '</td><td>' + esc(p.slug) + '</td><td>₹' + p.price + '</td><td>' + (p.stock || 0) + '</td><td>' + esc(colMap[p.collection_id] || '-') + '</td><td><span class="badge ' + (p.status === 'active' ? 'badge-success' : 'badge-warning') + '">' + esc(p.status) + '</span></td><td class="actions"><button class="btn btn-sm btn-primary" onclick="openProductModal(\'' + p.id + '\')">Edit</button><button class="btn btn-sm btn-danger" onclick="deleteItem(\'products\',\'' + p.id + '\')">Delete</button></td></tr>'; }).join('')}</tbody>
     </table></div>`;
 }
 
@@ -286,6 +286,11 @@ async function updateOrderStatus(id) {
 }
 
 // ─── HELPERS ───
+function fixImg(src) {
+  if (!src) return '';
+  if (src.startsWith('http://') || src.startsWith('https://') || src.startsWith('/')) return src;
+  return '/' + src;
+}
 function esc(str) {
   var div = document.createElement('div');
   div.appendChild(document.createTextNode(str || ''));
