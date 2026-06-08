@@ -481,78 +481,67 @@
       margin-bottom: 10px;
     }
 
-    .sizes-grid {
+    .size-stepper {
       display: flex;
-      gap: 10px;
-      overflow-x: auto;
-      scroll-snap-type: x mandatory;
-      -ms-overflow-style: none;
-      scrollbar-width: none;
-      padding-bottom: 2px;
+      align-items: center;
+      gap: 8px;
+      padding: 6px 10px;
+      border-radius: 8px;
+      background: rgba(255,255,255,0.01);
+      border: 1px solid rgba(255,255,255,0.04);
+      flex-shrink: 0;
     }
-    .sizes-grid::-webkit-scrollbar { display: none; }
+    .size-stepper .size-label {
+      font-size: 9px;
+      font-weight: 700;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      color: var(--text-muted);
+    }
+    .size-stepper .qty-control {
+      display: flex;
+      align-items: center;
+      gap: 0;
+      border: 1px solid rgba(255,255,255,0.06);
+      border-radius: 5px;
+      overflow: hidden;
+      background: rgba(255,255,255,0.02);
+    }
+    .size-stepper .qty-control .qty-btn {
+      width: 28px;
+      height: 28px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      background: transparent;
+      border: none;
+      color: rgba(255,255,255,0.4);
+      font-size: 13px;
+      cursor: pointer;
+      font-family: inherit;
+      transition: all 0.2s ease;
+      line-height: 1;
+    }
+    .size-stepper .qty-control .qty-btn:hover { color: #fff; background: rgba(255,255,255,0.03); }
+    .size-stepper .qty-control .qty-btn:active { transform: scale(0.9); }
+    .size-stepper .qty-control .qty-value {
+      width: 30px;
+      height: 28px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 12px;
+      font-weight: 600;
+      color: #fff;
+      border-left: 1px solid rgba(255,255,255,0.03);
+      border-right: 1px solid rgba(255,255,255,0.03);
+    }
 
     .sizes-row {
       display: flex;
       align-items: center;
       gap: 14px;
       margin-bottom: 36px;
-    }
-
-    .size-btn {
-      scroll-snap-align: start;
-      flex-shrink: 0;
-      position: relative;
-      width: 44px;
-      height: 44px;
-      border-radius: 8px;
-      background: rgba(255, 255, 255, 0.02);
-      border: 1px solid rgba(255, 255, 255, 0.06);
-      color: #fff;
-      font-family: inherit;
-      font-size: 11px;
-      font-weight: 700;
-      cursor: pointer;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      overflow: hidden;
-      transition: border-color 0.4s ease, transform 0.4s cubic-bezier(0.19, 1, 0.22, 1);
-    }
-
-    /* Swelling circle liquid effect inside size button */
-    .size-btn::before {
-      content: '';
-      position: absolute;
-      top: 50%;
-      left: 50%;
-      width: 80px;
-      height: 80px;
-      background: linear-gradient(135deg, #8b5cf6 0%, #7c3aed 100%);
-      border-radius: 50%;
-      transform: translate(-50%, -50%) scale(0);
-      transition: transform 0.6s cubic-bezier(0.19, 1, 0.22, 1);
-      z-index: 1;
-      pointer-events: none;
-    }
-
-    .size-btn span {
-      position: relative;
-      z-index: 2;
-      transition: color 0.3s ease;
-    }
-
-    .size-btn:hover {
-      transform: translateY(-2px);
-      border-color: rgba(139, 92, 246, 0.4);
-    }
-
-    .size-btn.active::before {
-      transform: translate(-50%, -50%) scale(1.2);
-    }
-
-    .size-btn.active {
-      border-color: var(--neon-violet);
     }
 
     .showcase-rating {
@@ -1602,6 +1591,23 @@
         gap: 8px;
         margin-bottom: 20px;
       }
+      .size-stepper {
+        padding: 4px 8px;
+        gap: 6px;
+      }
+      .size-stepper .size-label {
+        font-size: 8px;
+      }
+      .size-stepper .qty-control .qty-btn {
+        width: 22px;
+        height: 22px;
+        font-size: 10px;
+      }
+      .size-stepper .qty-control .qty-value {
+        width: 22px;
+        height: 22px;
+        font-size: 10px;
+      }
       .sizes-row .qty-selector {
         padding: 4px 8px;
         gap: 6px;
@@ -1855,12 +1861,13 @@
             <!-- Size Section -->
             <div class="size-section-label" style="margin-top: 24px;">Select Fit Size</div>
             <div class="sizes-row">
-              <div class="sizes-grid" id="sizes-grid">
-                <button class="size-btn"><span>S</span></button>
-                <button class="size-btn active"><span>M</span></button>
-                <button class="size-btn"><span>L</span></button>
-                <button class="size-btn"><span>XL</span></button>
-                <button class="size-btn"><span>XXL</span></button>
+              <div class="size-stepper">
+                <span class="size-label">Size</span>
+                <div class="qty-control">
+                  <button class="qty-btn" id="pd-size-dec">−</button>
+                  <span class="qty-value" id="pd-size-current">M</span>
+                  <button class="qty-btn" id="pd-size-inc">+</button>
+                </div>
               </div>
               <div class="qty-selector">
                 <span class="qty-label">Qty</span>
@@ -2254,16 +2261,17 @@
     productPrice.textContent = activeProduct.price;
     productDesc.textContent = activeProduct.desc;
 
-    // ─── INTERACTIVE SIZE BTNS ───
-    const sizeBtns = document.querySelectorAll('.size-btn');
-    sizeBtns.forEach(btn => {
-      btn.addEventListener('click', () => {
-        sizeBtns.forEach(b => b.classList.remove('active'));
-        btn.classList.add('active');
-        
-        // Premium tactile click bounce
-        gsap.fromTo(btn, { scale: 0.95 }, { scale: 1, duration: 0.35, ease: 'elastic.out(1, 0.3)' });
-      });
+    // ─── SIZE STEPPER ───
+    var sizes = ['S', 'M', 'L', 'XL', 'XXL'];
+    var currentSizeIndex = 1;
+    function updateSizeDisplay() { document.getElementById('pd-size-current').textContent = sizes[currentSizeIndex]; }
+    document.getElementById('pd-size-inc').addEventListener('click', function() {
+      if (currentSizeIndex < sizes.length - 1) currentSizeIndex++;
+      updateSizeDisplay();
+    });
+    document.getElementById('pd-size-dec').addEventListener('click', function() {
+      if (currentSizeIndex > 0) currentSizeIndex--;
+      updateSizeDisplay();
     });
 
     // ─── RENDER GALLERY THUMBNAILS ───
@@ -2385,7 +2393,7 @@
 
     // ─── GET SELECTED SIZE ───
     function getSelectedSize() {
-      return (document.querySelector('.size-btn.active') || {}).textContent || 'M';
+      return document.getElementById('pd-size-current').textContent || 'M';
     }
 
     // ─── PAGE QUANTITY SELECTOR ───
