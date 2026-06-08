@@ -9,7 +9,7 @@
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.cdnfonts.com/css/pilowlava" rel="stylesheet">
   <link href="https://api.fontshare.com/v2/css?f[]=clash-display@200,300,400,500,600,700&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.min.css" />
   <style>
     * { margin: 0; padding: 0; box-sizing: border-box; }
 
@@ -301,8 +301,8 @@
     .loc-input::placeholder { color: rgba(255,255,255,0.15); }
     .loc-row { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
     .loc-map-wrap {
-      border-radius: 12px; overflow: hidden; border: 1px solid rgba(255,255,255,0.04);
-      height: 320px; position: relative;
+      border-radius: 12px; overflow: hidden; border: 1px solid rgba(139,92,246,0.15);
+      height: 320px; position: relative; background: #0a0a12;
     }
     .loc-map-wrap #map {
       width: 100%; height: 100%;
@@ -824,7 +824,7 @@
 
   <script src="js/api.js"></script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/gsap.min.js"></script>
-  <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.min.js"></script>
   <script>
     // ─── PRODUCTS DATABASE ───
     var productsDB = YARO_API.getFallbackProducts().map(function(p) {
@@ -1215,9 +1215,15 @@
     // ─── MAP INIT ───
     function initMap() {
       var mapEl = document.getElementById('map');
-      if (!mapEl) return;
+      if (!mapEl) { console.warn('Map element not found'); return; }
+      if (typeof L === 'undefined') { console.error('Leaflet not loaded'); return; }
       map = L.map('map', { zoomControl: true, attributionControl: false }).setView([20.5937, 78.9629], 5);
-      L.tileLayer('https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png', { maxZoom: 19 }).addTo(map);
+      L.tileLayer('https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png', {
+        maxZoom: 19
+      }).addTo(map);
+      // Force map to recalculate after layout settles
+      setTimeout(function() { map.invalidateSize(); }, 200);
+      setTimeout(function() { map.invalidateSize(); }, 600);
 
       map.on('click', function(e) {
         mapLat = e.latlng.lat;
