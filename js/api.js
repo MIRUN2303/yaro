@@ -5,7 +5,7 @@
 
 const YARO_API = (function() {
 
-  var BASE = '/api';
+  var BASE = 'http://localhost:3000/api';
   var token = null;
 
   // ─── FALLBACK DATA (matches existing frontend productsDB exactly) ───
