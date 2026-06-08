@@ -747,8 +747,24 @@
       border-radius: 8px;
       background: rgba(255,255,255,0.01);
       border: 1px solid rgba(255,255,255,0.04);
-      margin-left: auto;
       flex-shrink: 0;
+    }
+
+    .qty-wrap {
+      display: flex;
+      flex-direction: column;
+      align-items: flex-end;
+      gap: 4px;
+      margin-left: auto;
+    }
+
+    .qty-section-label {
+      font-size: 9px;
+      font-weight: 700;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      color: var(--text-muted);
+      white-space: nowrap;
     }
     .qty-selector .qty-label {
       font-size: 9px;
@@ -1610,7 +1626,6 @@
       }
       .sizes-row .qty-selector {
         padding: 4px 8px;
-        gap: 6px;
       }
       .sizes-row .qty-selector .qty-label {
         font-size: 8px;
@@ -1624,6 +1639,9 @@
         width: 22px;
         height: 22px;
         font-size: 10px;
+      }
+      .qty-section-label {
+        font-size: 8px;
       }
       .sug-card {
         width: calc(50% - 10px);
@@ -1863,12 +1881,14 @@
                   <button class="qty-btn" id="pd-size-inc">+</button>
                 </div>
               </div>
-              <div class="qty-selector">
-                <span class="qty-label">Qty</span>
-                <div class="qty-control">
-                  <button class="qty-btn" id="pd-qty-dec">−</button>
-                  <span class="qty-value" id="pd-qty-count">0</span>
-                  <button class="qty-btn" id="pd-qty-inc">+</button>
+              <div class="qty-wrap">
+                <div class="qty-section-label">Select Quantity</div>
+                <div class="qty-selector">
+                  <div class="qty-control">
+                    <button class="qty-btn" id="pd-qty-dec">−</button>
+                    <span class="qty-value" id="pd-qty-count">0</span>
+                    <button class="qty-btn" id="pd-qty-inc">+</button>
+                  </div>
                 </div>
               </div>
             </div>
