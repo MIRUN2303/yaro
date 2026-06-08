@@ -497,6 +497,8 @@
       white-space: nowrap;
     }
 
+    .rupee { color: var(--neon-violet); }
+
     .showcase-rating {
       position: absolute;
       top: 10px;
@@ -2199,7 +2201,7 @@
     productBadge.textContent = activeProduct.badge;
     productBadge.className = `prod-badge ${activeProduct.badgeClass}`;
     productTitle.textContent = activeProduct.name;
-    productPrice.textContent = activeProduct.price;
+    productPrice.innerHTML = activeProduct.price.replace(/₹/g, '<span class="rupee">₹</span>');
     productDesc.textContent = activeProduct.desc;
 
     // ─── SIZE STEPPER ───
@@ -2655,7 +2657,7 @@
           discountHtml = ` <span class="discount-tag">${p.offerName || 'Sale'} -${pct}%</span>`;
         }
       }
-      priceEl.innerHTML = `<span class="offer-price">${p.price}</span>${p.originalPrice ? ` <span class="orig-price">${p.originalPrice}</span>` : ''}${discountHtml}`;
+      priceEl.innerHTML = `<span class="offer-price">${p.price.replace(/₹/g, '<span class="rupee">₹</span>')}</span>${p.originalPrice ? ` <span class="orig-price">${p.originalPrice}</span>` : ''}${discountHtml}`;
       if (reviews.length === 0) {
         ratingEl.innerHTML = '';
         return;

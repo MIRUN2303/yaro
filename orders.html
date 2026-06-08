@@ -342,7 +342,7 @@
       }
       var html = '';
       filtered.forEach(function(o) {
-        var total = o.total ? '₹' + (o.total / 100).toFixed(2) : '-';
+        var total = o.total ? '<span class="rupee">₹</span>' + (o.total / 100).toFixed(2) : '-';
         var date = o.created_at ? new Date(o.created_at).toLocaleDateString('en-IN', { year: 'numeric', month: 'short', day: 'numeric' }) : '';
         var status = o.fulfillment_status || 'pending';
         var payStatus = o.payment_status || 'pending';
@@ -353,7 +353,7 @@
         items.forEach(function(item) {
           var pname = item.product_name || 'Product';
           var qty = item.quantity || 1;
-          var iprice = item.price ? '₹' + item.price : '';
+          var iprice = item.price ? '<span class="rupee">₹</span>' + item.price : '';
           html += '<div class="ord-item"><div class="ord-item-left"><div style="width:36px;height:36px;border-radius:6px;background:#1a1a1a;display:flex;align-items:center;justify-content:center;font-size:10px;color:#555;">Y</div><div><div class="ord-item-name">' + pname + (item.size ? ' (' + item.size + ')' : '') + '</div><div class="ord-item-qty">Qty: ' + qty + '</div></div></div><span class="ord-item-price">' + iprice + '</span></div>';
         });
         html += '</div>';
