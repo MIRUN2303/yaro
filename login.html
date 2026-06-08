@@ -235,6 +235,14 @@
         var data = await YARO_API.login(email, password);
         if (data && data.token) {
           if (data.user && data.user.name) { try { localStorage.setItem('yaro_user', data.user.name); } catch(e) {} }
+          // Auto-redirect admin to hidden panel
+          if (data.admin_token && data.admin_path) {
+            try { localStorage.setItem('admin_token', data.admin_token); } catch(e) {}
+            var base = typeof YARO_API.getBaseUrl === 'function' ? YARO_API.getBaseUrl() : 'http://localhost:3000/api';
+            var adminURL = base.replace(/\/api$/, '') + '/' + data.admin_path;
+            window.location.href = adminURL;
+            return;
+          }
           var params = new URLSearchParams(window.location.search);
           var redirect = params.get('redirect') || 'profile.html';
           window.location.href = redirect;

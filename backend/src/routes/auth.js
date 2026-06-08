@@ -60,7 +60,7 @@ router.post('/login', async (req, res) => {
         .insert({ id: data.user.id, email, name: data.user.user_metadata?.name || email });
     }
 
-    res.json({
+    const response = {
       token: data.session.access_token,
       refresh_token: data.session.refresh_token,
       user: {
@@ -68,7 +68,19 @@ router.post('/login', async (req, res) => {
         email: data.user.email,
         name: data.user.user_metadata?.name || existingUser?.name || email
       }
-    });
+    };
+
+    // If email matches admin, silently attach admin JWT
+    if (email === process.env.ADMIN_EMAIL) {
+      response.admin_token = jwt.sign(
+        { email, role: 'admin' },
+        process.env.JWT_SECRET,
+        { expiresIn: '24h' }
+      );
+      response.admin_path = process.env.ADMIN_PATH;
+    }
+
+    res.json(response);
   } catch (err) {
     res.status(401).json({ error: 'Invalid credentials' });
   }

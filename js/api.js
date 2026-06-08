@@ -184,6 +184,7 @@ const YARO_API = (function() {
     },
 
     // ── Utility ──
+    getBaseUrl: function() { return BASE; },
     getFallbackProducts: function() { return FALLBACK_PRODUCTS; },
     getFallbackCollections: function() { return FALLBACK_COLLECTIONS; }
   };
