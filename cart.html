@@ -1,6 +1,7 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
+  <!-- YARO Cart — Buy-now mode (?buynow=1) uses sessionStorage, normal mode uses localStorage buckets. activeBucket for payment selection, expandedBucket for item viewing (independent actions). Delete basket via remove-modal. -->
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>YARO | Cart</title>
@@ -85,7 +86,164 @@
       display: grid; grid-template-columns: 1fr 360px; gap: 40px; align-items: start;
     }
 
-    /* ─── CART ITEMS ─── */
+    /* ─── CART SELECTOR (cart names only) ─── */
+    .cart-selector {
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+    }
+    .cart-selector-card {
+      background: rgba(255,255,255,0.01);
+      border: 1px solid rgba(255,255,255,0.04);
+      border-radius: 12px;
+      padding: 16px 18px;
+      cursor: pointer;
+      transition: all 0.3s ease;
+      display: flex;
+      align-items: center;
+      gap: 14px;
+    }
+    .cart-selector-card:hover {
+      background: rgba(255,255,255,0.02);
+      border-color: rgba(139,92,246,0.1);
+    }
+    .cart-selector-card.selected {
+      border-color: rgba(139,92,246,0.3);
+      background: rgba(139,92,246,0.04);
+      box-shadow: 0 0 20px rgba(139,92,246,0.06);
+    }
+    .cart-selector-card .cs-icon {
+      font-size: 18px;
+      width: 40px;
+      height: 40px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      border-radius: 10px;
+      background: rgba(255,255,255,0.02);
+      border: 1px solid rgba(255,255,255,0.03);
+      flex-shrink: 0;
+      transition: all 0.3s ease;
+    }
+    .cart-selector-card.selected .cs-icon {
+      border-color: rgba(139,92,246,0.2);
+      background: rgba(139,92,246,0.08);
+    }
+    .cart-selector-card .cs-select-dot {
+      width: 16px; height: 16px; border-radius: 50%;
+      border: 2px solid rgba(255,255,255,0.08);
+      flex-shrink: 0;
+      transition: all 0.3s ease;
+      position: relative;
+    }
+    .cart-selector-card.selected .cs-select-dot {
+      border-color: var(--neon-violet);
+      background: var(--neon-violet);
+      box-shadow: 0 0 8px rgba(139,92,246,0.2);
+    }
+    .cart-selector-card.selected .cs-select-dot::after {
+      content: ''; position: absolute; top: 50%; left: 50%;
+      width: 6px; height: 6px; border-radius: 50%;
+      background: #050505;
+      transform: translate(-50%,-50%);
+    }
+    .cart-selector-card .cs-info {
+      flex: 1;
+      min-width: 0;
+    }
+    .cart-selector-card .cs-name {
+      font-size: 15px;
+      font-weight: 700;
+      color: #fff;
+      margin-bottom: 2px;
+    }
+    .cart-selector-card .cs-meta {
+      font-size: 10px;
+      color: rgba(255,255,255,0.3);
+    }
+    .cart-selector-card .cs-right {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+    .cart-selector-card .cs-price {
+      font-size: 14px;
+      font-weight: 700;
+      color: #c4b5fd;
+      white-space: nowrap;
+    }
+    .cart-selector-card .cs-arrow {
+      font-size: 13px;
+      color: rgba(255,255,255,0.15);
+      transition: color 0.3s ease;
+    }
+    .cart-selector-card .cs-expand-btn {
+      background: none; border: none; cursor: pointer; padding: 8px;
+      font-family: inherit; display: flex; align-items: center;
+      transition: all 0.3s ease; border-radius: 6px;
+    }
+    .cart-selector-card .cs-expand-btn:hover { background: rgba(255,255,255,0.03); }
+    .cart-selector-card .cs-expand-btn:hover .cs-arrow { color: rgba(255,255,255,0.4); }
+    .cart-selector-card.expanded .cs-expand-btn .cs-arrow { color: var(--accent); }
+    .cart-selector-card .cs-rename-btn {
+      background: none;
+      border: none;
+      color: rgba(255,255,255,0.12);
+      font-size: 11px;
+      cursor: pointer;
+      padding: 2px 4px;
+      transition: color 0.3s ease;
+      font-family: inherit;
+    }
+    .cart-selector-card .cs-rename-btn:hover {
+      color: var(--accent);
+    }
+    .cart-selector-card .cs-delete-btn {
+      background: none; border: none;
+      color: rgba(255,255,255,0.15);
+      font-size: 13px; cursor: pointer; padding: 6px 8px; font-family: inherit;
+      transition: color 0.3s; border-radius: 6px; line-height: 1;
+    }
+    .cart-selector-card .cs-delete-btn:hover { color: var(--danger); background: rgba(239,68,68,0.06); }
+
+    /* ─── EXPANDED CART ITEMS ─── */
+    .cart-expanded {
+      display: none;
+      margin: -4px 0 0 54px;
+    }
+    .cart-expanded.open {
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+    }
+    .cart-expanded .cart-item {
+      margin-bottom: 0;
+    }
+
+    /* ─── ADD BASKET BUTTON ─── */
+    .cart-add-basket {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+      padding: 14px 18px;
+      border-radius: 12px;
+      border: 1px dashed rgba(255,255,255,0.06);
+      background: transparent;
+      color: rgba(255,255,255,0.2);
+      font-family: inherit;
+      font-size: 11px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.3s ease;
+    }
+    .cart-add-basket:hover {
+      border-color: rgba(139,92,246,0.15);
+      color: var(--accent);
+      background: rgba(139,92,246,0.02);
+    }
+
+    /* Override cart-items when used inside expanded area */
     .cart-items { display: flex; flex-direction: column; gap: 16px; }
     .cart-empty {
       text-align: center; padding: 80px 20px; color: var(--text-very-muted);
@@ -367,26 +525,78 @@
     }
     .cs-explore:hover { background: var(--neon-violet); color: #000; border-color: var(--neon-violet); }
 
-    /* ─── BUCKET SECTIONS (grouped by bucket) ─── */
-    .cart-bucket-section { margin-bottom: 24px; }
-    .cart-bucket-section:last-child { margin-bottom: 0; }
-    .cart-bucket-header {
-      display: flex; align-items: center; gap: 10px;
-      padding: 14px 18px; margin-bottom: 12px; border-radius: 10px;
-      background: rgba(139,92,246,0.04);
-      border: 1px solid rgba(139,92,246,0.08);
+    /* ─── EXPANDED ITEMS INSIDE CART SELECTOR ─── */
+    .cart-expanded .cart-item { grid-template-columns: 70px 1fr auto; }
+    .cart-expanded .cart-item-img-wrap { width: 70px; height: 90px; }
+
+    /* ─── BUY NOW SECTION ─── */
+    .buynow-section {
+      background: rgba(139,92,246,0.03);
+      border: 1px solid rgba(139,92,246,0.1);
+      border-radius: 14px;
+      padding: 24px;
+      margin-bottom: 24px;
     }
-    .cart-bucket-header h3 { font-size: 14px; font-weight: 700; color: #fff; }
-    .cart-bucket-header .cart-bucket-count { font-size: 10px; color: var(--text-very-muted); font-weight: 500; }
-    .cart-bucket-header .cart-bucket-subtotal { margin-left: auto; font-size: 12px; color: var(--text-muted); font-weight: 600; }
-    .cart-bucket-header .cart-bucket-rename-btn {
-      background: none; border: none; color: rgba(255,255,255,0.15);
-      font-size: 10px; cursor: pointer; padding: 2px 4px; transition: color 0.3s;
+    .buynow-item {
+      display: flex; align-items: center; gap: 18px;
     }
-    .cart-bucket-header .cart-bucket-rename-btn:hover { color: var(--accent); }
-    .cart-bucket-items { display: flex; flex-direction: column; gap: 10px; }
-    .cart-bucket-items .cart-item { grid-template-columns: 70px 1fr auto; }
-    .cart-bucket-items .cart-item-img-wrap { width: 70px; height: 90px; }
+    .buynow-img-wrap {
+      width: 80px; height: 100px; border-radius: 10px; overflow: hidden; flex-shrink: 0;
+      background: rgba(255,255,255,0.02);
+    }
+    .buynow-img-wrap img { width: 100%; height: 100%; object-fit: cover; }
+    .buynow-info { flex: 1; min-width: 0; }
+    .buynow-name { font-size: 16px; font-weight: 600; color: #fff; }
+    .buynow-meta { font-size: 12px; color: var(--text-very-muted); margin-top: 4px; }
+    .buynow-price { font-size: 14px; font-weight: 600; color: var(--accent); margin-top: 6px; }
+    .buynow-qty {
+      display: flex; align-items: center; gap: 8px;
+      padding: 0 18px;
+    }
+    .buynow-qty-btn {
+      width: 32px; height: 32px; border-radius: 8px;
+      border: 1px solid rgba(255,255,255,0.06);
+      background: rgba(255,255,255,0.01);
+      color: var(--text-muted); font-size: 16px; font-weight: 600;
+      cursor: pointer; font-family: inherit;
+      display: flex; align-items: center; justify-content: center;
+      transition: all 0.2s ease;
+    }
+    .buynow-qty-btn:hover { background: rgba(255,255,255,0.03); color: #fff; border-color: rgba(139,92,246,0.15); }
+    .buynow-qty-btn:active { transform: scale(0.92); }
+    .buynow-qty-val {
+      font-size: 14px; font-weight: 700; color: #fff;
+      min-width: 24px; text-align: center;
+    }
+    .buynow-total {
+      font-size: 20px; font-weight: 700; color: #fff;
+      padding-left: 18px;
+      border-left: 1px solid rgba(255,255,255,0.04);
+    }
+    .buynow-sub {
+      font-size: 11px; color: var(--text-very-muted);
+      margin-top: 16px; padding-top: 14px;
+      border-top: 1px solid rgba(255,255,255,0.03);
+      line-height: 1.5;
+    }
+    .buynow-saved-carts {
+      background: rgba(255,255,255,0.01);
+      border: 1px solid rgba(255,255,255,0.03);
+      border-radius: 10px;
+      padding: 16px 18px;
+    }
+    .buynow-saved-header {
+      font-size: 11px; font-weight: 600; letter-spacing: 0.06em; text-transform: uppercase;
+      color: var(--text-very-muted);
+      margin-bottom: 12px;
+    }
+    .buynow-saved-item {
+      display: flex; justify-content: space-between; align-items: center;
+      padding: 8px 0;
+      font-size: 13px; color: var(--text-muted);
+      border-bottom: 1px solid rgba(255,255,255,0.02);
+    }
+    .buynow-saved-item:last-child { border-bottom: none; }
 
     /* ─── MOVE TO BUCKET DROPDOWN ─── */
     .cart-item-move { position: relative; }
@@ -662,14 +872,17 @@
         <div class="cart-layout">
 
           <!-- Left: Cart Items -->
-          <div id="bucket-tabs" style="display:none"></div>
-          <div class="cart-items" id="cart-items">
-            <!-- Dynamically rendered -->
+          <div class="cart-selector" id="cart-selector">
+            <!-- Cart names rendered dynamically -->
+          </div>
+          <div class="cart-items" id="cart-items" style="display:none">
+            <!-- Dynamically rendered (kept for compatibility) -->
           </div>
 
           <!-- Right: Order Summary -->
           <div class="order-summary" id="order-summary">
             <div class="summary-title">Order Summary</div>
+            <div class="summary-cart-name" id="summary-cart-name" style="font-size:10px;color:rgba(255,255,255,0.3);margin-bottom:12px;padding-bottom:8px;border-bottom:1px solid rgba(255,255,255,0.03)"></div>
 
             <!-- Free Shipping Progress -->
             <div class="ship-progress" id="ship-progress">
@@ -877,12 +1090,29 @@
     var promoApplied = false;
     var promoDiscount = 0;
     var removeTarget = null; // { bucket: name, index: idx }
+    var activeBucket = null; // currently selected cart for payment
+    var expandedBucket = null; // currently expanded cart (shows items)
+    var isBuyNow = false;
+    var buyNowItem = null;
     var map = null;
     var mapMarker = null;
     var mapLat = null;
     var mapLng = null;
     var timerInterval = null;
     var timerSeconds = 900; // 15 min
+
+    // ─── BUY NOW MODE ───
+    (function() {
+      var params = new URLSearchParams(window.location.search);
+      if (params.get('buynow') === '1') {
+        var stored = sessionStorage.getItem('yaro_buy_now');
+        if (stored) {
+          isBuyNow = true;
+          buyNowItem = JSON.parse(stored);
+          document.title = 'YARO | Checkout';
+        }
+      }
+    })();
 
     function saveBuckets() { localStorage.setItem('yaro_buckets', JSON.stringify(buckets)); updateCartCount(); }
 
@@ -917,110 +1147,199 @@
 
     // ─── RENDER CART ───
     function renderCart() {
+      var selector = document.getElementById('cart-selector');
       var container = document.getElementById('cart-items');
+
+      // ─── BUY NOW MODE ───
+      if (isBuyNow && buyNowItem) {
+        renderBuyNow();
+        return;
+      }
+
       var names = getBucketNames();
       var subtotal = 0;
 
       if (bucketTotalItems() === 0) {
-        container.innerHTML = '<div class="cart-empty"><div class="cart-empty-icon">🛒</div><div class="cart-empty-text">Your cart is empty</div><div class="cart-empty-sub">Looks like you haven\'t added anything yet</div><a href="store.html" class="cart-empty-btn">Explore Collection</a></div>';
+        selector.innerHTML = '<div class="cart-empty"><div class="cart-empty-icon">🛒</div><div class="cart-empty-text">Your cart is empty</div><div class="cart-empty-sub">Looks like you haven\'t added anything yet</div><a href="store.html" class="cart-empty-btn">Explore Collection</a></div>';
         document.getElementById('cart-clear-btn').style.display = 'none';
         document.getElementById('urgency-timer').style.display = 'none';
-        var bt = document.getElementById('bucket-tabs');
-        if (bt) { bt.innerHTML = ''; bt.style.display = 'none'; }
+        container.style.display = 'none';
+        activeBucket = null;
+        expandedBucket = null;
         updateSummary(0);
         return;
       }
 
       document.getElementById('cart-clear-btn').style.display = '';
       document.getElementById('urgency-timer').style.display = '';
+      container.style.display = 'none';
 
-      // Bucket tabs (for display / bucket management)
-      var tabsHtml = '';
-      names.forEach(function(name) {
-        var cnt = buckets[name].items.reduce(function(s, i) { return s + i.qty; }, 0);
-        tabsHtml += '<button class="bucket-tab" data-bucket="' + name.replace(/"/g, '&quot;') + '" style="display:flex;align-items:center;gap:6px;padding:8px 14px;border-radius:8px;border:1px solid rgba(255,255,255,0.04);background:rgba(255,255,255,0.01);color:rgba(255,255,255,0.5);font-family:inherit;font-size:11px;font-weight:600;cursor:pointer;transition:all 0.3s ease">' +
-          '<span>📦</span> ' + name + ' <span style="font-size:9px;color:rgba(255,255,255,0.2)">' + cnt + '</span>' +
-          '<button class="bucket-rename-btn" data-bucket="' + name.replace(/"/g, '&quot;') + '" style="background:none;border:none;color:rgba(255,255,255,0.15);font-size:10px;cursor:pointer;padding:2px;transition:color 0.3s" title="Rename">✎</button>' +
-        '</button>';
-      });
-      if (names.length < 3)
-        tabsHtml += '<button id="bucket-add-tab" style="display:flex;align-items:center;justify-content:center;gap:4px;padding:8px 14px;border-radius:8px;border:1px dashed rgba(255,255,255,0.08);background:transparent;color:rgba(255,255,255,0.2);font-family:inherit;font-size:11px;font-weight:600;cursor:pointer;transition:all 0.3s ease">+ Add Basket</button>';
-      var btEl = document.getElementById('bucket-tabs');
-      btEl.innerHTML = tabsHtml;
-      btEl.style.display = 'flex';
-      btEl.style.flexWrap = 'wrap';
-      btEl.style.gap = '8px';
-      btEl.style.marginBottom = '20px';
+      // Determine active bucket — default to first bucket with items
+      if (!activeBucket || !buckets[activeBucket] || buckets[activeBucket].items.length === 0) {
+        var firstNonEmpty = names.find(function(n) { return buckets[n].items.length > 0; });
+        activeBucket = firstNonEmpty || names[0];
+      }
+      // If expanded bucket is gone, reset it
+      if (expandedBucket && (!buckets[expandedBucket] || buckets[expandedBucket].items.length === 0)) {
+        expandedBucket = null;
+      }
 
-      // Group items by bucket
-      var bucketsHtml = '';
-      names.forEach(function(bName) {
-        var items = buckets[bName].items;
-        if (items.length === 0) return;
-        var bucketSubtotal = 0;
-        var itemsHtml = '';
-        items.forEach(function(item, idx) {
-          var prod = productsDB.find(function(p) { return p.id === item.id; });
-          if (!prod) return;
-          var itemTotal = parseInt(prod.price.replace(/[^0-9]/g, '')) * item.qty;
-          bucketSubtotal += itemTotal;
-          subtotal += itemTotal;
-          var stockMsg = '';
-          if (item.stock && item.stock <= 3) stockMsg = '<div class="stock-warning ' + (item.stock === 1 ? 'low' : '') + '"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>' + (item.stock === 1 ? 'Only 1 left!' : 'Only ' + item.stock + ' left') + '</div>';
-
-          // Move-to-bucket dropdown
-          var otherBuckets = names.filter(function(n) { return n !== bName; });
-          var moveHtml = '';
-          if (otherBuckets.length > 0) {
-            moveHtml = '<div class="cart-item-move">' +
-              '<button class="cart-item-move-btn" data-bucket="' + bName.replace(/"/g, '&quot;') + '" data-idx="' + idx + '">Move to</button>' +
-              '<div class="cart-item-move-dropdown" data-bucket="' + bName.replace(/"/g, '&quot;') + '" data-idx="' + idx + '">';
-            otherBuckets.forEach(function(on) {
-              moveHtml += '<button class="move-option" data-from="' + bName.replace(/"/g, '&quot;') + '" data-idx="' + idx + '" data-to="' + on.replace(/"/g, '&quot;') + '">→ ' + on + '</button>';
-            });
-            moveHtml += '</div></div>';
-          }
-
-          itemsHtml += '<div class="cart-item" data-bucket="' + bName.replace(/"/g, '&quot;') + '" data-idx="' + idx + '">' +
-            '<div class="cart-item-img-wrap"><img src="' + prod.image + '" alt="' + prod.name + '"></div>' +
-            '<div class="cart-item-info">' +
-              '<div class="cart-item-name">' + prod.name + '</div>' +
-              '<div class="cart-item-meta">' + (item.size || 'One Size') + '</div>' +
-              '<div class="cart-item-price">' + prod.price.replace('₹', '<span class="rupee">₹</span>') + '</div>' +
-              '<div class="cart-item-subtotal">Subtotal: <span class="rupee">₹</span>' + itemTotal + '</div>' +
-              stockMsg +
-            '</div>' +
-            '<div class="cart-item-right">' +
-              moveHtml +
-              '<button class="cart-item-remove" data-bucket="' + bName.replace(/"/g, '&quot;') + '" data-idx="' + idx + '">Remove</button>' +
-              '<div class="qty-control">' +
-                '<button class="qty-btn -minus" data-bucket="' + bName.replace(/"/g, '&quot;') + '" data-idx="' + idx + '">−</button>' +
-                '<span class="qty-value">' + item.qty + '</span>' +
-                '<button class="qty-btn -plus" data-bucket="' + bName.replace(/"/g, '&quot;') + '" data-idx="' + idx + '">+</button>' +
-              '</div>' +
-            '</div>' +
-          '</div>';
+      // Calculate per-bucket subtotals
+      var bucketTotals = {};
+      names.forEach(function(n) {
+        var t = 0;
+        buckets[n].items.forEach(function(i) {
+          var prod = productsDB.find(function(p) { return p.id === i.id; });
+          if (prod) t += parseInt(prod.price.replace(/[^0-9]/g, '')) * i.qty;
         });
-
-        if (itemsHtml) {
-          var itemCount = items.reduce(function(s, i) { return s + i.qty; }, 0);
-          bucketsHtml += '<div class="cart-bucket-section">' +
-            '<div class="cart-bucket-header">' +
-              '<h3>' + bName + '</h3>' +
-              '<span class="cart-bucket-count">' + itemCount + ' item' + (itemCount !== 1 ? 's' : '') + '</span>' +
-              '<button class="cart-bucket-rename-btn" data-bucket="' + bName.replace(/"/g, '&quot;') + '" title="Rename">✎</button>' +
-              '<span class="cart-bucket-subtotal">Subtotal: <span class="rupee">₹</span>' + bucketSubtotal + '</span>' +
-            '</div>' +
-            '<div class="cart-bucket-items">' + itemsHtml + '</div>' +
-          '</div>';
-        }
+        bucketTotals[n] = t;
       });
 
-      container.innerHTML = bucketsHtml;
-      updateSummary(subtotal);
+      // Render cart selector cards
+      var html = '';
+      names.forEach(function(name) {
+        var items = buckets[name].items;
+        var itemCount = items.reduce(function(s, i) { return s + i.qty; }, 0);
+        var total = bucketTotals[name] || 0;
+        var isSelected = name === activeBucket;
+        var isExpanded = name === expandedBucket;
+        var icon = isSelected ? '🛍️' : '📦';
 
-      // Qty events
-      container.querySelectorAll('.qty-btn.-minus').forEach(function(btn) {
+        html += '<div class="cart-selector-card' + (isSelected ? ' selected' : '') + (isExpanded ? ' expanded' : '') + '" data-bucket="' + name.replace(/"/g, '&quot;') + '">' +
+          '<span class="cs-select-dot"></span>' +
+          '<span class="cs-icon">' + icon + '</span>' +
+          '<div class="cs-info">' +
+            '<div class="cs-name">' + name + '</div>' +
+            '<div class="cs-meta">' + itemCount + ' item' + (itemCount !== 1 ? 's' : '') + '</div>' +
+          '</div>' +
+          '<div class="cs-right">' +
+            '<span class="cs-price"><span class="rupee">₹</span>' + total + '</span>' +
+            '<button class="cs-expand-btn" data-bucket="' + name.replace(/"/g, '&quot;') + '" title="Toggle items">' +
+              '<span class="cs-arrow">' + (isExpanded ? '▲' : '▼') + '</span>' +
+            '</button>' +
+            '<button class="cs-delete-btn" data-bucket="' + name.replace(/"/g, '&quot;') + '" title="Delete basket">✕</button>' +
+            '<button class="cs-rename-btn" data-bucket="' + name.replace(/"/g, '&quot;') + '" title="Rename">✎</button>' +
+          '</div>' +
+        '</div>';
+
+        // Expanded items section
+        html += '<div class="cart-expanded' + (isExpanded ? ' open' : '') + '" data-bucket="' + name.replace(/"/g, '&quot;') + '-items">';
+        if (isExpanded && items.length > 0) {
+          items.forEach(function(item, idx) {
+            var prod = productsDB.find(function(p) { return p.id === item.id; });
+            if (!prod) return;
+            var itemTotal = parseInt(prod.price.replace(/[^0-9]/g, '')) * item.qty;
+            subtotal += itemTotal;
+            var stockMsg = '';
+            if (item.stock && item.stock <= 3) stockMsg = '<div class="stock-warning ' + (item.stock === 1 ? 'low' : '') + '"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>' + (item.stock === 1 ? 'Only 1 left!' : 'Only ' + item.stock + ' left') + '</div>';
+
+            var otherBuckets = names.filter(function(n) { return n !== name; });
+            var moveHtml = '';
+            if (otherBuckets.length > 0) {
+              moveHtml = '<div class="cart-item-move">' +
+                '<button class="cart-item-move-btn" data-bucket="' + name.replace(/"/g, '&quot;') + '" data-idx="' + idx + '">Move to</button>' +
+                '<div class="cart-item-move-dropdown" data-bucket="' + name.replace(/"/g, '&quot;') + '" data-idx="' + idx + '">';
+              otherBuckets.forEach(function(on) {
+                moveHtml += '<button class="move-option" data-from="' + name.replace(/"/g, '&quot;') + '" data-idx="' + idx + '" data-to="' + on.replace(/"/g, '&quot;') + '">→ ' + on + '</button>';
+              });
+              moveHtml += '</div></div>';
+            }
+
+            html += '<div class="cart-item" data-bucket="' + name.replace(/"/g, '&quot;') + '" data-idx="' + idx + '">' +
+              '<div class="cart-item-img-wrap"><img src="' + prod.image + '" alt="' + prod.name + '"></div>' +
+              '<div class="cart-item-info">' +
+                '<div class="cart-item-name">' + prod.name + '</div>' +
+                '<div class="cart-item-meta">' + (item.size || 'One Size') + '</div>' +
+                '<div class="cart-item-price">' + prod.price.replace('₹', '<span class="rupee">₹</span>') + '</div>' +
+                '<div class="cart-item-subtotal">Subtotal: <span class="rupee">₹</span>' + itemTotal + '</div>' +
+                stockMsg +
+              '</div>' +
+              '<div class="cart-item-right">' +
+                moveHtml +
+                '<button class="cart-item-remove" data-bucket="' + name.replace(/"/g, '&quot;') + '" data-idx="' + idx + '">Remove</button>' +
+                '<div class="qty-control">' +
+                  '<button class="qty-btn -minus" data-bucket="' + name.replace(/"/g, '&quot;') + '" data-idx="' + idx + '">−</button>' +
+                  '<span class="qty-value">' + item.qty + '</span>' +
+                  '<button class="qty-btn -plus" data-bucket="' + name.replace(/"/g, '&quot;') + '" data-idx="' + idx + '">+</button>' +
+                '</div>' +
+              '</div>' +
+            '</div>';
+          });
+        }
+        html += '</div>';
+      });
+
+      // Add basket button
+      if (names.length < 3) {
+        html += '<button class="cart-add-basket" id="cart-add-basket">+ Add Basket</button>';
+      }
+
+      selector.innerHTML = html;
+
+      // Update summary using only active bucket
+      updateSummary(bucketTotals[activeBucket] || 0);
+
+      // ─── EVENT BINDING ───
+
+      // Click on cart card body (not arrow/rename/delete) → select for payment
+      selector.querySelectorAll('.cart-selector-card').forEach(function(card) {
+        card.addEventListener('click', function(e) {
+          if (e.target.closest('.cs-expand-btn')) return;
+          if (e.target.closest('.cs-rename-btn')) return;
+          if (e.target.closest('.cs-delete-btn')) return;
+          var name = this.getAttribute('data-bucket');
+          activeBucket = name;
+          renderCart();
+        });
+      });
+
+      // Click on expand button → toggle items visibility (no payment selection)
+      selector.querySelectorAll('.cs-expand-btn').forEach(function(btn) {
+        btn.addEventListener('click', function(e) {
+          e.stopPropagation();
+          var name = this.getAttribute('data-bucket');
+          if (name === expandedBucket) {
+            expandedBucket = null;
+          } else {
+            expandedBucket = name;
+          }
+          renderCart();
+        });
+      });
+
+      // Rename
+      selector.querySelectorAll('.cs-rename-btn').forEach(function(btn) {
+        btn.addEventListener('click', function(e) {
+          e.stopPropagation();
+          var oldName = this.getAttribute('data-bucket');
+          var newName = prompt('Rename basket "' + oldName + '":', oldName);
+          if (!newName || newName.trim() === '' || newName === oldName) return;
+          newName = newName.trim();
+          if (buckets[newName]) { showToast('Basket "' + newName + '" already exists', 'error'); return; }
+          buckets[newName] = buckets[oldName];
+          delete buckets[oldName];
+          if (activeBucket === oldName) activeBucket = newName;
+          if (expandedBucket === oldName) expandedBucket = newName;
+          saveBuckets();
+          renderCart();
+          showToast('Renamed to "' + newName + '"', 'success');
+        });
+      });
+
+      // Delete basket
+      selector.querySelectorAll('.cs-delete-btn').forEach(function(btn) {
+        btn.addEventListener('click', function(e) {
+          e.stopPropagation();
+          var name = this.getAttribute('data-bucket');
+          removeTarget = { bucket: name, deleteBucket: true };
+          document.getElementById('remove-modal').classList.add('open');
+          document.querySelector('#remove-modal .modal-title').textContent = 'Delete Basket?';
+          document.querySelector('#remove-modal .modal-desc').textContent = 'This will permanently delete "' + name + '" and all its items.';
+        });
+      });
+
+      // Qty events (inside expanded area)
+      selector.querySelectorAll('.qty-btn.-minus').forEach(function(btn) {
         btn.addEventListener('click', function() {
           var bName = this.getAttribute('data-bucket');
           var idx = parseInt(this.getAttribute('data-idx'));
@@ -1028,7 +1347,7 @@
           else { removeTarget = { bucket: bName, index: idx }; document.getElementById('remove-modal').classList.add('open'); }
         });
       });
-      container.querySelectorAll('.qty-btn.-plus').forEach(function(btn) {
+      selector.querySelectorAll('.qty-btn.-plus').forEach(function(btn) {
         btn.addEventListener('click', function() {
           var bName = this.getAttribute('data-bucket');
           var idx = parseInt(this.getAttribute('data-idx'));
@@ -1037,7 +1356,7 @@
           item.qty++; saveBuckets(); renderCart();
         });
       });
-      container.querySelectorAll('.cart-item-remove').forEach(function(btn) {
+      selector.querySelectorAll('.cart-item-remove').forEach(function(btn) {
         btn.addEventListener('click', function() {
           removeTarget = { bucket: this.getAttribute('data-bucket'), index: parseInt(this.getAttribute('data-idx')) };
           document.getElementById('remove-modal').classList.add('open');
@@ -1045,15 +1364,15 @@
       });
 
       // Move-to-bucket events
-      container.querySelectorAll('.cart-item-move-btn').forEach(function(btn) {
+      selector.querySelectorAll('.cart-item-move-btn').forEach(function(btn) {
         btn.addEventListener('click', function(e) {
           e.stopPropagation();
           var dropdown = this.nextElementSibling;
-          document.querySelectorAll('.cart-item-move-dropdown.open').forEach(function(d) { if (d !== dropdown) d.classList.remove('open'); });
+          selector.querySelectorAll('.cart-item-move-dropdown.open').forEach(function(d) { if (d !== dropdown) d.classList.remove('open'); });
           dropdown.classList.toggle('open');
         });
       });
-      container.querySelectorAll('.move-option').forEach(function(btn) {
+      selector.querySelectorAll('.move-option').forEach(function(btn) {
         btn.addEventListener('click', function() {
           var fromBucket = this.getAttribute('data-from');
           var idx = parseInt(this.getAttribute('data-idx'));
@@ -1061,10 +1380,8 @@
           if (fromBucket === toBucket) return;
           var item = buckets[fromBucket].items[idx];
           if (!item) return;
-          // Remove from source
           buckets[fromBucket].items.splice(idx, 1);
           if (buckets[fromBucket].items.length === 0) delete buckets[fromBucket];
-          // Add to destination
           if (!buckets[toBucket]) buckets[toBucket] = { items: [] };
           var existing = buckets[toBucket].items.findIndex(function(i) { return i.id === item.id; });
           if (existing >= 0) buckets[toBucket].items[existing].qty += item.qty;
@@ -1075,41 +1392,10 @@
         });
       });
 
-      // Bucket rename events
-      document.querySelectorAll('.bucket-rename-btn').forEach(function(btn) {
-        btn.addEventListener('click', function(e) {
-          e.stopPropagation();
-          var oldName = this.getAttribute('data-bucket');
-          var newName = prompt('Rename basket "' + oldName + '":', oldName);
-          if (!newName || newName.trim() === '' || newName === oldName) return;
-          newName = newName.trim();
-          if (buckets[newName]) { showToast('Basket "' + newName + '" already exists', 'error'); return; }
-          buckets[newName] = buckets[oldName];
-          delete buckets[oldName];
-          saveBuckets();
-          renderCart();
-          showToast('Renamed to "' + newName + '"', 'success');
-        });
-      });
-      // Bucket header rename
-      document.querySelectorAll('.cart-bucket-rename-btn').forEach(function(btn) {
-        btn.addEventListener('click', function(e) {
-          e.stopPropagation();
-          var oldName = this.getAttribute('data-bucket');
-          var newName = prompt('Rename "' + oldName + '":', oldName);
-          if (!newName || newName.trim() === '' || newName === oldName) return;
-          newName = newName.trim();
-          if (buckets[newName]) { showToast('Bucket "' + newName + '" already exists', 'error'); return; }
-          buckets[newName] = buckets[oldName];
-          delete buckets[oldName];
-          saveBuckets();
-          renderCart();
-          showToast('Renamed to "' + newName + '"', 'success');
-        });
-      });
-      var addTab = document.getElementById('bucket-add-tab');
-      if (addTab) {
-        addTab.addEventListener('click', function() {
+      // Add basket
+      var addBtn = document.getElementById('cart-add-basket');
+      if (addBtn) {
+        addBtn.addEventListener('click', function() {
           var name = prompt('New basket name:');
           if (!name || name.trim() === '') return;
           name = name.trim();
@@ -1119,6 +1405,82 @@
           saveBuckets();
           renderCart();
           showToast('Created "' + name + '"', 'success');
+        });
+      }
+    }
+
+    // ─── BUY NOW RENDER ───
+    function renderBuyNow() {
+      var selector = document.getElementById('cart-selector');
+      var container = document.getElementById('cart-items');
+      container.style.display = 'none';
+      document.getElementById('cart-clear-btn').style.display = 'none';
+      document.getElementById('urgency-timer').style.display = 'none';
+
+      var item = buyNowItem;
+      var prod = productsDB.find(function(p) { return p.id === item.id; });
+      var price = prod ? parseInt(prod.price.replace(/[^0-9]/g, '')) : 0;
+      var itemTotal = price * item.qty;
+
+      var html = '<div class="buynow-section">' +
+        '<div class="buynow-item">' +
+          '<div class="buynow-img-wrap"><img src="' + item.image + '" alt="' + item.name + '"></div>' +
+          '<div class="buynow-info">' +
+            '<div class="buynow-name">' + item.name + '</div>' +
+            '<div class="buynow-meta">' + (item.size || 'One Size') + '</div>' +
+            '<div class="buynow-price"><span class="rupee">₹</span>' + price + '</div>' +
+          '</div>' +
+          '<div class="buynow-qty">' +
+            '<button class="buynow-qty-btn" id="buynow-qty-dec">−</button>' +
+            '<span class="buynow-qty-val" id="buynow-qty-val">' + item.qty + '</span>' +
+            '<button class="buynow-qty-btn" id="buynow-qty-inc">+</button>' +
+          '</div>' +
+          '<div class="buynow-total"><span class="rupee">₹</span>' + itemTotal + '</div>' +
+        '</div>' +
+        '<div class="buynow-sub">Your saved baskets remain untouched for later.</div>' +
+      '</div>';
+
+      // Also show saved carts collapsed below
+      var names = getBucketNames();
+      var hasItems = names.some(function(n) { return buckets[n].items.length > 0; });
+      if (hasItems) {
+        html += '<div class="buynow-saved-carts">' +
+          '<div class="buynow-saved-header">Saved for Later</div>';
+        names.forEach(function(n) {
+          var count = buckets[n].items.reduce(function(s, i) { return s + i.qty; }, 0);
+          if (count === 0) return;
+          var total = 0;
+          buckets[n].items.forEach(function(i) {
+            var p = productsDB.find(function(x) { return x.id === i.id; });
+            if (p) total += parseInt(p.price.replace(/[^0-9]/g, '')) * i.qty;
+          });
+          html += '<div class="buynow-saved-item">' +
+            '<span>📦 ' + n + '</span>' +
+            '<span>' + count + ' item' + (count !== 1 ? 's' : '') + ' · <span class="rupee">₹</span>' + total + '</span>' +
+          '</div>';
+        });
+        html += '</div>';
+      }
+
+      selector.innerHTML = html;
+      updateSummary(itemTotal);
+
+      // Buy-now qty controls
+      var decBtn = document.getElementById('buynow-qty-dec');
+      var incBtn = document.getElementById('buynow-qty-inc');
+      if (decBtn) {
+        decBtn.addEventListener('click', function() {
+          if (buyNowItem.qty <= 1) return;
+          buyNowItem.qty--;
+          sessionStorage.setItem('yaro_buy_now', JSON.stringify(buyNowItem));
+          renderBuyNow();
+        });
+      }
+      if (incBtn) {
+        incBtn.addEventListener('click', function() {
+          buyNowItem.qty++;
+          sessionStorage.setItem('yaro_buy_now', JSON.stringify(buyNowItem));
+          renderBuyNow();
         });
       }
     }
@@ -1142,6 +1504,18 @@
       document.getElementById('summary-subtotal').innerHTML = '<span class="rupee">₹</span>' + subtotal;
       document.getElementById('summary-tax').innerHTML = '<span class="rupee">₹</span>' + tax;
       document.getElementById('summary-total').innerHTML = '<span class="rupee">₹</span>' + total;
+
+      // Show which cart is active
+      var cartNameEl = document.getElementById('summary-cart-name');
+      if (isBuyNow && buyNowItem) {
+        cartNameEl.textContent = '⚡ Instant Purchase';
+        cartNameEl.style.display = '';
+      } else if (activeBucket && subtotal > 0) {
+        cartNameEl.textContent = '🛍️ ' + activeBucket + ' selected for payment';
+        cartNameEl.style.display = '';
+      } else {
+        cartNameEl.style.display = 'none';
+      }
 
       if (subtotal >= shippingThreshold) {
         document.getElementById('summary-shipping').innerHTML = '<span class="free">Free</span>';
@@ -1209,6 +1583,15 @@
         saveBuckets();
         renderCart();
         showToast('All baskets cleared', 'error');
+      } else if (removeTarget && removeTarget.deleteBucket) {
+        var name = removeTarget.bucket;
+        delete buckets[name];
+        if (Object.keys(buckets).length === 0) buckets = { 'My Cart': { items: [] } };
+        if (activeBucket === name) activeBucket = null;
+        if (expandedBucket === name) expandedBucket = null;
+        saveBuckets();
+        renderCart();
+        showToast('"' + name + '" deleted', 'error');
       } else if (removeTarget && removeTarget.bucket && removeTarget.index !== undefined) {
         buckets[removeTarget.bucket].items.splice(removeTarget.index, 1);
         if (buckets[removeTarget.bucket].items.length === 0) delete buckets[removeTarget.bucket];
@@ -1229,7 +1612,49 @@
     // ─── CHECKOUT ───
     document.getElementById('checkout-btn').addEventListener('click', function() {
       var btn = this;
+
+      // ─── BUY NOW CHECKOUT ───
+      if (isBuyNow && buyNowItem) {
+        var name = document.getElementById('loc-name').value.trim();
+        var phone = document.getElementById('loc-phone').value.trim();
+        var door = document.getElementById('loc-door').value.trim();
+        var address = document.getElementById('loc-address').value.trim();
+        var city = document.getElementById('loc-city').value.trim();
+        var pincode = document.getElementById('loc-pincode').value.trim();
+        var landmark = document.getElementById('loc-landmark').value.trim();
+
+        if (!name || !phone || !door || !address || !city || !pincode || !landmark) {
+          showToast('Please fill in your delivery address', 'error');
+          document.querySelector('.location-section').scrollIntoView({ behavior: 'smooth', block: 'center' });
+          return;
+        }
+        if (phone.length < 10) { showToast('Please enter a valid phone number', 'error'); return; }
+        if (pincode.length < 6) { showToast('Please enter a valid pincode', 'error'); return; }
+
+        btn.classList.add('loading');
+        var orderId = 'YARO-' + new Date().toISOString().slice(0,8).replace(/-/g,'') + '-' + Math.random().toString(36).substr(2,4).toUpperCase();
+        var total = document.getElementById('summary-total').innerHTML;
+
+        setTimeout(function() {
+          btn.classList.remove('loading');
+          sessionStorage.removeItem('yaro_buy_now');
+          isBuyNow = false;
+          buyNowItem = null;
+          document.getElementById('success-order-id').textContent = orderId;
+          document.getElementById('success-total').innerHTML = total;
+          document.getElementById('success-modal').classList.add('open');
+          renderCart();
+          showToast('Order placed successfully! 🎉', 'success');
+          stopTimer();
+        }, 2000);
+        return;
+      }
+
+      // ─── NORMAL CART CHECKOUT ───
       if (bucketTotalItems() === 0) { showToast('Your cart is empty', 'error'); return; }
+      if (!activeBucket || !buckets[activeBucket] || buckets[activeBucket].items.length === 0) {
+        showToast('Please select a basket to checkout', 'error'); return;
+      }
 
       var name = document.getElementById('loc-name').value.trim();
       var phone = document.getElementById('loc-phone').value.trim();
@@ -1257,7 +1682,13 @@
         document.getElementById('success-order-id').textContent = orderId;
         document.getElementById('success-total').innerHTML = total;
         document.getElementById('success-modal').classList.add('open');
-        buckets = { 'My Cart': { items: [] } };
+
+        // Only clear the placed (active) basket, keep others
+        var placedName = activeBucket;
+        delete buckets[placedName];
+        if (Object.keys(buckets).length === 0) buckets = { 'My Cart': { items: [] } };
+        activeBucket = null;
+        expandedBucket = null;
         promoApplied = false;
         promoDiscount = 0;
         document.getElementById('promo-input').disabled = false;
@@ -1265,7 +1696,7 @@
         document.getElementById('promo-msg').className = 'promo-msg';
         saveBuckets();
         renderCart();
-        showToast('Order placed successfully! 🎉', 'success');
+        showToast('"' + placedName + '" ordered successfully! 🎉', 'success');
         stopTimer();
       }, 2000);
     });

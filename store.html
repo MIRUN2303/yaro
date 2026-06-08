@@ -1,6 +1,7 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
+  <!-- YARO Store — Gender system: gender field on products; card badge top-right (any/his/hers/mini), product page shows "For the Soul/Gents/Ladies/Little/Little Gents/Little Ladies". Dynamic loader maps Mini-* to "mini". -->
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>YARO | Collections</title>
@@ -1404,6 +1405,32 @@ background: url("data:image/svg+xml,%3Csvg viewBox='0 0 400 400' xmlns='http://w
       color: rgba(196,181,253,0.25);
     }
 
+    .product-card .prod-gender {
+      position: absolute;
+      top: 12px;
+      right: 12px;
+      z-index: 3;
+      font-size: 8.5px;
+      font-weight: 500;
+      letter-spacing: 0.16em;
+      text-transform: uppercase;
+      color: rgba(255,255,255,0.35);
+      background: rgba(0,0,0,0.45);
+      backdrop-filter: blur(4px);
+      padding: 3px 8px;
+      border-radius: 6px;
+      border: 1px solid rgba(255,255,255,0.06);
+      line-height: 1.2;
+      pointer-events: none;
+      transition: all 0.3s ease;
+    }
+
+    .product-card:hover .prod-gender {
+      color: rgba(139,92,246,0.7);
+      background: rgba(0,0,0,0.55);
+      border-color: rgba(139,92,246,0.15);
+    }
+
     .product-card .prod-bottom {
       display: flex;
       align-items: center;
@@ -1871,6 +1898,7 @@ background: url("data:image/svg+xml,%3Csvg viewBox='0 0 400 400' xmlns='http://w
                 <img src="images/detail_pics/center_model.png" alt="Midnight Drift" class="prod-img-element">
               </div>
               <span class="prod-badge bestseller">Chapter</span>
+              <span class="prod-gender">any</span>
               <div class="prod-hover-overlay"><span>View Story</span></div>
             </div>
             <div class="prod-info">
@@ -1893,6 +1921,7 @@ background: url("data:image/svg+xml,%3Csvg viewBox='0 0 400 400' xmlns='http://w
                 <img src="images/violet_haze_hoodie.png" alt="City Lights" class="prod-img-element">
               </div>
               <span class="prod-badge bestseller">Chapter</span>
+              <span class="prod-gender">any</span>
               <div class="prod-hover-overlay"><span>View Story</span></div>
             </div>
             <div class="prod-info">
@@ -1915,6 +1944,7 @@ background: url("data:image/svg+xml,%3Csvg viewBox='0 0 400 400' xmlns='http://w
                 <img src="images/shadow_cargo_pant.png" alt="Empty Roads" class="prod-img-element">
               </div>
               <span class="prod-badge new">New</span>
+              <span class="prod-gender">his</span>
               <div class="prod-hover-overlay"><span>View Story</span></div>
             </div>
             <div class="prod-info">
@@ -1937,6 +1967,7 @@ background: url("data:image/svg+xml,%3Csvg viewBox='0 0 400 400' xmlns='http://w
                 <img src="images/crop_lacroix_tee.png" alt="Concrete Soul" class="prod-img-element">
               </div>
               <span class="prod-badge bestseller">Chapter</span>
+              <span class="prod-gender">hers</span>
               <div class="prod-hover-overlay"><span>View Story</span></div>
             </div>
             <div class="prod-info">
@@ -1959,6 +1990,7 @@ background: url("data:image/svg+xml,%3Csvg viewBox='0 0 400 400' xmlns='http://w
                 <img src="images/relaxed_fit_sweatshirt.png" alt="Lost Signal" class="prod-img-element">
               </div>
               <span class="prod-badge bestseller">Chapter</span>
+              <span class="prod-gender">any</span>
               <div class="prod-hover-overlay"><span>View Story</span></div>
             </div>
             <div class="prod-info">
@@ -1981,6 +2013,7 @@ background: url("data:image/svg+xml,%3Csvg viewBox='0 0 400 400' xmlns='http://w
                 <img src="images/oversized_drop_shoulder.png" alt="Silent Crowd" class="prod-img-element">
               </div>
               <span class="prod-badge new">New</span>
+              <span class="prod-gender">any</span>
               <div class="prod-hover-overlay"><span>View Story</span></div>
             </div>
             <div class="prod-info">
@@ -2003,6 +2036,7 @@ background: url("data:image/svg+xml,%3Csvg viewBox='0 0 400 400' xmlns='http://w
                 <img src="images/mini_logo_tee.png" alt="Late Escape" class="prod-img-element">
               </div>
               <span class="prod-badge new">New</span>
+              <span class="prod-gender">mini</span>
               <div class="prod-hover-overlay"><span>View Story</span></div>
             </div>
             <div class="prod-info">
@@ -2025,6 +2059,7 @@ background: url("data:image/svg+xml,%3Csvg viewBox='0 0 400 400' xmlns='http://w
                 <img src="images/mini_hoodie.png" alt="Lost Path" class="prod-img-element">
               </div>
               <span class="prod-badge new">New</span>
+              <span class="prod-gender">mini</span>
               <div class="prod-hover-overlay"><span>View Story</span></div>
             </div>
             <div class="prod-info">
@@ -2195,6 +2230,10 @@ background: url("data:image/svg+xml,%3Csvg viewBox='0 0 400 400' xmlns='http://w
           html += '<img src="' + img + '" alt="' + name + '" class="prod-img-element" loading="lazy">';
           html += '</div>';
           if (badge) html += '<span class="prod-badge ' + badgeClass + '">' + badge + '</span>';
+          if (p.gender) {
+            var shortGender = p.gender && p.gender.indexOf('Mini-') === 0 ? 'mini' : p.gender.toLowerCase();
+            html += '<span class="prod-gender">' + shortGender + '</span>';
+          }
           html += '<div class="prod-hover-overlay"><span>View Story</span></div></div>';
           html += '<div class="prod-info">';
           html += '<span class="prod-name">' + name + '</span>';

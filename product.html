@@ -1,6 +1,7 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
+  <!-- YARO Product — Gender system: activeProduct.gender mapped via genderMap (His→For the Gents, Hers→For the Ladies, Any→For the Soul, Mini→For the Little, Mini-Gent→For the Little Gents, Mini-Lady→For the Little Ladies) shown in .prod-action-gender below action buttons. Static productsDB and API map both include gender field. -->
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>YARO | Story</title>
@@ -208,50 +209,74 @@
     }
 
     .desktop-read-story {
-      display: none;
-    }
+        display: none;
+      }
 
-    @media (min-width: 601px) {
-      .gallery-below .read-story-btn {
-        display: none;
+      /* ─── READ STORY PULSE ANIMATIONS ─── */
+      @keyframes pulseDesktopGlow {
+        0%, 100% {
+          box-shadow: 0 0 18px rgba(139,92,246,0.08), 0 0 40px rgba(139,92,246,0.04);
+          border-color: rgba(139,92,246,0.2);
+        }
+        50% {
+          box-shadow: 0 0 24px rgba(139,92,246,0.18), 0 0 55px rgba(139,92,246,0.1);
+          border-color: rgba(139,92,246,0.4);
+        }
       }
-      .desktop-read-story {
-        display: flex;
-        width: 100%;
-        justify-content: center;
-        align-items: center;
-        margin-bottom: 20px;
-        padding: 22px 28px;
-        font-size: 13px;
-        gap: 10px;
-        color: #c4b5fd;
-        text-shadow: 0 0 12px rgba(139,92,246,0.15);
-        background: rgba(139,92,246,0.1);
-        border: 1px solid rgba(139,92,246,0.2);
-        border-radius: 8px;
-        letter-spacing: 0.1em;
-        text-transform: uppercase;
-        position: relative;
-        overflow: hidden;
-        box-shadow: 0 0 18px rgba(139,92,246,0.08), 0 0 40px rgba(139,92,246,0.04);
-        transition: all 0.3s ease;
+      @keyframes pulseMobileGlow {
+        0%, 100% {
+          box-shadow: 0 0 20px rgba(139,92,246,0.2), 0 0 50px rgba(139,92,246,0.08);
+          border-color: rgba(139,92,246,0.35);
+        }
+        50% {
+          box-shadow: 0 0 35px rgba(139,92,246,0.35), 0 0 70px rgba(139,92,246,0.18);
+          border-color: #a78bfa;
+        }
       }
-      .desktop-read-story::before {
-        content: '✦';
-        font-size: 14px;
-        color: #c4b5fd;
-        text-shadow: 0 0 10px rgba(139,92,246,0.3);
+
+      @media (min-width: 601px) {
+        .gallery-below .read-story-btn {
+          display: none;
+        }
+        .desktop-read-story {
+          display: flex;
+          width: 100%;
+          justify-content: center;
+          align-items: center;
+          margin-bottom: 20px;
+          padding: 22px 28px;
+          font-size: 13px;
+          gap: 10px;
+          color: #c4b5fd;
+          text-shadow: 0 0 12px rgba(139,92,246,0.15);
+          background: rgba(139,92,246,0.1);
+          border: 1px solid rgba(139,92,246,0.2);
+          border-radius: 8px;
+          letter-spacing: 0.1em;
+          text-transform: uppercase;
+          position: relative;
+          overflow: hidden;
+          box-shadow: 0 0 18px rgba(139,92,246,0.08), 0 0 40px rgba(139,92,246,0.04);
+          transition: all 0.3s ease;
+          animation: pulseDesktopGlow 3s ease-in-out infinite;
+        }
+        .desktop-read-story::before {
+          content: '✦';
+          font-size: 14px;
+          color: #c4b5fd;
+          text-shadow: 0 0 10px rgba(139,92,246,0.3);
+        }
+        .desktop-read-story .story-emoji {
+          display: none;
+        }
+        .desktop-read-story:hover {
+          background: rgba(139,92,246,0.2);
+          border-color: var(--neon-violet);
+          color: #fff;
+          box-shadow: 0 0 28px rgba(139,92,246,0.25), 0 0 60px rgba(139,92,246,0.12);
+          animation-play-state: paused;
+        }
       }
-      .desktop-read-story .story-emoji {
-        display: none;
-      }
-      .desktop-read-story:hover {
-        background: rgba(139,92,246,0.2);
-        border-color: var(--neon-violet);
-        color: #fff;
-        box-shadow: 0 0 24px rgba(139,92,246,0.15), 0 0 50px rgba(139,92,246,0.08);
-      }
-    }
 
     .main-showcase {
       width: 100%;
@@ -570,6 +595,27 @@
       text-transform: uppercase;
       color: rgba(255,255,255,0.25);
       background: #0A0A0A;
+    }
+
+    .prod-action-gender {
+      text-align: center;
+      font-size: 12px;
+      font-weight: 500;
+      letter-spacing: 0.04em;
+      color: rgba(139,92,246,0.55);
+      margin: -12px 0 16px;
+      font-style: italic;
+      position: relative;
+    }
+
+    .prod-action-gender::before {
+      content: '✧ ';
+      opacity: 0.5;
+    }
+
+    .prod-action-gender::after {
+      content: ' ✧';
+      opacity: 0.5;
     }
 
     .actions-section {
@@ -1646,12 +1692,13 @@
         margin-top: 0;
         box-shadow: 0 0 14px rgba(139,92,246,0.06);
         transition: all 0.3s ease;
+        animation: pulseMobileGlow 3s ease-in-out infinite;
       }
       .read-story-btn:hover {
         background: rgba(139,92,246,0.2);
         border-color: var(--neon-violet);
         color: #fff;
-        box-shadow: 0 0 20px rgba(139,92,246,0.12);
+        box-shadow: 0 0 30px rgba(139,92,246,0.3), 0 0 60px rgba(139,92,246,0.15);
       }
       .read-story-btn .story-emoji {
         display: none;
@@ -1847,6 +1894,8 @@
                 </button>
               </div>
             </div>
+
+            <div class="prod-action-gender" id="product-gender"></div>
 
             <!-- Spec Items / Description -->
             <div class="specs-list">
@@ -2050,7 +2099,8 @@
         additionalImages: [
           'images/detail_pics/left_back.png',
           'images/detail_pics/right_front.png'
-        ]
+        ],
+        gender: 'Any'
       },
       {
         id: 'violet-haze-hoodie',
@@ -2064,7 +2114,8 @@
         image: 'images/violet_haze_hoodie.png',
         story: 'Lost in the neon glow, chasing shadows of a life we used to know.',
         desc: 'Heavyweight combed ringspun cotton with drop-shoulder silhouette, massive structured hood, and relaxed cuffs.',
-        additionalImages: []
+        additionalImages: [],
+        gender: 'Any'
       },
       {
         id: 'shadow-cargo-pant',
@@ -2078,7 +2129,8 @@
         image: 'images/shadow_cargo_pant.png',
         story: 'No destination, just the cold wind and the open path ahead.',
         desc: 'Technical shadow cargo pant engineered with heavy nylon cotton canvas, deep modular pockets, dual side utility straps, and matte steel adjustment hardware.',
-        additionalImages: []
+        additionalImages: [],
+        gender: 'His'
       },
       {
         id: 'crop-lacroix-tee',
@@ -2092,7 +2144,8 @@
         image: 'images/crop_lacroix_tee.png',
         story: 'Born of the pavement, thriving in the noise of the crowded street.',
         desc: 'Minimalist off-white crop tee crafted with organic soft rib cotton, structured box fit drape, and double stitch hem details.',
-        additionalImages: []
+        additionalImages: [],
+        gender: 'Hers'
       },
       {
         id: 'relaxed-fit-sweatshirt',
@@ -2106,7 +2159,8 @@
         image: 'images/relaxed_fit_sweatshirt.png',
         story: 'A frequency cut short, a voice fading into static.',
         desc: 'Cozy oversized charcoal crewneck sweatshirt with organic cotton fleece backing, drop-shoulder seams, and rib finish mockneck collar.',
-        additionalImages: []
+        additionalImages: [],
+        gender: 'Any'
       },
       {
         id: 'oversized-drop-shoulder',
@@ -2120,7 +2174,8 @@
         image: 'images/oversized_drop_shoulder.png',
         story: 'Surrounded by thousands, yet walking in absolute silence.',
         desc: 'Heavyweight sand beige drop-shoulder t-shirt with premium mock neck rib collar and structured boxy aesthetic outline.',
-        additionalImages: []
+        additionalImages: [],
+        gender: 'Any'
       },
       {
         id: 'mini-logo-tee',
@@ -2134,7 +2189,8 @@
         image: 'images/mini_logo_tee.png',
         story: 'Sneaking out into the cool night, leaving the city behind.',
         desc: 'Classic kids white graphic t-shirt in extremely soft organic ring-spun combed cotton, featuring the YARO micro logo on the chest.',
-        additionalImages: []
+        additionalImages: [],
+        gender: 'Mini-Gent'
       },
       {
         id: 'mini-hoodie',
@@ -2148,7 +2204,8 @@
         image: 'images/mini_hoodie.png',
         story: 'Not all who wander are looking for a way home.',
         desc: 'Ultra soft double fleece organic light beige kid hoodie. Minimalist clean style with micro branding and perfect warmth for children.',
-        additionalImages: []
+        additionalImages: [],
+        gender: 'Mini-Lady'
       }
     ];
 
@@ -2171,7 +2228,8 @@
             desc: p.description || '',
             additionalImages: p.images ? p.images.slice(1) : [],
             sizes: p.sizes || ['S','M','L','XL','XXL'],
-            stock: p.stock || 0
+            stock: p.stock || 0,
+            gender: p.gender || 'Any'
           };
         });
         // Re-resolve active product with API data
@@ -2207,6 +2265,7 @@
     const productTitle = document.getElementById('product-title');
     const productPrice = document.getElementById('product-price');
     const productDesc = document.getElementById('product-desc');
+    const productGender = document.getElementById('product-gender');
 
     categoryLabel.textContent = activeProduct.category;
     productBadge.textContent = activeProduct.badge;
@@ -2214,6 +2273,11 @@
     productTitle.textContent = activeProduct.name;
     productPrice.innerHTML = activeProduct.price.replace(/₹/g, '<span class="rupee">₹</span>');
     productDesc.textContent = activeProduct.desc;
+    if (productGender && activeProduct.gender) {
+      var g = activeProduct.gender;
+      var genderMap = { 'His': 'For the Gents', 'Hers': 'For the Ladies', 'Any': 'For the Soul', 'Mini': 'For the Little', 'Mini-Gent': 'For the Little Gents', 'Mini-Lady': 'For the Little Ladies' };
+      productGender.textContent = genderMap[g] || g;
+    }
 
     // ─── SIZE STEPPER ───
     var sizes = ['S', 'M', 'L', 'XL', 'XXL'];
@@ -2358,15 +2422,16 @@
     // ─── BUY NOW ───
     document.getElementById('buy-btn').addEventListener('click', function() {
       if (pageQty < 1) { showToast('Quantity must be at least 1', 'error'); return; }
-      var names = getBucketNames();
-      if (names.length === 0) { buckets['My Cart'] = { items: [] }; saveBuckets(); names = ['My Cart']; }
-      addToBucket(names[0], {
+      var buyItem = {
         id: activeProduct.id,
+        name: activeProduct.name,
+        price: activeProduct.price,
+        image: activeProduct.image,
         qty: pageQty,
-        size: getSelectedSize(),
-        stock: 5
-      });
-      window.location.href = 'cart.html';
+        size: getSelectedSize()
+      };
+      sessionStorage.setItem('yaro_buy_now', JSON.stringify(buyItem));
+      window.location.href = 'cart.html?buynow=1';
     });
 
     // ─── ADD TO CART MODAL ───
