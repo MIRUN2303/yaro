@@ -1,0 +1,1919 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>YARO | Brand & Design System</title>
+  <link href="https://fonts.cdnfonts.com/css/pilowlava" rel="stylesheet">
+  <link href="https://api.fontshare.com/v2/css?f[]=clash-display@200,300,400,500,600,700&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --bg: #050505;
+      --card-bg: rgba(20, 10, 40, 0.4);
+      --card-hover: rgba(30, 15, 55, 0.5);
+      --border: rgba(196, 181, 253, 0.15);
+      --text: #ffffff;
+      --text-muted: rgba(255,255,255,0.55);
+      --accent: #c4b5fd;
+      --accent-dim: rgba(196, 181, 253, 0.12);
+      --sidebar-w: 220px;
+      --topbar-h: 48px;
+    }
+
+    *, *::before, *::after {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    html {
+      scroll-behavior: smooth;
+    }
+
+    body {
+      background: var(--bg);
+      color: var(--text);
+      font-family: 'Clash Display', sans-serif;
+      line-height: 1.6;
+      display: flex;
+      min-height: 100vh;
+    }
+
+    nav {
+      position: fixed;
+      top: var(--topbar-h); left: 0;
+      width: var(--sidebar-w);
+      height: calc(100vh - var(--topbar-h));
+      background: rgba(10, 5, 20, 0.95);
+      border-right: 1px solid var(--border);
+      padding: 40px 20px 20px;
+      overflow-y: auto;
+      z-index: 100;
+      backdrop-filter: blur(12px);
+      display: flex;
+      flex-direction: column;
+    }
+
+    nav .nav-logo {
+      font-family: 'Pilowlava', serif;
+      font-size: 24px;
+      letter-spacing: -0.02em;
+      margin-bottom: 32px;
+      text-shadow: 0 0 20px rgba(139, 92, 246, 0.4);
+    }
+
+    nav .nav-links {
+      flex: 1;
+    }
+
+    nav a {
+      display: block;
+      color: var(--text-muted);
+      text-decoration: none;
+      font-size: 13px;
+      font-weight: 500;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      padding: 8px 12px;
+      border-radius: 6px;
+      margin-bottom: 2px;
+      transition: all 0.2s ease;
+      border-left: 2px solid transparent;
+    }
+
+    nav a:hover {
+      color: #fff;
+      background: var(--accent-dim);
+    }
+
+    nav a.active {
+      color: var(--accent);
+      border-left-color: var(--accent);
+      background: var(--accent-dim);
+    }
+
+    .nav-confidential {
+      padding: 8px 12px;
+      border-radius: 6px;
+      font-size: 10px;
+      font-weight: 600;
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+      border: 1px solid rgba(255, 50, 50, 0.3);
+      background: rgba(255, 50, 50, 0.08);
+      color: #ff6b6b;
+      text-align: center;
+      margin-top: 12px;
+    }
+
+    .main {
+      margin-left: var(--sidebar-w);
+      flex: 1;
+      max-width: 1000px;
+      padding: calc(var(--topbar-h) + 40px) 48px 48px;
+    }
+
+    header {
+      text-align: center;
+      margin-bottom: 56px;
+      padding-bottom: 40px;
+      border-bottom: 1px solid var(--border);
+    }
+
+    .yaro-logo {
+      font-family: 'Pilowlava', serif;
+      font-size: 80px;
+      letter-spacing: -0.02em;
+      display: inline-flex;
+      margin: 0 0 8px;
+      text-shadow: 0 0 35px rgba(139, 92, 246, 0.7), 0 0 70px rgba(139, 92, 246, 0.45);
+    }
+
+    .yaro-logo .char {
+      display: inline-block;
+      animation-duration: 3s;
+      animation-iteration-count: infinite;
+      animation-timing-function: ease-in-out;
+      transform-origin: center;
+    }
+
+    .char-y { animation-name: animY; }
+    .char-a { animation-name: animA; }
+    .char-r { animation-name: animR; }
+    .char-o { animation-name: animO; }
+
+    @keyframes animY { 0%, 100% { transform: translate(0, 0) rotate(0deg); } 50% { transform: translate(-12px, -3px) rotate(18deg); } }
+    @keyframes animA { 0%, 100% { transform: translate(0, 0) rotate(0deg); } 50% { transform: translate(-4px, -9px) rotate(8deg); } }
+    @keyframes animR { 0%, 100% { transform: translate(0, 0) rotate(0deg); } 50% { transform: translate(4px, -9px) rotate(-8deg); } }
+    @keyframes animO { 0%, 100% { transform: translate(0, 0) rotate(0deg); } 50% { transform: translate(12px, -3px) rotate(-18deg); } }
+
+    .header-sub {
+      color: var(--text-muted);
+      letter-spacing: 0.2em;
+      text-transform: uppercase;
+      font-size: 13px;
+    }
+
+    .header-desc {
+      color: var(--accent);
+      font-size: 13px;
+      max-width: 580px;
+      margin: 14px auto 0;
+      font-weight: 500;
+      line-height: 1.5;
+    }
+
+    section {
+      margin-bottom: 56px;
+    }
+
+    section h2 {
+      font-size: 20px;
+      font-weight: 500;
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+      color: var(--accent);
+      margin-bottom: 24px;
+      padding-bottom: 12px;
+      border-bottom: 1px solid var(--border);
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+
+    section h2 .num {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      width: 28px;
+      height: 28px;
+      border-radius: 50%;
+      background: var(--accent-dim);
+      color: var(--accent);
+      font-size: 12px;
+      font-weight: 600;
+    }
+
+    .grid-2 {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+      gap: 20px;
+    }
+
+    .card {
+      background: var(--card-bg);
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      padding: 24px;
+      transition: border-color 0.2s ease, background 0.2s ease;
+    }
+
+    .card.full {
+      grid-column: 1 / -1;
+    }
+
+    .card:hover {
+      border-color: rgba(196, 181, 253, 0.3);
+      background: var(--card-hover);
+    }
+
+    .card h3 {
+      font-size: 13px;
+      font-weight: 600;
+      color: var(--text-muted);
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      margin-bottom: 10px;
+    }
+
+    .card .preview {
+      font-family: 'Pilowlava', serif;
+      font-size: 28px;
+      margin: 8px 0 14px;
+    }
+
+    .card .preview-clash {
+      font-family: 'Clash Display', sans-serif;
+      font-size: 24px;
+      margin: 8px 0 14px;
+    }
+
+    .code-snip {
+      position: relative;
+      background: rgba(0,0,0,0.55);
+      border-radius: 6px;
+      padding: 12px 14px;
+      padding-right: 52px;
+      font-family: 'SF Mono', 'Cascadia Code', monospace;
+      font-size: 13px;
+      color: #e2e8f0;
+      overflow-x: auto;
+      white-space: pre-wrap;
+      border: 1px solid rgba(255,255,255,0.04);
+      margin-bottom: 10px;
+      line-height: 1.5;
+    }
+
+    .code-snip .copy-snip {
+      position: absolute;
+      top: 8px;
+      right: 8px;
+      background: rgba(196, 181, 253, 0.1);
+      border: 1px solid rgba(196, 181, 253, 0.25);
+      color: var(--accent);
+      padding: 3px 8px;
+      border-radius: 4px;
+      cursor: pointer;
+      font-family: 'Clash Display', sans-serif;
+      font-size: 10px;
+      font-weight: 600;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      transition: all 0.2s ease;
+      line-height: 1.4;
+    }
+
+    .code-snip .copy-snip:hover {
+      background: var(--accent);
+      color: #000;
+    }
+
+    .usage-rules {
+      font-size: 12px;
+      color: var(--text-muted);
+      border-top: 1px solid var(--border);
+      padding-top: 12px;
+      margin-top: 12px;
+    }
+
+    .usage-rules strong {
+      color: #fff;
+    }
+
+    .swatch {
+      width: 100%;
+      height: 52px;
+      border-radius: 6px;
+      margin-bottom: 14px;
+      border: 1px solid rgba(255,255,255,0.08);
+    }
+
+    .tag {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      padding: 4px 10px;
+      border-radius: 4px;
+      font-size: 11px;
+      font-weight: 600;
+      letter-spacing: 0.06em;
+      text-transform: uppercase;
+    }
+
+    .tag-blueprint {
+      background: rgba(196, 181, 253, 0.1);
+      color: var(--accent);
+      border: 1px solid rgba(196, 181, 253, 0.2);
+    }
+
+    .logic-card {
+      background: rgba(0,0,0,0.45);
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      padding: 28px;
+    }
+
+    .logic-card h3 {
+      font-size: 15px;
+      font-weight: 500;
+      color: var(--accent);
+      margin-bottom: 10px;
+    }
+
+    .logic-card .meta {
+      font-size: 12px;
+      color: var(--text-muted);
+      margin-bottom: 14px;
+    }
+
+    .logic-card .meta strong {
+      color: rgba(255,255,255,0.7);
+    }
+
+    .logic-card p {
+      font-size: 13px;
+      color: var(--text-muted);
+      margin-bottom: 12px;
+      line-height: 1.6;
+    }
+
+    .logic-card ul {
+      font-size: 13px;
+      padding-left: 18px;
+      color: #e2e8f0;
+    }
+
+    .logic-card ul li {
+      margin-bottom: 6px;
+    }
+
+    .logic-card ul li strong {
+      color: var(--accent);
+    }
+
+    .logic-card code {
+      background: rgba(255,255,255,0.06);
+      padding: 1px 6px;
+      border-radius: 3px;
+      font-size: 12px;
+      color: var(--accent);
+    }
+
+    .badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      padding: 10px 20px;
+      background: linear-gradient(90deg, rgba(30, 15, 50, 0.9) 0%, rgba(15, 8, 25, 0.7) 100%);
+      backdrop-filter: blur(15px);
+      border: 1px solid rgba(255, 255, 255, 0.08);
+      border-left: 3px solid var(--accent);
+      border-radius: 4px 12px 12px 4px;
+      font-size: 13px;
+      font-weight: 600;
+      letter-spacing: 0.2em;
+      text-transform: uppercase;
+    }
+
+    .badge .dot {
+      width: 6px;
+      height: 6px;
+      border-radius: 50%;
+      background: var(--accent);
+      box-shadow: 0 0 10px var(--accent);
+    }
+
+    .gap-row {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
+      margin-bottom: 14px;
+    }
+
+    .deploy-blocker {
+      position: fixed;
+      inset: 0;
+      z-index: 99999;
+      background: #050505;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      text-align: center;
+      padding: 40px 24px;
+      font-family: 'Clash Display', sans-serif;
+    }
+
+    .deploy-blocker h1 {
+      font-family: 'Pilowlava', serif;
+      font-size: clamp(2rem, 6vw, 4rem);
+      color: #ff6b6b;
+      letter-spacing: -0.02em;
+      margin-bottom: 16px;
+    }
+
+    .deploy-blocker p {
+      font-size: 14px;
+      color: rgba(255,255,255,0.55);
+      max-width: 480px;
+      line-height: 1.6;
+      margin-bottom: 8px;
+    }
+
+    .deploy-blocker .block-icon {
+      font-size: 48px;
+      margin-bottom: 20px;
+    }
+    .top-bar {
+      position: fixed;
+      top: 0; left: 0;
+      width: 100%;
+      height: var(--topbar-h);
+      background: rgba(5, 5, 5, 0.92);
+      backdrop-filter: blur(14px);
+      border-bottom: 1px solid var(--border);
+      z-index: 200;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 0 20px 0 24px;
+    }
+
+    .top-bar .tb-logo {
+      font-family: 'Pilowlava', serif;
+      font-size: 18px;
+      letter-spacing: -0.02em;
+      color: #fff;
+      text-shadow: 0 0 16px rgba(139, 92, 246, 0.3);
+    }
+
+    .top-bar .tb-right {
+      display: flex;
+      align-items: center;
+      gap: 16px;
+    }
+
+    .tb-status {
+      display: flex;
+      align-items: center;
+      gap: 7px;
+      font-size: 11px;
+      font-weight: 500;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      color: var(--text-muted);
+    }
+
+    .tb-status .dot {
+      width: 6px;
+      height: 6px;
+      border-radius: 50%;
+      flex-shrink: 0;
+      transition: background 0.4s ease, box-shadow 0.4s ease;
+    }
+
+    .tb-status .dot.active {
+      background: #4ade80;
+      box-shadow: 0 0 7px rgba(74, 222, 128, 0.5);
+      animation: pulseGreen 2s ease-in-out infinite;
+    }
+
+    .tb-status .dot.inactive {
+      background: #f87171;
+      box-shadow: 0 0 7px rgba(248, 113, 113, 0.3);
+    }
+
+    .tb-last {
+      font-size: 11px;
+      color: var(--text-muted);
+      letter-spacing: 0.04em;
+    }
+
+    .tb-last strong {
+      color: rgba(255, 255, 255, 0.5);
+      font-weight: 500;
+    }
+
+    @keyframes pulseGreen {
+      0%, 100% { opacity: 1; }
+      50% { opacity: 0.5; }
+    }
+
+    @media (max-width: 720px) {
+      .top-bar {
+        padding: 0 12px;
+      }
+      .top-bar .tb-logo {
+        font-size: 15px;
+      }
+      .tb-last {
+        display: none;
+      }
+      nav {
+        position: relative;
+        top: 0;
+        width: 100%;
+        height: auto;
+        border-right: none;
+        border-bottom: 1px solid var(--border);
+        padding: 16px 12px;
+        display: flex;
+        flex-wrap: wrap;
+        align-items: center;
+        gap: 6px;
+      }
+
+      nav .nav-logo {
+        display: none;
+      }
+
+      nav .nav-links {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 4px;
+      }
+
+      nav a {
+        font-size: 11px;
+        padding: 4px 10px;
+        margin-bottom: 0;
+      }
+
+      .nav-confidential { display: none; }
+      .main { margin-left: 0; padding: 20px 16px 32px; }
+      .yaro-logo { font-size: 48px; }
+      .grid-2 { grid-template-columns: 1fr; }
+      .backup-modal { padding: 20px; }
+      .bm-results { grid-template-columns: repeat(2, 1fr); }
+    }
+
+    /* ─── BACKUP SYSTEM ─── */
+    .backup-btn {
+      position: relative;
+      display: inline-flex;
+      align-items: center;
+      gap: 7px;
+      padding: 5px 16px 5px 10px;
+      background: linear-gradient(135deg, rgba(30,15,50,0.7), rgba(15,8,25,0.5));
+      border: 1px solid rgba(196,181,253,0.12);
+      border-radius: 100px;
+      color: var(--accent);
+      font-family: 'Clash Display', sans-serif;
+      font-size: 9px;
+      font-weight: 700;
+      letter-spacing: 0.14em;
+      text-transform: uppercase;
+      cursor: pointer;
+      transition: all 0.4s cubic-bezier(0.22,1,0.36,1);
+      line-height: 1;
+      user-select: none;
+      backdrop-filter: blur(8px);
+      -webkit-backdrop-filter: blur(8px);
+      box-shadow:
+        inset 0 1px 0 rgba(255,255,255,0.06),
+        0 4px 12px rgba(0,0,0,0.3);
+      overflow: hidden;
+    }
+
+    .backup-btn::after {
+      content: '';
+      position: absolute;
+      top: -50%;
+      left: -50%;
+      width: 200%;
+      height: 200%;
+      background: linear-gradient(
+        105deg,
+        transparent 35%,
+        rgba(255,255,255,0.04) 48%,
+        rgba(255,255,255,0.08) 50%,
+        rgba(255,255,255,0.04) 52%,
+        transparent 65%
+      );
+      background-repeat: no-repeat;
+      background-size: 200% 100%;
+      background-position: -200% 0;
+      animation: bbSweep 4s ease-in-out infinite;
+      pointer-events: none;
+      transition: animation-duration 0.4s ease;
+    }
+
+    .backup-btn:hover::after {
+      animation-duration: 1.5s;
+    }
+
+    @keyframes bbSweep {
+      0%, 70% { background-position: -200% 0; }
+      85%, 100% { background-position: 200% 0; }
+    }
+
+    .backup-btn:hover {
+      background: linear-gradient(135deg, rgba(196,181,253,0.9), rgba(139,92,246,0.85));
+      border-color: transparent;
+      color: #000;
+      transform: translateY(-1px);
+      box-shadow:
+        0 0 24px rgba(196,181,253,0.25),
+        0 6px 20px rgba(0,0,0,0.4),
+        inset 0 1px 0 rgba(255,255,255,0.2);
+    }
+
+    .backup-btn:active {
+      transform: translateY(0) scale(0.97);
+    }
+
+    .backup-btn svg {
+      width: 12px;
+      height: 12px;
+      transition: transform 0.4s cubic-bezier(0.22,1,0.36,1);
+      filter: drop-shadow(0 0 4px rgba(196,181,253,0.2));
+    }
+
+    .backup-btn:hover svg {
+      transform: scale(1.15);
+      filter: drop-shadow(0 0 8px rgba(196,181,253,0.4));
+    }
+
+    .backup-btn.running { pointer-events: none; opacity: 0.5; filter: grayscale(0.5); }
+
+    .backup-modal-overlay {
+      position: fixed; inset: 0; z-index: 5000;
+      background: rgba(0,0,0,0.75);
+      backdrop-filter: blur(24px) saturate(60%);
+      -webkit-backdrop-filter: blur(24px) saturate(60%);
+      display: flex; align-items: center; justify-content: center;
+      opacity: 0; visibility: hidden;
+      transition: opacity 0.5s cubic-bezier(0.16,1,0.3,1), visibility 0.5s ease;
+      padding: 20px;
+    }
+    .backup-modal-overlay.open { opacity: 1; visibility: visible; }
+    .backup-modal {
+      width: 100%; max-width: 580px; max-height: 88vh;
+      background: linear-gradient(180deg, rgba(22,12,38,0.92), rgba(10,6,18,0.95));
+      backdrop-filter: blur(48px) saturate(160%);
+      -webkit-backdrop-filter: blur(48px) saturate(160%);
+      border: 1px solid rgba(196,181,253,0.06);
+      border-left: 3px solid rgba(196,181,253,0.12);
+      border-radius: 16px;
+      padding: 28px 28px 24px;
+      transform: translateY(24px) scale(0.96);
+      opacity: 0;
+      transition: transform 0.6s cubic-bezier(0.16,1,0.3,1), opacity 0.5s ease;
+      overflow-y: auto;
+      box-shadow: 0 0 0 1px rgba(139,92,246,0.05), 0 40px 120px rgba(0,0,0,0.8);
+    }
+    .backup-modal-overlay.open .backup-modal { transform: translateY(0) scale(1); opacity: 1; }
+
+    .bm-header {
+      display: flex; align-items: center; justify-content: space-between;
+      margin-bottom: 20px;
+    }
+    .bm-title {
+      font-family: 'Pilowlava', serif;
+      font-size: 20px; letter-spacing: -0.02em;
+      display: flex; align-items: center; gap: 10px;
+    }
+    .bm-title span { color: var(--accent); font-size: 18px; }
+    .bm-close {
+      width: 28px; height: 28px; border-radius: 50%;
+      background: rgba(196,181,253,0.04); border: 1px solid rgba(196,181,253,0.06);
+      color: rgba(196,181,253,0.3); cursor: pointer; display: flex;
+      align-items: center; justify-content: center;
+      font-size: 12px; transition: all 0.3s ease;
+    }
+    .bm-close:hover { background: rgba(196,181,253,0.1); color: var(--accent); transform: rotate(90deg); }
+
+    .bm-progress-wrap { margin: 16px 0 20px; }
+    .bm-progress-bar {
+      width: 100%; height: 4px;
+      background: rgba(255,255,255,0.03);
+      border-radius: 4px; overflow: hidden; position: relative;
+    }
+    .bm-progress-fill {
+      height: 100%; width: 0%;
+      background: linear-gradient(90deg, #7c3aed, #c4b5fd, #a78bfa);
+      border-radius: 4px;
+      transition: width 0.4s cubic-bezier(0.22,1,0.36,1);
+      position: relative;
+    }
+    .bm-progress-fill::after {
+      content: '';
+      position: absolute; inset: 0;
+      background: linear-gradient(90deg, transparent, rgba(255,255,255,0.3), transparent);
+      animation: progressShine 1.5s ease-in-out infinite;
+    }
+    @keyframes progressShine {
+      0% { transform: translateX(-100%); }
+      100% { transform: translateX(100%); }
+    }
+    .bm-progress-info {
+      display: flex; justify-content: space-between; align-items: center;
+      margin-top: 8px;
+    }
+    .bm-progress-pct {
+      font-size: 16px; font-weight: 700; color: var(--accent);
+      font-variant-numeric: tabular-nums;
+    }
+    .bm-progress-status { font-size: 10px; color: var(--text-muted); letter-spacing: 0.06em; }
+
+    .bm-log {
+      max-height: 180px; overflow-y: auto;
+      margin: 12px 0 16px;
+      padding: 8px 0;
+      border-top: 1px solid rgba(255,255,255,0.03);
+      border-bottom: 1px solid rgba(255,255,255,0.03);
+    }
+    .bm-log::-webkit-scrollbar { width: 3px; }
+    .bm-log::-webkit-scrollbar-track { background: transparent; }
+    .bm-log::-webkit-scrollbar-thumb { background: rgba(139,92,246,0.15); border-radius: 4px; }
+    .bm-log-item {
+      display: flex; align-items: center; gap: 8px;
+      padding: 4px 0; font-size: 11px; color: var(--text-muted);
+      opacity: 0; animation: logIn 0.3s ease forwards;
+    }
+    @keyframes logIn { to { opacity: 1; } }
+    .bm-log-item .l-icon {
+      width: 16px; height: 16px; border-radius: 50%;
+      display: flex; align-items: center; justify-content: center;
+      flex-shrink: 0; font-size: 7px;
+    }
+    .bm-log-item .l-icon.ready { background: rgba(74,222,128,0.12); color: #4ade80; }
+    .bm-log-item .l-icon.fetch { background: rgba(196,181,253,0.1); color: var(--accent); }
+    .bm-log-item .l-icon.done { background: rgba(74,222,128,0.12); color: #4ade80; }
+    .bm-log-item .l-icon.warn { background: rgba(245,158,11,0.1); color: #f59e0b; }
+    .bm-log-item .l-icon.err { background: rgba(239,68,68,0.1); color: #ef4444; }
+    .bm-log-item .l-icon.hash { background: rgba(99,102,241,0.1); color: #818cf8; }
+    .bm-log-item .l-fname { font-weight: 600; color: rgba(255,255,255,0.6); }
+    .bm-log-item .l-msg { color: var(--text-muted); }
+
+    .bm-results {
+      display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px;
+      margin: 12px 0 16px;
+    }
+    .bm-stat {
+      padding: 14px; border-radius: 10px;
+      background: rgba(255,255,255,0.01); border: 1px solid rgba(255,255,255,0.03);
+      text-align: center;
+    }
+    .bm-stat .stat-num { font-size: 22px; font-weight: 700; }
+    .bm-stat .stat-label { font-size: 8px; letter-spacing: 0.1em; text-transform: uppercase; color: var(--text-muted); margin-top: 4px; }
+    .bm-stat.modified .stat-num { color: #f59e0b; }
+    .bm-stat.added .stat-num { color: #4ade80; }
+    .bm-stat.removed .stat-num { color: #ef4444; }
+    .bm-stat.unchanged .stat-num { color: rgba(255,255,255,0.25); }
+
+    .bm-file-list { display: flex; flex-direction: column; gap: 4px; margin: 10px 0; }
+    .bm-file-item {
+      display: flex; align-items: center; gap: 8px;
+      padding: 6px 10px; border-radius: 6px;
+      background: rgba(255,255,255,0.01); border: 1px solid rgba(255,255,255,0.02);
+      font-size: 10px;
+    }
+    .bm-file-item .fi-icon { font-size: 9px; width: 14px; text-align: center; }
+    .bm-file-item .fi-icon.add { color: #4ade80; }
+    .bm-file-item .fi-icon.mod { color: #f59e0b; }
+    .bm-file-item .fi-icon.del { color: #ef4444; }
+    .bm-file-item .fi-icon.ok { color: rgba(255,255,255,0.15); }
+    .bm-file-item .fi-name { flex: 1; color: rgba(255,255,255,0.7); font-weight: 500; letter-spacing: 0.02em; }
+    .bm-file-item .fi-detail { font-size: 9px; color: var(--text-muted); }
+    .bm-file-item .fi-hash { font-size: 8px; color: rgba(255,255,255,0.12); font-family: monospace; }
+
+    .bm-snapshot-info {
+      font-size: 10px; color: var(--text-muted); text-align: center;
+      padding: 12px 0 0;
+      border-top: 1px solid rgba(255,255,255,0.03);
+      margin-top: 12px;
+    }
+    .bm-snapshot-info strong { color: rgba(255,255,255,0.4); }
+
+    .bm-actions { display: flex; gap: 10px; margin-top: 16px; }
+    .bm-btn {
+      flex: 1; padding: 12px; border-radius: 8px; border: none;
+      font-family: inherit; font-size: 11px; font-weight: 700;
+      letter-spacing: 0.1em; text-transform: uppercase;
+      cursor: pointer; transition: all 0.3s ease;
+    }
+    .bm-btn.primary { background: var(--accent); color: #000; }
+    .bm-btn.primary:hover { background: #d8cdfa; transform: translateY(-1px); box-shadow: 0 4px 16px rgba(196,181,253,0.25); }
+    .bm-btn.secondary { background: rgba(255,255,255,0.03); color: var(--text-muted); border: 1px solid rgba(255,255,255,0.04); }
+    .bm-btn.secondary:hover { background: rgba(255,255,255,0.06); color: #fff; }
+    .bm-btn:active { transform: scale(0.97); }
+    .bm-btn.done { pointer-events: none; opacity: 0.5; }
+  </style>
+  <link rel="stylesheet" href="css/styles.css">
+</head>
+<body>
+
+  <div class="top-bar">
+    <span class="tb-logo">YARO</span>
+    <div class="tb-right">
+      <button class="backup-btn" id="backup-btn" title="Full code backup with change detection">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2z"/>
+          <polyline points="17,21 17,13 7,13 7,21"/>
+          <polyline points="7,3 7,8 15,8"/>
+        </svg>
+        Backup
+      </button>
+      <span class="tb-status" id="tb-status">
+        <span class="dot" id="tb-dot"></span>
+        <span id="tb-label">Checking</span>
+      </span>
+      <span class="tb-last">Last: <strong id="tb-time">—</strong></span>
+    </div>
+  </div>
+
+  <nav>
+    <div class="nav-links">
+      <a href="#typography">Typography</a>
+      <a href="#logo">Logo</a>
+      <a href="#colors">Colors</a>
+      <a href="#components">Components</a>
+      <a href="#logic">Logic</a>
+      <a href="#pages">Pages</a>
+      <a href="#scan">Live Scan</a>
+    </div>
+    <div class="nav-confidential">Confidential</div>
+  </nav>
+
+  <div class="main">
+
+    <header>
+      <h1 class="yaro-logo">
+        <span class="char char-y">Y</span><span class="char char-a">A</span><span class="char char-r">R</span><span class="char char-o">O</span>
+      </h1>
+      <p class="header-sub">Brand Guidelines &amp; Living Design System</p>
+      <p class="header-desc">
+        Internal tool — separate from the public site. Documents every component, animation principle, interaction, and architecture decision across all pages.
+      </p>
+    </header>
+
+    <section id="typography">
+      <h2><span class="num">1</span> Typography</h2>
+      <div class="grid-2">
+        <div class="card">
+          <h3>Primary Logo Font</h3>
+          <div class="preview">Pilowlava</div>
+          <div class="code-snip">font-family: 'Pilowlava', serif;</div>
+          <div class="usage-rules">
+            <strong>Usage:</strong> Logo hero text only (index title, collection banner, brand guidelines). Not for body copy or buttons.
+          </div>
+        </div>
+        <div class="card">
+          <h3>Secondary UI Font</h3>
+          <div class="preview-clash">Clash Display</div>
+          <div class="code-snip">font-family: 'Clash Display', sans-serif;
+font-weight: 200, 300, 400, 500, 600, 700;</div>
+          <div class="usage-rules">
+            <strong>Usage:</strong> ALL other UI — subtitles, buttons, descriptions, navigation, prices. Always uppercase with <code>letter-spacing: 0.1em+</code>.
+          </div>
+        </div>
+        <div class="card full">
+          <h3>Font Sizing Convention</h3>
+          <div class="code-snip">/* Clamp-based responsive sizing */
+font-size: clamp(min, preferred, max);
+
+/* Common scales: */
+-- Logo: clamp(3.2rem, 8vw, 6.5rem)
+-- Section titles: clamp(1.05rem, 3dvh, 1.5rem)
+-- Body: clamp(0.75rem, 1.8dvh, 1rem)
+-- Labels/tags: 8-11px uppercase</div>
+        </div>
+      </div>
+    </section>
+
+    <section id="logo">
+      <h2><span class="num">2</span> Logo Properties</h2>
+      <div class="grid-2">
+        <div class="card">
+          <h3>Letter Spacing</h3>
+          <div class="code-snip">letter-spacing: -0.02em;</div>
+        </div>
+        <div class="card">
+          <h3>Font Size Scale</h3>
+          <div class="code-snip">font-size: clamp(3.2rem, 8vw, 6.5rem);</div>
+        </div>
+        <div class="card full">
+          <h3>Violet Glow — Hover State</h3>
+          <div class="code-snip">text-shadow:
+  0 0 35px rgba(139, 92, 246, 0.7),
+  0 0 70px rgba(139, 92, 246, 0.45),
+  0 0 140px rgba(168, 85, 247, 0.2);</div>
+        </div>
+        <div class="card full">
+          <h3>Ambient White Glow — Idle State</h3>
+          <div class="code-snip">text-shadow:
+  0 0 60px rgba(80, 30, 120, 0.2),
+  0 0 120px rgba(60, 20, 90, 0.1);</div>
+        </div>
+        <div class="card full">
+          <h3>Character Scatter Animation (Pure CSS)</h3>
+          <div class="code-snip">.char { animation-duration: 3s; animation-iteration-count: infinite; animation-timing-function: ease-in-out; }
+
+@keyframes animY { 0%,100% { transform: translate(0,0) rotate(0deg); } 50% { transform: translate(-12px,-3px) rotate(18deg); } }
+@keyframes animA { 0%,100% { transform: translate(0,0) rotate(0deg); } 50% { transform: translate(-4px,-9px) rotate(8deg); } }
+@keyframes animR { 0%,100% { transform: translate(0,0) rotate(0deg); } 50% { transform: translate(4px,-9px) rotate(-8deg); } }
+@keyframes animO { 0%,100% { transform: translate(0,0) rotate(0deg); } 50% { transform: translate(12px,-3px) rotate(-18deg); } }</div>
+        </div>
+      </div>
+    </section>
+
+    <section id="colors">
+      <h2><span class="num">3</span> Color Palette</h2>
+      <div class="grid-2">
+        <div class="card">
+          <div class="swatch" style="background: #c4b5fd;"></div>
+          <h3>Accent Violet</h3>
+          <div class="code-snip">#c4b5fd</div>
+          <div class="usage-rules">Hover states, badges, active indicators</div>
+        </div>
+        <div class="card">
+          <div class="swatch" style="background: rgba(139, 92, 246, 1);"></div>
+          <h3>Deep Violet</h3>
+          <div class="code-snip">rgba(139, 92, 246, 1)</div>
+          <div class="usage-rules">Cursor hover, button ink, glows</div>
+        </div>
+        <div class="card">
+          <div class="swatch" style="background: #050505;"></div>
+          <h3>Obsidian Background</h3>
+          <div class="code-snip">#050505</div>
+          <div class="usage-rules">All page backgrounds</div>
+        </div>
+        <div class="card">
+          <div class="swatch" style="background: #ffffff;"></div>
+          <h3>White</h3>
+          <div class="code-snip">#ffffff</div>
+          <div class="usage-rules">Primary text color</div>
+        </div>
+        <div class="card">
+          <div class="swatch" style="background: #ef4444;"></div>
+          <h3>Danger / Error</h3>
+          <div class="code-snip">#ef4444</div>
+          <div class="usage-rules">Discounts, errors, stock warnings, remove actions</div>
+        </div>
+        <div class="card">
+          <div class="swatch" style="background: #22c55e;"></div>
+          <h3>Success</h3>
+          <div class="code-snip">#22c55e</div>
+          <div class="usage-rules">Success toasts, free shipping, stock available</div>
+        </div>
+        <div class="card">
+          <div class="swatch" style="background: #f59e0b;"></div>
+          <h3>Warning</h3>
+          <div class="code-snip">#f59e0b</div>
+          <div class="usage-rules">Limited stock, promo warnings</div>
+        </div>
+        <div class="card">
+          <div class="swatch" style="background: #fbbf24;"></div>
+          <h3>Star / Amber</h3>
+          <div class="code-snip">#fbbf24</div>
+          <div class="usage-rules">Star ratings</div>
+        </div>
+      </div>
+    </section>
+
+    <section id="components">
+      <h2><span class="num">4</span> Core Components</h2>
+      <div class="grid-2">
+
+        <div class="card">
+          <h3>Premium Glass Badge</h3>
+          <div class="code-snip">background: linear-gradient(90deg, rgba(30,15,50,0.9), rgba(15,8,25,0.7));
+backdrop-filter: blur(20px);
+border-left: 4px solid #c4b5fd;</div>
+          <div class="badge"><span class="dot"></span><span>NEW ARRIVAL</span></div>
+          <div class="usage-rules">
+            <strong>Used on:</strong> index.html slides 2 & 3 (NEW ARRIVAL, FEATURED STORIES). Mobile: badgePulse animation 4s ease-in-out (3-step glow breathing).
+          </div>
+        </div>
+
+        <div class="card">
+          <h3>Badge Glow Animation</h3>
+          <div class="code-snip">@keyframes badgePulse {
+  0% { box-shadow: 0 0 20px rgba(167,139,250,0.2), ...; border-color: rgba(196,181,253,0.3); }
+  50% { box-shadow: 0 0 45px rgba(167,139,250,0.6), ...; border-color: rgba(196,181,253,0.7); }
+  100% { box-shadow: 0 0 20px rgba(167,139,250,0.2), ...; border-color: rgba(196,181,253,0.3); }
+}</div>
+          <div class="usage-rules">Smooth 3-step breathing pulse, 4s cycle. Avoids 2-state snap.</div>
+        </div>
+
+        <div class="card full">
+          <h3>Glass Frame Layout</h3>
+          <div class="code-snip">.glass-frame {
+  background: linear-gradient(135deg, rgba(20,10,40,0.45), rgba(30,15,55,0.35));
+  backdrop-filter: blur(28px) saturate(70%);
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  padding: 24px;
+}</div>
+          <div class="usage-rules">
+            <strong>Applied on:</strong> store.html (product grid) and product.html (detail). Beveled via inner shadow + multiple outer drop-shadows. Index uses <code>.glass-layer</code> with heavier specular/depth layers and <code>::before</code> noise texture + <code>::after</code> grid overlay.
+          </div>
+        </div>
+
+        <div class="card full">
+          <h3>Electric Impulse CTA Button</h3>
+          <div class="code-snip">@property --impulse-angle {
+  syntax: '&lt;angle&gt;';
+  inherits: false;
+  initial-value: 0deg;
+}
+
+.cta-btn::before {
+  background: conic-gradient(from var(--impulse-angle),
+    rgba(255,255,255,0.1) 0deg,
+    rgba(255,255,255,0.95) 8deg,   /* white impulse */
+    rgba(255,255,255,0.2) 22deg,
+    rgba(196,181,253,0.9) 188deg,  /* violet impulse */
+    ...
+  );
+  animation: impulseFlow 4s linear infinite;
+}
+
+@keyframes impulseFlow { to { --impulse-angle: 360deg; } }
+
+.cta-btn:hover::before { animation-duration: 1.5s; }</div>
+          <div class="usage-rules">
+            <strong>Only on index.html.</strong> Pill button with glass bg + blur, glass sweep overlay (::after, 4s), spark particles on left/right (3 each, burst at 25%/75%), magnetic pull (JS, 8px clamp). On hover: speed to 1.5s, arrow rotates -45deg. Mobile: arrow + sparks hidden.
+          </div>
+        </div>
+
+        <div class="card">
+          <h3>Universal Header</h3>
+          <div class="code-snip">&lt;header class="site-header"&gt;
+  &lt;div class="sh-inner"&gt;
+    &lt;a class="sh-logo" href="index.html"&gt;YARO&lt;/a&gt;
+    &lt;nav class="sh-nav"&gt;...&lt;/nav&gt;
+    &lt;div class="sh-search"&gt;...&lt;/div&gt;
+  &lt;/div&gt;
+&lt;/header&gt;</div>
+          <div class="usage-rules">
+            <strong>Defined in:</strong> css/styles.css. Height 52px (→46px mobile). Pilowlava logo 18px. Nav links 11px uppercase. Search: 140px pill → 200px on focus.
+          </div>
+        </div>
+
+        <div class="card">
+          <h3>Universal Footer</h3>
+          <div class="code-snip">&lt;footer class="site-footer"&gt;
+  &lt;div class="sf-inner"&gt;
+    &lt;span&gt;&amp;copy; YARO&lt;/span&gt;
+    &lt;div class="sf-links"&gt;...&lt;/div&gt;
+  &lt;/div&gt;
+&lt;/footer&gt;</div>
+          <div class="usage-rules">store.html, product.html. Flex layout, copyright + links, 11px muted text.</div>
+        </div>
+
+        <div class="card">
+          <h3>Search Bar — Cross-Page</h3>
+          <div class="code-snip">.sh-search {
+  width: 140px; transition: width 0.25s;
+  background: rgba(255,255,255,0.04);
+  border: 1px solid var(--border);
+  border-radius: 100px;
+}
+.sh-search:focus-within { width: 200px; border-color: var(--accent); }</div>
+          <div class="usage-rules">
+            <strong>JS:</strong> On Enter → <code>store.html?search=...</code>. On collection page, fills local search input directly (no reload). Clear button (×) appears on input.
+          </div>
+        </div>
+
+        <div class="card full">
+          <h3>Custom Cursor System (3-Layer)</h3>
+          <div class="code-snip">/* Dot: precise 3px white */
+.cursor-dot { width: 3px; height: 3px; background: #fff; lerp: 0.25; }
+
+/* Ring: 24px ghost with lava conic gradient */
+.cursor-ring { width: 24px; border: 0.5px solid rgba(255,255,255,0.12);
+  ::after { conic-gradient rotation, animation: lavaSpin 2.5s linear infinite; }
+  lerp: 0.15 (index), 0.1 (collection), 0.12 (cart); }
+
+/* Canvas trail: 18-point history, violet decay */
+#cursor-canvas { trail.length = 18; life decay = 0.045; }</div>
+          <div class="usage-rules">
+            <strong>Pages:</strong> index.html, store.html, cart.html. Not on product.html (content page). States: .hovering (violet dot, 44px ring + lava), .on-logo, .clicking, .hidden. Mobile: hidden at ≤820px or hover: none. Interactive elements via <code>.interactive-elem</code> class toggles hover states.
+          </div>
+        </div>
+
+        <div class="card full">
+          <h3>Page Transition System</h3>
+          <div class="code-snip">/* index/collection: opacity overlay + content scale(0.97) + blur */
+.page-transition { background: #070509; backdrop-filter: blur(20px); }
+
+/* product.html: translateY slide overlay */
+.page-transition { transform: translateY(100%); }
+.page-transition.active { transform: translateY(0); }</div>
+          <div class="usage-rules">
+            All internal links trigger GSAP exit → overlay activates → navigate. GSAP duration: 0.12-0.65s. Ease: cubic-bezier(0.4,0,0.2,1).
+          </div>
+        </div>
+
+        <div class="card full">
+          <h3>Hero Slide System (index.html)</h3>
+          <div class="code-snip">SLIDE_DURATIONS = [2500, 7000, 4500]; /* Slide 0 (brand), 1 (gallery), 2 (featured) */
+
+goToSlide(index) {
+  // GSAP timeline: blur crossfade + scale shift
+  // Forward: enter scale(1.08) blur(12px) → scale(1) blur(0)
+  // Exit: opacity 0, scale 0.85, blur(12px)
+  // Loop (slide 2→0): special 1.1s sine.inOut with inner blur(25px) scale(0.45)
+}</div>
+          <div class="usage-rules">
+            Auto-loop via setTimeout chain. Safety reset if stuck >3s. Directional entry (forward = top, loop = special). Slide 2 has circuit wire sparks + pulse rings + card pop (desktop) or 1-by-1 carousel (mobile).
+          </div>
+        </div>
+
+        <div class="card">
+          <h3>Slide 2 — Desktop Gallery</h3>
+          <div class="code-snip">/* 3-card perspective layout */
+.gallery-item { position: absolute; perspective: 1200px; }
+.side-left { transform: translateX(-330px) translateZ(-200px) rotateY(15deg) rotate(-6deg); }
+.side-right { transform: translateX(330px) translateZ(-200px) rotateY(-15deg) rotate(6deg); }
+.center-front { width: 300px; height: 400px; }
+
+/* Circuit wire sparks: 4 SVG paths, stroke-dashoffset 30→-200, 0.38s, staggered 0.03s */
+/* Pulse rings: dual expanding rings scale 0.95→1.35 with blur + fade */
+/* Card pop: .pop-straight class for 1.5s — brightened, un-blurred, elevated z-index */</div>
+        </div>
+
+        <div class="card">
+          <h3>Slide 2 — Mobile 1-by-1 Gallery</h3>
+          <div class="code-snip">/* Replaces 3-card layout at ≤820px */
+.gallery-item { top: -10%; left: 10vw; width: 80vw; height: 105%; }
+// Center: scale(0.88), opacity 1
+// Sides: scale(0.55), opacity 0.45
+// Cycle every 2s (setInterval, power2.out 0.5s)
+// View Story button: margin-top -5dvh</div>
+        </div>
+
+        <div class="card">
+          <h3>Slide 3 — Featured Stories</h3>
+          <div class="code-snip">/* Interactive story list: 3 items with hover/active state */
+.featured-story-item { transition: all 0.3s cubic-bezier(0.22,1,0.36,1); }
+.featured-story-item:hover, .featured-story-item.active {
+  background: rgba(255,255,255,0.03) !important;
+  border-color: rgba(196,181,253,0.2) !important;
+  transform: translateX(4px);
+}
+
+/* Auto-cycle (desktop + mobile): item0 → 1.8s → item1 → 1.8s → item2 → 0.6s → advance to slide 0 */
+/* Image crossfade: GSAP fromTo 0.2s power2.out */</div>
+        </div>
+
+        <div class="card full">
+          <h3>GSAP Logo Hover — Character Offsets</h3>
+          <div class="code-snip">const CHAR_OFFSETS = [
+  { x: -24, y: -6,  rot: 18 },  // Y — high, curves left
+  { x: -8,  y: -18, rot: 8 },   // A — very high, slight left
+  { x: 8,   y: -18, rot: -8 },  // R — very high, slight right
+  { x: 24,  y: -6,  rot: -18 }  // O — high, curves right
+];
+// Container: rotationX: -10, rotationY: 5  (power3.out, 0.9s)
+// Badges pushed down 24px during scatter</div>
+        </div>
+
+        <div class="card full">
+          <h3>Product Cards (store.html)</h3>
+          <div class="code-snip">.product-card { transition: transform 0.4s, box-shadow 0.4s; }
+.product-card:hover { transform: translateY(-8px); }
+.product-card:hover .prod-image-inner { transform: scale(1.05); }
+// 3-col grid → 2-col at 1100px → 1-col at 820px
+// Hover overlay: "View Story" with opacity fade + icon arrow slide</div>
+        </div>
+
+        <div class="card full">
+          <h3>Product Filter Modal (store.html)</h3>
+          <div class="code-snip">/* Category filter modal */
+.cat-modal-overlay { backdrop-filter: blur(24px); }
+.cat-card { /* 15 category cards */ border-radius: 12px; }
+.cat-card.active { border-color: var(--accent); background: rgba(196,181,253,0.08); }
+
+/* Search + Category AND logic: categoryMatch && searchMatch */
+/* Active filters shown as badges with remove (×) buttons */
+/* Heading updates: "Search: query" / category name / "Best Selling" */</div>
+        </div>
+
+        <div class="card full">
+          <h3>Multi-Bucket Cart System (cart.html / product.html)</h3>
+          <div class="code-snip">// localStorage: yaro_buckets { items: [{ id, name, price, qty, image, category, stock }] }
+// Up to 3 baskets, each with rename support
+// Functions: saveBuckets(), getBucketNames(), bucketTotalItems(), renderCart(), updateSummary()
+// Cart badge syncs count across all pages
+
+// Free shipping: ₹699 threshold with animated progress bar
+// Promo codes: YARO10 (10%), WELCOME (15%), FLASH20 (20%)
+// Urgency timer: 15:00 countdown, resets at 0</div>
+        </div>
+
+        <div class="card full">
+          <h3>Order Summary / Checkout (cart.html)</h3>
+          <div class="code-snip">// Subtotal, shipping (free ≥₹699), 5% tax, promo discount, total
+// Checkout: validate address → generate order ID (YARO-YYYYMMDD-XXXX)
+// → clear cart → success modal with delivery ETA (3-5 days)
+// Leaflet map: dark tiles (CartoDB), draggable marker, click-to-drop, geolocation
+// Loading spinner on checkout button during processing</div>
+        </div>
+
+        <div class="card full">
+          <h3>Product Detail Image Gallery (product.html)</h3>
+          <div class="code-snip">// Main image + 3 thumbnails + arrow nav
+// GSAP transition: opacity 0.3→1, scale 0.92→1, blur 4px→0 (0.45s power2.out)
+// Mobile swipe: touch events with 40px threshold
+// Related essentials: drag/swipe carousel with spring bounds + arrow nav</div>
+        </div>
+
+        <div class="card full">
+          <h3>Size Selector + Action Buttons (product.html)</h3>
+          <div class="code-snip">/* Size buttons (S-XXL): liquid swelling ink effect */
+.size-btn.active::before {
+  /* Circle expands from center, 0.6s cubic-bezier(0.19,1,0.22,1) */
+}
+
+/* "Keep This" — inner sparkle chase: ::before background-position sweep 2.8s */
+/* "Add to Cart" — purple swelling circle: ::before scale 0→20 on hover, 0.75s */</div>
+        </div>
+
+        <div class="card full">
+          <h3>Customer Reviews (product.html)</h3>
+          <div class="code-snip">// Seeded reviews array (8 entries), rendered as cards
+// Star rating: hover (brighten) / click to set, 500 char limit with counter
+// "See More" toggle for long reviews
+// Click review card → modal overlay with full content
+// Review form: stars + textarea + submit → toast + add to list</div>
+        </div>
+
+        <div class="card full">
+          <h3>Toast Notification System</h3>
+          <div class="code-snip">showToast(message, type) // 'success' or 'error'
+// Slide-in from right (translateX 120%→0, 0.4s)
+// Auto-dismiss 3.5s, click to dismiss
+// Colors: green (#22c55e) / red (#ef4444)
+
+// Used in: cart.html (add/remove/promo/success), product.html (add to cart)</div>
+        </div>
+
+        <div class="card">
+          <h3>Store Modal</h3>
+          <div class="code-snip">&lt;div class="store-modal-overlay"&gt;
+  &lt;div class="store-modal"&gt;
+    &lt;h3&gt;Our Store&lt;/h3&gt;
+    &lt;a&gt;General&lt;/a&gt;
+    &lt;a&gt;Night Ride&lt;/a&gt;
+    &lt;a&gt;Urban Echo&lt;/a&gt;
+    &lt;a&gt;Midnight Society&lt;/a&gt;
+    &lt;a&gt;Wander&lt;/a&gt;
+  &lt;/div&gt;
+&lt;/div&gt;</div>
+          <div class="usage-rules">Defined in css/styles.css. Used across all pages. Blur backdrop, card with hover lift. Cursor auto on open.</div>
+        </div>
+
+        <div class="card">
+          <h3>Story Popup Modal</h3>
+          <div class="code-snip">/* In css/styles.css — similar to store modal */
+.story-popup-card { max-width: 460px; backdrop-filter: blur(40px); }
+.story-popup-divider { width: 40px; height: 2px; background: var(--accent); }
+.story-popup-text { font-size: 14px; font-style: italic; }</div>
+          <div class="usage-rules">Used in product.html for the "Read Story" button on each product.</div>
+        </div>
+
+      </div>
+    </section>
+
+    <section id="logic">
+      <h2><span class="num">5</span> Core Logic &amp; Animation Principles</h2>
+
+      <div class="logic-card" style="margin-bottom: 20px; border-color: rgba(255,255,255,0.15); background: rgba(0,0,0,0.55);">
+        <p style="margin-bottom: 0; color: rgba(255,255,255,0.65); font-size: 13px;">
+          <span class="tag tag-blueprint" style="margin-bottom: 10px;">Architectural Blueprint</span><br>
+          This section stores <strong>concepts and parameters</strong> behind YARO's core interactions — not raw code. Use these principles as a lightweight guide for building or recreating features.
+        </p>
+      </div>
+
+      <div class="logic-card" style="margin-bottom: 16px;">
+        <h3>1. Cinematic Slide Orchestration ("Zero-Cut" Principle)</h3>
+        <div class="meta"><strong>Where:</strong> <code>goToSlide()</code> — index.html portal, gallery, and offer transitions</div>
+        <p>No abrupt visual cuts. Every transition uses blur crossfade with subtle scale shifts.</p>
+        <ul>
+          <li><strong>Ease:</strong> <code>power2.inOut</code> or <code>power3.inOut</code> for slide-level transitions</li>
+          <li><strong>Blur:</strong> Fading out = <code>scale(0.85)</code> + <code>blur(12px)</code>; coming in = reverse</li>
+          <li><strong>Loop (slide 2→0):</strong> 1.1s <code>sine.inOut</code>, inner content blur(25px) + scale(0.45) + y drift</li>
+          <li><strong>Layer isolation:</strong> Keep target elements separate from parent transforms to avoid browser clipping artifacts</li>
+          <li><strong>Safety:</strong> <code>isTransitioning</code> reset if stuck >3s</li>
+        </ul>
+      </div>
+
+      <div class="logic-card" style="margin-bottom: 16px;">
+        <h3>2. Handcrafted Logo Scatter (GSAP Hover)</h3>
+        <div class="meta"><strong>Where:</strong> <code>#yaro-title</code> — index.html hero title mouseenter/mouseleave</div>
+        <p>Asymmetrical offsets create a premium physical "explosion" rather than random scattering.</p>
+        <ul>
+          <li><strong>Y:</strong> <code>(x: -24, y: -6, rot: 18)</code> — high, curves left</li>
+          <li><strong>A:</strong> <code>(x: -8, y: -18, rot: 8)</code> — very high, slight left</li>
+          <li><strong>R:</strong> <code>(x: 8, y: -18, rot: -8)</code> — very high, slight right</li>
+          <li><strong>O:</strong> <code>(x: 24, y: -6, rot: -18)</code> — high, curves right</li>
+          <li><strong>Container:</strong> <code>rotationX: -10, rotationY: 5</code>, ease <code>power3.out</code>, 0.9s</li>
+          <li><strong>Badge push:</strong> All <code>.premium-badge</code> elements shift down 24px during scatter</li>
+        </ul>
+      </div>
+
+      <div class="logic-card" style="margin-bottom: 16px;">
+        <h3>3. Impulse Border — @property Animation</h3>
+        <div class="meta"><strong>Where:</strong> <code>.cta-btn::before</code> on index.html</div>
+        <p>Uses CSS <code>@property</code> to register a custom angle variable, animated via <code>@keyframes</code> — avoids transform:rotate() fan-blade artifacts.</p>
+        <ul>
+          <li><strong>--impulse-angle:</strong> Registered as <code>&lt;angle&gt;</code>, animated 0→360deg (4s linear, 1.5s on hover)</li>
+          <li><strong>Impulses:</strong> White at 0°, violet at 180°, with soft falloff</li>
+          <li><strong>Ring:</strong> 3px visible via <code>inset: -1px; padding: 3px; mask-composite: exclude</code></li>
+          <li><strong>Glass sweep:</strong> ::after diagonal sheen, 4s (75% idle, then sweep)</li>
+          <li><strong>Sparks:</strong> 3 particles per side, burst at 25%/75% cycle, staggered 1-2%</li>
+          <li><strong>Magnetic pull:</strong> JS mouse-follow clamped to 8px max, rAF-driven</li>
+        </ul>
+      </div>
+
+      <div class="logic-card" style="margin-bottom: 16px;">
+        <h3>4. Cursor Interaction &amp; Trail System</h3>
+        <div class="meta"><strong>Where:</strong> index.html, store.html, cart.html</div>
+        <p>Three-layer cursor: precise dot + lagging ring + canvas trail for particle-like afterglow.</p>
+        <ul>
+          <li><strong>Dot:</strong> 3px white, lerp 0.25, turns violet on interactive elements</li>
+          <li><strong>Ring:</strong> 24px ghost ring with conic violet gradient (<code>lavaSpin 2.5s</code>), lerp varies by page</li>
+          <li><strong>Trail:</strong> 18-point history on canvas, violet decay (<code>rgba(167,139,250, life*0.25)</code>), lineWidth <code>life*1.2</code></li>
+          <li><strong>States:</strong> <code>.hovering</code> (violet dot, 44px ring), <code>.on-logo</code>, <code>.clicking</code>, <code>.hidden</code></li>
+          <li><strong>Interactive:</strong> Class <code>.interactive-elem</code> toggles hover states via mouseenter/mouseleave</li>
+          <li><strong>Mobile:</strong> Hidden at ≤820px or <code>hover: none</code></li>
+          <li><strong>Negative inversion:</strong> collection filter button uses <code>mix-blend-mode: difference</code>, 50px white ring</li>
+        </ul>
+      </div>
+
+      <div class="logic-card" style="margin-bottom: 16px;">
+        <h3>5. Desktop Gallery — Circuit Wire &amp; Pulse Sequence</h3>
+        <div class="meta"><strong>Where:</strong> <code>#slide-2</code> on index.html, screens >820px</div>
+        <p>High-voltage aesthetic: SVG circuit wires with traveling sparks, then pulse rings, then card pop.</p>
+        <ul>
+          <li><strong>Sparks:</strong> 4 SVG paths with <code>stroke-dashoffset</code> 30→-200 (0.38s, staggered 0.03s)</li>
+          <li><strong>Pulse rings:</strong> Two layered rings scale from 0.95 to 1.2-1.35 with blur, then fade</li>
+          <li><strong>Card pop:</strong> Side cards get <code>.pop-straight</code> class for 1.5s (brightened, un-blurred, elevated z-index)</li>
+          <li><strong>Timing:</strong> All triggered from <code>goToSlide(1)</code> timeline at offsets 1.4s→2.0s→3.5s</li>
+        </ul>
+      </div>
+
+      <div class="logic-card" style="margin-bottom: 16px;">
+        <h3>6. Mobile Gallery — 1-by-1 Showcase</h3>
+        <div class="meta"><strong>Where:</strong> <code>#slide-2 .product-gallery</code> at ≤820px</div>
+        <p>Replaces the desktop 3-card layout with a single-card carousel that auto-cycles every 2s.</p>
+        <ul>
+          <li>Center card: <code>scale(0.88)</code>, full opacity, no blur</li>
+          <li>Side cards: <code>scale(0.55)</code>, <code>blur(6px)</code>, <code>opacity(0.45)</code></li>
+          <li>Transition: <code>power2.out</code>, 0.5s with staggered blur</li>
+          <li>Loop: <code>setInterval</code> cycling <code>currentIdx = (currentIdx + 1) % 3</code></li>
+        </ul>
+      </div>
+
+      <div class="logic-card" style="margin-bottom: 16px;">
+        <h3>7. Slide 3 — Featured Stories Auto-Cycle</h3>
+        <div class="meta"><strong>Where:</strong> <code>#slide-3</code> — desktop + mobile</div>
+        <p>3 story items highlight in sequence, then advance to the next slide (no looping within the slide).</p>
+        <ul>
+          <li><strong>Highlight:</strong> item 0 (immediate) → 1.8s → item 1 → 1.8s → item 2 → 0.6s → <code>goToSlide(currentSlide + 1)</code></li>
+          <li><strong>Image:</strong> Updates featured image + desktop title + mobile title on each step</li>
+          <li><strong>Transition:</strong> GSAP fromTo opacity 0.3→1, blur 4px→0, scale 0.98→1 (0.2s power2.out)</li>
+          <li><strong>Cleanup:</strong> Timer cleared when leaving slide 3</li>
+        </ul>
+      </div>
+
+      <div class="logic-card" style="margin-bottom: 16px;">
+        <h3>8. Header Search — Cross-Page Sync</h3>
+        <div class="meta"><strong>Where:</strong> <code>.sh-search</code> in header on store.html, product.html, cart.html</div>
+        <p>Single search bar connects to the product catalog across all pages.</p>
+        <ul>
+          <li><strong>Navigation:</strong> On Enter → <code>store.html?search=&lt;query&gt;</code></li>
+          <li><strong>Local override:</strong> If on store.html, fills page's search input and dispatches <code>input</code> event — no reload</li>
+          <li><strong>URL param init:</strong> Reads <code>?search=</code> on page load, triggers filter</li>
+          <li><strong>Clear button:</strong> × appears when text exists, clears on click</li>
+        </ul>
+      </div>
+
+      <div class="logic-card" style="margin-bottom: 16px;">
+        <h3>9. Product Filtering — Category + Search AND Logic</h3>
+        <div class="meta"><strong>Where:</strong> <code>store.html</code> — <code>updateProducts()</code></div>
+        <p>Dual-axis filtering with AND logic: category selection AND text search work simultaneously.</p>
+        <ul>
+          <li><strong>Categories:</strong> 12 categories — each product card has <code>data-categories</code> attribute</li>
+          <li><strong>Search:</strong> Matches against product name AND all category tokens</li>
+          <li><strong>AND logic:</strong> <code>categoryMatch && searchMatch</code> must both pass</li>
+          <li><strong>Heading:</strong> "Search: query" / category name / "Best Selling"</li>
+          <li><strong>Count:</strong> Live display of visible items (e.g. "5 items")</li>
+          <li><strong>SPA-style:</strong> <code>history.pushState</code> updates URL without page reload</li>
+        </ul>
+      </div>
+
+      <div class="logic-card" style="margin-bottom: 16px;">
+        <h3>10. Multi-Bucket Cart &amp; Checkout</h3>
+        <div class="meta"><strong>Where:</strong> cart.html, product.html</div>
+        <p>LocalStorage-based cart with up to 3 named baskets, promo codes, and full checkout flow.</p>
+        <ul>
+          <li><strong>Storage:</strong> <code>localStorage.yaro_buckets</code> — array of <code>{ name, items: [] }</code></li>
+          <li><strong>Bucket tabs:</strong> Click to switch, inline rename, "Add Basket" (max 3)</li>
+          <li><strong>Item ops:</strong> Quantity +/- (stock limits), remove with confirm modal</li>
+          <li><strong>Promo codes:</strong> YARO10 (-10%), WELCOME (-15%), FLASH20 (-20%) — case-insensitive</li>
+          <li><strong>Free shipping:</strong> ₹699 threshold with gradient progress bar</li>
+          <li><strong>Checkout:</strong> Address validation (name, phone, pincode, city, state) → order ID gen → cart clear → success modal (3-5 day ETA)</li>
+          <li><strong>Urgency timer:</strong> 15:00 countdown, resets at 0:00</li>
+        </ul>
+      </div>
+
+      <div class="logic-card" style="margin-bottom: 16px;">
+        <h3>11. Product Detail — Gallery &amp; Actions</h3>
+        <div class="meta"><strong>Where:</strong> product.html</div>
+        <p>Dynamic product detail with image gallery, size selector, and two distinct action animations.</p>
+        <ul>
+          <li><strong>Image gallery:</strong> Main showcase + 3 thumbnails + arrow nav. GSAP: opacity 0.3→1, scale 0.92→1, blur 4px→0 (0.45s). Mobile swipe (40px threshold).</li>
+          <li><strong>Size buttons:</strong> S-XXL, liquid swelling effect via <code>::before</code> scale animation (0.6s elastic.out)</li>
+          <li><strong>"Keep This":</strong> Inner sparkle chase — <code>::before</code> background-position sweep, 2.8s infinite</li>
+          <li><strong>"Add to Cart":</strong> Purple circle swells from center (<code>::before</code> scale 0→20), 0.75s on hover</li>
+          <li><strong>Related carousel:</strong> Drag/swipe + arrow nav with GSAP spring bounds</li>
+        </ul>
+      </div>
+
+      <div class="logic-card" style="margin-bottom: 16px;">
+        <h3>12. Customer Reviews System</h3>
+        <div class="meta"><strong>Where:</strong> product.html</div>
+        <p>Seeded reviews, interactive star rating, and expandable review modal.</p>
+        <ul>
+          <li><strong>Seeded data:</strong> 8 hardcoded reviews with names, dates, ratings, text</li>
+          <li><strong>Star rating:</strong> Hover brightens stars, click sets rating (1-5)</li>
+          <li><strong>Form:</strong> Stars + textarea with 500 char limit and live counter</li>
+          <li><strong>Submit:</strong> Validates rating + text → adds to list → toast notification</li>
+          <li><strong>"See More":</strong> Toggle to expand/collapse long reviews</li>
+          <li><strong>Review modal:</strong> Click any review card → full content overlay</li>
+        </ul>
+      </div>
+
+      <div class="logic-card" style="margin-bottom: 16px;">
+        <h3>13. Toast Notification System</h3>
+        <div class="meta"><strong>Where:</strong> cart.html, product.html</div>
+        <p>Non-intrusive slide-in notifications for cart actions, promo codes, and errors.</p>
+        <ul>
+          <li><strong>Position:</strong> Fixed top-right, stacked vertically</li>
+          <li><strong>Entrance:</strong> translateX(120%) → 0, 0.4s ease</li>
+          <li><strong>Auto-dismiss:</strong> 3.5s, or click to dismiss immediately</li>
+          <li><strong>Types:</strong> <code>.success</code> (green #22c55e), <code>.error</code> (red #ef4444)</li>
+          <li><strong>Usage:</strong> "Added to cart", "Removed", "Promo applied", "Order placed", error messages</li>
+        </ul>
+      </div>
+
+      <div class="logic-card" style="margin-bottom: 16px;">
+        <h3>14. Leaflet Map Integration</h3>
+        <div class="meta"><strong>Where:</strong> cart.html — delivery location section</div>
+        <p>Dark-themed Leaflet map with geolocation and draggable pin.</p>
+        <ul>
+          <li><strong>Tiles:</strong> CartoDB dark matter via unpkg CSS</li>
+          <li><strong>Marker:</strong> Draggable, shows lat/lng on move</li>
+          <li><strong>Click-to-drop:</strong> Click anywhere on map to move marker</li>
+          <li><strong>Geolocation:</strong> <code>navigator.geolocation.getCurrentPosition</code> on load, high accuracy</li>
+          <li><strong>Fallback:</strong> Defaults to New Delhi [28.6139, 77.2090]</li>
+        </ul>
+      </div>
+
+      <div class="logic-card" style="margin-bottom: 16px;">
+        <h3>15. Page Entrance &amp; Transition Patterns</h3>
+        <div class="meta"><strong>Where:</strong> All pages</div>
+        <p>Consistent entrance and exit patterns across all page navigations.</p>
+        <ul>
+          <li><strong>Index entrance:</strong> Glow sweep (0.6s) → logo drops from blur 20px, y -80, scale 0.7 (1.3s power4.out) → subtitle fade → CTA fade</li>
+          <li><strong>Collection entrance:</strong> GSAP stagger on <code>.reveal-item</code> (opacity, y, scale, blur)</li>
+          <li><strong>Product entrance:</strong> TranslateY slide overlay uncovers. Gallery slides left (0.65s), info slides right (0.65s)</li>
+          <li><strong>Cart entrance:</strong> GSAP stagger fade-up on frame-content children</li>
+          <li><strong>Exit (all):</strong> Content scale(0.96) + opacity + blur → overlay active → navigate after 250ms</li>
+        </ul>
+      </div>
+
+      <div class="logic-card" style="margin-bottom: 16px;">
+        <h3>Easing Curve Reference</h3>
+        <div class="meta"><strong>Shared across all pages</strong></div>
+        <ul>
+          <li><code>cubic-bezier(0.22, 1, 0.36, 1)</code> — Primary GSAP-style ease (cursor, CTA, modals, toasts)</li>
+          <li><code>cubic-bezier(0.19, 1, 0.22, 1)</code> — Buttons, cards, thumbnails, search expand</li>
+          <li><code>cubic-bezier(0.16, 1, 0.3, 1)</code> — Modal entrances (category modal)</li>
+          <li><code>cubic-bezier(0.4, 0, 0.2, 1)</code> — Page transitions (index/collection opacity overlay)</li>
+          <li><code>cubic-bezier(0.76, 0, 0.24, 1)</code> — Page transition (product.html translateY slide)</li>
+          <li><code>power2.out / power3.out / power4.out</code> — GSAP animations</li>
+          <li><code>elastic.out(1, 0.3)</code> — Size button bounce feedback</li>
+        </ul>
+      </div>
+
+      <div class="logic-card" style="margin-bottom: 16px;">
+        <h3>Glass Morphism Pattern (All Pages)</h3>
+        <div class="meta"><strong>Architecture</strong></div>
+        <ul>
+          <li><strong>Background:</strong> Multiple radial gradients (violet/purple atmospheric tones) over <code>#0A0A0A</code></li>
+          <li><strong>Border bevel:</strong> <code>rgba(255,255,255,0.22)</code> top, <code>rgba(0,0,0,0.3)</code> bottom — creates 3D rim</li>
+          <li><strong>Box shadows:</strong> 3 outer drop-shadows, 2 outer bevel, 4 inner specular/depth, 1 violet ambient rim</li>
+          <li><strong>Grid overlay:</strong> <code>::after</code> — 1px lines at 80px intervals (60px on product.html)</li>
+          <li><strong>Noise texture:</strong> <code>::before</code> — SVG <code>feTurbulence</code>, <code>mix-blend-mode: overlay</code>, 0.35-0.4 opacity</li>
+        </ul>
+      </div>
+
+    </section>
+
+    <section id="pages">
+      <h2><span class="num">6</span> Page Architecture</h2>
+      <div class="grid-2">
+
+        <div class="card full">
+          <h3>index.html — Hero/Landing (2582 lines)</h3>
+          <p style="font-size:12px;color:var(--text-muted);margin-bottom:10px;">
+            Cinematic portal with full-screen glass frame, auto-looping slide system (3 slides), interactive logo, custom cursor with trail, CTA with impulse border.
+          </p>
+          <div class="usage-rules">
+            <strong>Key sections:</strong> .yaro-screen, .glass-layer (with obsidian stones, glows, grid, noise), .yaro-title (4 chars), brand-content, CTA wrapper, pagination dots, #slide-2 (best seller gallery with circuit wires), #slide-3 (featured stories), custom cursor (3-layer), page-transition overlay, store modal.
+          </div>
+        </div>
+
+        <div class="card full">
+          <h3>store.html — Product Catalog (2370 lines)</h3>
+          <p style="font-size:12px;color:var(--text-muted);margin-bottom:10px;">
+            Product grid with search, category filter modal (SPA-style), hero banner with floating orbs, 8 product cards.
+          </p>
+          <div class="usage-rules">
+            <strong>Key sections:</strong> .site-header, .glass-frame, .hero-banner (orbs, illustrations, dust, sweep), filter bar (search + category modal), .cat-modal (15 categories), .product-grid (3-col, 8 cards with hover lift/overlay), custom cursor, store modal, footer.
+          </div>
+        </div>
+
+        <div class="card full">
+          <h3>cart.html — Shopping Cart (1418 lines)</h3>
+          <p style="font-size:12px;color:var(--text-muted);margin-bottom:10px;">
+            Multi-bucket cart with order summary, promo codes, urgency timer, Leaflet map, modals, and related suggestions.
+          </p>
+          <div class="usage-rules">
+            <strong>Key sections:</strong> .site-header, .glass-frame, bucket tabs (up to 3), cart items with qty, free shipping bar, order summary, promo input, checkout with spinner, trust badges, location + Leaflet map, related suggestions, modals (remove/success/quick-add), toasts.
+          </div>
+        </div>
+
+        <div class="card full">
+          <h3>product.html — Product Detail (2780 lines)</h3>
+          <p style="font-size:12px;color:var(--text-muted);margin-bottom:10px;">
+            Product detail with image gallery, size selector, buy/cart modals, reviews, related carousel, story popup.
+          </p>
+          <div class="usage-rules">
+            <strong>Key sections:</strong> .site-header, .back-btn, .glass-frame, .prod-detail-layout (2-col: gallery + info), size selector (S-XXL), action buttons (Keep This / Add to Cart), specs accordion, related carousel (drag+arrows), reviews (star rating + form + modal), buy/cart modals, story popup, footer.
+          </div>
+        </div>
+
+        <div class="card full">
+          <h3>css/styles.css — Shared Styles (476 lines)</h3>
+          <p style="font-size:12px;color:var(--text-muted);margin-bottom:10px;">
+            Shared CSS for header, footer, search bar, store modal, and story popup across all pages.
+          </p>
+          <div class="usage-rules">
+            <strong>Variables:</strong> <code>--border</code>, <code>--accent</code>, <code>--accent-dim</code>. <strong>Sections:</strong> Universal header (52px fixed), search (140→200px pill), footer, store modal (backdrop-filter: blur 20px), story popup, read-story-btn. <strong>Mobile:</strong> ≤820px — 46px header, column footer.
+          </div>
+        </div>
+
+      </div>
+    </section>
+
+    <section id="scan">
+      <h2><span class="num">7</span> Live Page Scan <span class="tag tag-blueprint" id="scan-badge" style="font-size:10px;">Offline</span></h2>
+
+      <div class="logic-card" style="margin-bottom: 16px; border-color: rgba(255,255,255,0.15); background: rgba(0,0,0,0.55);">
+        <p style="margin-bottom: 0; color: rgba(255,255,255,0.65); font-size: 13px;">
+          Fetches and analyzes all public site pages in real time. Updates automatically every 30s. Data reflects the live DOM structure — not this document.
+        </p>
+      </div>
+
+      <div id="scan-grid" class="grid-2">
+        <div class="card" id="scan-index">
+          <h3>index.html</h3>
+          <div class="meta" style="font-size:12px;color:var(--text-muted);">Status: <span class="scan-status">Waiting...</span></div>
+          <div class="scan-details" style="font-size:12px;color:var(--text-muted);margin-top:8px;"></div>
+        </div>
+        <div class="card" id="scan-collection">
+          <h3>store.html</h3>
+          <div class="meta" style="font-size:12px;color:var(--text-muted);">Status: <span class="scan-status">Waiting...</span></div>
+          <div class="scan-details" style="font-size:12px;color:var(--text-muted);margin-top:8px;"></div>
+        </div>
+        <div class="card" id="scan-product">
+          <h3>product.html</h3>
+          <div class="meta" style="font-size:12px;color:var(--text-muted);">Status: <span class="scan-status">Waiting...</span></div>
+          <div class="scan-details" style="font-size:12px;color:var(--text-muted);margin-top:8px;"></div>
+        </div>
+        <div class="card" id="scan-cart">
+          <h3>cart.html</h3>
+          <div class="meta" style="font-size:12px;color:var(--text-muted);">Status: <span class="scan-status">Waiting...</span></div>
+          <div class="scan-details" style="font-size:12px;color:var(--text-muted);margin-top:8px;"></div>
+        </div>
+        <div class="card full" id="scan-summary">
+          <h3>Cross-Page Inventory</h3>
+          <div class="scan-details" style="font-size:12px;color:var(--text-muted);margin-top:8px;"></div>
+        </div>
+      </div>
+    </section>
+
+  </div>
+
+  <div class="backup-modal-overlay" id="backup-overlay">
+    <div class="backup-modal" id="backup-modal">
+      <div class="bm-header">
+        <div class="bm-title">
+          <span>◈</span> Code Backup
+        </div>
+        <button class="bm-close" id="backup-close">✕</button>
+      </div>
+
+      <div id="backup-body">
+        <div style="font-size:12px;color:var(--text-muted);line-height:1.6;margin-bottom:4px;">
+          Scans every source file, computes fingerprints, and detects what changed — modified, added, or removed since the last snapshot.
+        </div>
+
+        <div class="bm-progress-wrap" id="backup-progress-wrap" style="display:none;">
+          <div class="bm-progress-bar">
+            <div class="bm-progress-fill" id="backup-progress-fill"></div>
+          </div>
+          <div class="bm-progress-info">
+            <span class="bm-progress-pct" id="backup-progress-pct">0%</span>
+            <span class="bm-progress-status" id="backup-progress-status">Initializing...</span>
+          </div>
+        </div>
+
+        <div class="bm-log" id="backup-log"></div>
+
+        <div id="backup-results" style="display:none;">
+          <div class="bm-results" id="backup-stats">
+            <div class="bm-stat modified"><div class="stat-num" id="stat-modified">0</div><div class="stat-label">Modified</div></div>
+            <div class="bm-stat added"><div class="stat-num" id="stat-added">0</div><div class="stat-label">Added</div></div>
+            <div class="bm-stat removed"><div class="stat-num" id="stat-removed">0</div><div class="stat-label">Removed</div></div>
+          </div>
+          <div class="bm-file-list" id="backup-file-list"></div>
+          <div class="bm-snapshot-info" id="backup-snapshot-info"></div>
+        </div>
+
+        <div class="bm-actions">
+          <button class="bm-btn primary" id="backup-start">Start Backup</button>
+          <button class="bm-btn secondary" id="backup-close-btn">Close</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    (function() {
+      var proto = window.location.protocol;
+      var host = window.location.hostname;
+      var isLocalFile = proto === 'file:';
+      var isLocalhost = host === 'localhost' || host === '127.0.0.1' || host === '::1';
+
+      if (!isLocalFile && !isLocalhost) {
+        document.body.innerHTML =
+          '<div class="deploy-blocker">' +
+            '<div class="block-icon">&#128274;</div>' +
+            '<h1>Access Denied</h1>' +
+            '<p>This file is <strong>strictly confidential</strong> and must never be deployed to any web server or hosting platform.</p>' +
+            '<p style="margin-top:12px;">It may only be opened locally or uploaded to <strong>Google Drive</strong> for personal backup.</p>' +
+            '<p style="margin-top:20px;font-size:12px;color:rgba(255,255,255,0.3);">YARO &mdash; Internal Use Only</p>' +
+          '</div>';
+        throw new Error('YARO: deployment blocked');
+      }
+    })();
+
+    function updateDataStatus() {
+      const dot = document.getElementById('tb-dot');
+      const label = document.getElementById('tb-label');
+      const timeEl = document.getElementById('tb-time');
+      const now = new Date();
+      const timeStr = now.toLocaleString(undefined, {
+        month: 'short', day: 'numeric',
+        hour: '2-digit', minute: '2-digit', second: '2-digit'
+      });
+      const isActive = document.visibilityState === 'visible';
+      dot.className = 'dot ' + (isActive ? 'active' : 'inactive');
+      label.textContent = isActive ? 'Collecting' : 'Standby';
+      timeEl.textContent = timeStr;
+    }
+    updateDataStatus();
+    document.addEventListener('visibilitychange', updateDataStatus);
+    setInterval(updateDataStatus, 30000);
+
+    (function attachCopyButtons(root) {
+      var snippets = (root || document).querySelectorAll('.code-snip:not([data-copy-ready])');
+      snippets.forEach(function(el) {
+        el.dataset.copyReady = '1';
+        var btn = document.createElement('button');
+        btn.className = 'copy-snip';
+        btn.textContent = 'Copy';
+        btn.addEventListener('click', function(e) {
+          e.stopPropagation();
+          var text = el.innerText.replace(/Copy$/, '').trim();
+          navigator.clipboard.writeText(text).then(function() {
+            btn.textContent = 'Copied!';
+            btn.style.background = '#c4b5fd';
+            btn.style.color = '#000';
+            setTimeout(function() {
+              btn.textContent = 'Copy';
+              btn.style.background = '';
+              btn.style.color = '';
+            }, 1200);
+          })['catch'](function() {
+            btn.textContent = 'Error';
+          });
+        });
+        el.appendChild(btn);
+      });
+    })();
+
+    var copyObserver = new MutationObserver(function() { attachCopyButtons(); });
+    copyObserver.observe(document.body, { childList: true, subtree: true });
+
+    document.querySelectorAll('.nav-links a').forEach(link => {
+      link.addEventListener('click', () => {
+        document.querySelectorAll('.nav-links a').forEach(a => a.classList.remove('active'));
+        link.classList.add('active');
+      });
+    });
+
+    const observer = new IntersectionObserver(entries => {
+      entries.forEach(entry => {
+        if (entry.isIntersecting) {
+          const id = entry.target.id;
+          document.querySelectorAll('.nav-links a').forEach(a => {
+            a.classList.toggle('active', a.getAttribute('href') === '#' + id);
+          });
+        }
+      });
+    });
+
+    document.querySelectorAll('section[id]').forEach(s => observer.observe(s));
+
+    // ─── BACKUP SYSTEM ───
+    (function() {
+      const btn = document.getElementById('backup-btn');
+      const overlay = document.getElementById('backup-overlay');
+      const modal = document.getElementById('backup-modal');
+      const closeBtn = document.getElementById('backup-close');
+      const closeBtn2 = document.getElementById('backup-close-btn');
+      const startBtn = document.getElementById('backup-start');
+      const progressWrap = document.getElementById('backup-progress-wrap');
+      const progressFill = document.getElementById('backup-progress-fill');
+      const progressPct = document.getElementById('backup-progress-pct');
+      const progressStatus = document.getElementById('backup-progress-status');
+      const logEl = document.getElementById('backup-log');
+      const resultsEl = document.getElementById('backup-results');
+      const statModified = document.getElementById('stat-modified');
+      const statAdded = document.getElementById('stat-added');
+      const statRemoved = document.getElementById('stat-removed');
+      const fileList = document.getElementById('backup-file-list');
+      const snapshotInfo = document.getElementById('backup-snapshot-info');
+
+      const FILES = [
+        'index.html', 'store.html', 'cart.html', 'product.html',
+        'css/styles.css', 'YARO-Brand-Guidelines.html'
+      ];
+      const SNAPSHOT_KEY = 'yaro_brand_snapshot';
+
+      function loadSnapshot() {
+        try { return JSON.parse(localStorage.getItem(SNAPSHOT_KEY)) || {}; } catch(e) { return {}; }
+      }
+
+      function saveSnapshot(snap) {
+        localStorage.setItem(SNAPSHOT_KEY, JSON.stringify(snap));
+      }
+
+      // Simple hash function
+      function hash(str) {
+        let h = 0;
+        for (let i = 0; i < str.length; i++) {
+          h = ((h << 5) - h) + str.charCodeAt(i);
+          h |= 0;
+        }
+        return h.toString(36);
+      }
+
+      function addLog(icon, fname, msg) {
+        const item = document.createElement('div');
+        item.className = 'bm-log-item';
+        item.innerHTML = '<span class="l-icon ' + icon + '">' +
+          (icon === 'ready' ? '✓' : icon === 'fetch' ? '↻' : icon === 'done' ? '✓' : icon === 'warn' ? '!' : icon === 'err' ? '✗' : '#') +
+          '</span><span class="l-fname">' + fname + '</span><span class="l-msg">' + msg + '</span>';
+        logEl.appendChild(item);
+        logEl.scrollTop = logEl.scrollHeight;
+      }
+
+      function clearLog() {
+        logEl.innerHTML = '';
+      }
+
+      function updateProgress(pct, status) {
+        progressFill.style.width = pct + '%';
+        progressPct.textContent = pct + '%';
+        progressStatus.textContent = status || '';
+      }
+
+      function openModal() {
+        overlay.classList.add('open');
+        document.body.style.overflow = 'hidden';
+      }
+
+      function closeModal() {
+        overlay.classList.remove('open');
+        document.body.style.overflow = '';
+      }
+
+      btn.addEventListener('click', openModal);
+      closeBtn.addEventListener('click', closeModal);
+      closeBtn2.addEventListener('click', closeModal);
+      overlay.addEventListener('click', function(e) {
+        if (e.target === overlay) closeModal();
+      });
+
+      startBtn.addEventListener('click', async function() {
+        startBtn.classList.add('done');
+        startBtn.textContent = 'Scanning...';
+        clearLog();
+        progressWrap.style.display = 'block';
+        resultsEl.style.display = 'none';
+        updateProgress(0, 'Initializing...');
+
+        const oldSnap = loadSnapshot();
+        const newSnap = {};
+        let modified = 0, added = 0, removed = 0;
+        const fileChanges = [];
+
+        // Check removed files
+        for (const fname in oldSnap) {
+          if (!FILES.includes(fname)) {
+            removed++;
+            fileChanges.push({ name: fname, type: 'del', detail: 'Removed from scan list' });
+            addLog('warn', fname, 'File removed');
+          }
+        }
+
+        for (let i = 0; i < FILES.length; i++) {
+          const fname = FILES[i];
+          updateProgress(Math.round((i / FILES.length) * 100), 'Fetching ' + fname + '...');
+          addLog('fetch', fname, 'Reading...');
+
+          try {
+            const response = await fetch(fname + '?t=' + Date.now());
+            if (!response.ok) throw new Error('HTTP ' + response.status);
+            const text = await response.text();
+            const h = hash(text);
+            newSnap[fname] = h;
+
+            if (oldSnap[fname] === undefined) {
+              added++;
+              fileChanges.push({ name: fname, type: 'add', detail: 'New file tracked' });
+              addLog('done', fname, 'Added to tracking');
+            } else if (oldSnap[fname] !== h) {
+              modified++;
+              fileChanges.push({ name: fname, type: 'mod', detail: 'Content changed' });
+              addLog('done', fname, 'Modified');
+            } else {
+              fileChanges.push({ name: fname, type: 'ok', detail: 'Unchanged' });
+              addLog('done', fname, 'Unchanged');
+            }
+          } catch (err) {
+            addLog('err', fname, err.message);
+            if (!oldSnap[fname]) {
+              newSnap[fname] = 'unreachable';
+            }
+          }
+        }
+
+        updateProgress(100, 'Complete');
+
+        // Show results
+        statModified.textContent = modified;
+        statAdded.textContent = added;
+        statRemoved.textContent = removed;
+        fileList.innerHTML = '';
+        fileChanges.forEach(fc => {
+          const div = document.createElement('div');
+          div.className = 'bm-file-item';
+          div.innerHTML = '<span class="fi-icon ' + fc.type + '">' +
+            (fc.type === 'add' ? '+' : fc.type === 'mod' ? '~' : fc.type === 'del' ? '−' : '✓') +
+            '</span><span class="fi-name">' + fc.name + '</span><span class="fi-detail">' + fc.detail + '</span>';
+          fileList.appendChild(div);
+        });
+
+        const now = new Date();
+        const snapTime = now.toLocaleString(undefined, { month: 'short', day: 'numeric', hour: '2-digit', minute: '2-digit', second: '2-digit' });
+        snapshotInfo.innerHTML = '<strong>Snapshot:</strong> ' + snapTime + ' &middot; <strong>Files:</strong> ' + FILES.length + ' &middot; <strong>Changes:</strong> ' + (modified + added + removed);
+
+        resultsEl.style.display = 'block';
+        saveSnapshot(newSnap);
+        startBtn.classList.remove('done');
+        startBtn.textContent = 'Start Backup';
+      });
+    })();
+  </script>
+</body>
+</html>

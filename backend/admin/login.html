@@ -1,0 +1,40 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>YARO Admin Login</title>
+<link rel="stylesheet" href="css/admin.css">
+</head>
+<body class="login-page">
+  <div class="login-container">
+    <div class="login-brand">YARO</div>
+    <h1>Admin Login</h1>
+    <form id="login-form">
+      <input type="email" id="login-email" placeholder="Admin Email" required>
+      <input type="password" id="login-password" placeholder="Password" required>
+      <button type="submit">Sign In</button>
+      <p id="login-error" class="error-msg"></p>
+    </form>
+  </div>
+  <script>
+    document.getElementById('login-form').addEventListener('submit', async function(e) {
+      e.preventDefault();
+      const email = document.getElementById('login-email').value;
+      const password = document.getElementById('login-password').value;
+      const errEl = document.getElementById('login-error');
+      try {
+        const res = await fetch('/api/auth/admin/login', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ email, password })
+        });
+        const data = await res.json();
+        if (!res.ok) { errEl.textContent = data.error; return; }
+        localStorage.setItem('admin_token', data.token);
+        window.location.href = 'index.html';
+      } catch(e) { errEl.textContent = 'Connection error'; }
+    });
+  </script>
+</body>
+</html>

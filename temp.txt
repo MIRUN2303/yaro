@@ -1,0 +1,46 @@
+409:     .yaro-title .char {
+410:       display: inline-block;
+411:       transition: color 0.4s ease,
+412:                   text-shadow 0.4s ease;
+413:       will-change: transform, color;
+414:       pointer-events: none;
+415:     }
+416: 
+417:     /* ─── SUBTITLE ─── */
+418:     .yaro-subtitle {
+419:       font-family: 'Clash Display', sans-serif;
+420:       font-weight: 300;
+421:       box-shadow:
+422:         inset 0 1px 0 rgba(255, 255, 255, 0.3),
+423:         inset 0 -2px 4px rgba(0, 0, 0, 0.35),
+424:         0 0 30px rgba(196, 181, 253, 0.15),
+425:         0 12px 40px rgba(0, 0, 0, 0.4);
+426:     }
+427: 
+428:     .cta-btn:active {
+429:       transform: scale(0.97);
+430:     }
+431: 
+432:     .cta-btn .arrow {
+433:       display: inline-flex;
+434:       align-items: center;
+435:       justify-content: center;
+436:       width: 28px;
+437:       height: 28px;
+438:       border-radius: 50%;
+439:       background: rgba(255, 255, 255, 0.08);
+440:       border: 1px solid rgba(255, 255, 255, 0.12);
+441:       font-size: 0.75rem;
+442:       transition: transform 0.4s cubic-bezier(0.22, 1, 0.36, 1);
+443:       flex-shrink: 0;
+444:     }
+445: 
+446:     .cta-btn:hover .arrow {
+447:       transform: rotate(-45deg);
+448:     }
+449:     .pagination-dots {
+450:       position: absolute;
+451:       bottom: 24px;
+452:       left: 50%;
+453:       transform: translateX(-50%);
+454:       display: flex;

@@ -1,0 +1,38 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>YARO Admin</title>
+<link rel="stylesheet" href="css/admin.css">
+</head>
+<body>
+<div id="app">
+  <aside id="sidebar">
+    <div class="sidebar-brand">YARO Admin</div>
+    <nav>
+      <a href="#" data-page="dashboard" class="active">Dashboard</a>
+      <a href="#" data-page="collections">Collections</a>
+      <a href="#" data-page="stories">Stories</a>
+      <a href="#" data-page="products">Products</a>
+      <a href="#" data-page="orders">Orders</a>
+    </nav>
+    <div class="sidebar-footer">
+      <button id="logout-btn">Logout</button>
+    </div>
+  </aside>
+  <main id="main-content">
+    <div id="page-content"></div>
+  </main>
+</div>
+
+<div id="modal-overlay" class="modal-overlay">
+  <div class="modal">
+    <button class="modal-close">&times;</button>
+    <div id="modal-body"></div>
+  </div>
+</div>
+
+<script src="js/admin.js"></script>
+</body>
+</html>
