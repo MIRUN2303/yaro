@@ -99,6 +99,11 @@ app.get('/api/health', (req, res) => {
   res.json({ status: 'ok', timestamp: new Date().toISOString() });
 });
 
+// ─── REDIRECT ROOT TO FRONTEND (for Supabase email confirmations) ───
+app.get('/', (req, res) => {
+  res.redirect(process.env.FRONTEND_URL === '*' ? 'http://localhost:3000/store.html' : process.env.FRONTEND_URL);
+});
+
 // ─── 404 CATCH ───
 app.use((req, res) => {
   res.status(404).json({ error: 'Not found' });
