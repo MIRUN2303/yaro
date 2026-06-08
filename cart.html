@@ -666,7 +666,7 @@
                 <input type="text" class="loc-input" id="loc-city" placeholder="City *">
                 <input type="text" class="loc-input" id="loc-pincode" placeholder="Pincode *">
               </div>
-              <input type="text" class="loc-input" id="loc-landmark" placeholder="Landmark (optional)">
+              <input type="text" class="loc-input" id="loc-landmark" placeholder="Landmark *">
               <input type="text" class="loc-input" id="loc-instructions" placeholder="Delivery instructions (optional)">
               <button class="loc-use-btn" id="loc-detect-btn">
                 📡 Detect My Location
@@ -1146,8 +1146,9 @@
       var address = document.getElementById('loc-address').value.trim();
       var city = document.getElementById('loc-city').value.trim();
       var pincode = document.getElementById('loc-pincode').value.trim();
+      var landmark = document.getElementById('loc-landmark').value.trim();
 
-      if (!name || !phone || !door || !address || !city || !pincode) {
+      if (!name || !phone || !door || !address || !city || !pincode || !landmark) {
         showToast('Please fill in your delivery address', 'error');
         document.querySelector('.location-section').scrollIntoView({ behavior: 'smooth', block: 'center' });
         return;
