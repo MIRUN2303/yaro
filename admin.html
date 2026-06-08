@@ -190,6 +190,25 @@ html, body { width: 100%; min-height: 100vh; background: var(--bg); font-family:
 .site-header .sh-nav a.active {
   color: var(--accent);
 }
+.back-store-btn {
+  color: rgba(255,255,255,0.25);
+  text-decoration: none;
+  font-size: 9px;
+  letter-spacing: 0.1em;
+  font-family: 'Clash Display', sans-serif;
+  margin-left: 16px;
+  padding: 4px 10px;
+  border: 1px solid rgba(255,255,255,0.06);
+  border-radius: 6px;
+  transition: all 0.25s ease;
+  text-transform: uppercase;
+  white-space: nowrap;
+}
+.back-store-btn:hover {
+  color: var(--accent);
+  border-color: rgba(196,181,253,0.2);
+  background: rgba(196,181,253,0.06);
+}
 .site-header .sh-nav .admin-email {
   font-size: 9px;
   opacity: 0.35;
@@ -540,6 +559,7 @@ img.thumb {
 <div id="admin-app">
   <header class="site-header">
     <a href="/" class="sh-logo">YARO</a>
+    <a href="/" class="back-store-btn">&larr; Store</a>
     <nav class="sh-nav">
       <a class="active" data-page="dashboard">Dashboard</a>
       <a data-page="collections">Collections</a>
