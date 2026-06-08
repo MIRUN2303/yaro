@@ -9,6 +9,10 @@
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.cdnfonts.com/css/pilowlava" rel="stylesheet">
   <link href="https://api.fontshare.com/v2/css?f[]=clash-display@200,300,400,500,600,700&display=swap" rel="stylesheet">
+  <link rel="dns-prefetch" href="https://tile.openstreetmap.org">
+  <link rel="dns-prefetch" href="https://cdnjs.cloudflare.com">
+  <link rel="preconnect" href="https://tile.openstreetmap.org">
+  <link rel="preconnect" href="https://cdnjs.cloudflare.com">
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.min.css" />
   <style>
     * { margin: 0; padding: 0; box-sizing: border-box; }
@@ -290,24 +294,31 @@
     .location-grid {
       display: grid; grid-template-columns: 1fr 1fr; gap: 24px;
     }
-    .loc-form { display: flex; flex-direction: column; gap: 12px; }
+    .loc-form { display: flex; flex-direction: column; gap: 12px; padding: 20px; border-radius: 12px; background: rgba(255,255,255,0.03); border: 1px solid rgba(139,92,246,0.08); box-shadow: 0 0 20px rgba(139,92,246,0.03); }
     .loc-input {
       width: 100%; padding: 12px 16px; border-radius: 8px;
-      border: 1px solid rgba(255,255,255,0.04); background: rgba(255,255,255,0.02);
+      border: 1px solid rgba(255,255,255,0.07); background: rgba(255,255,255,0.04);
       font-family: inherit; font-size: 12px; color: #fff; outline: none;
-      transition: border-color 0.3s ease;
+      transition: border-color 0.3s ease, box-shadow 0.3s ease;
     }
-    .loc-input:focus { border-color: rgba(255,255,255,0.08); }
-    .loc-input::placeholder { color: rgba(255,255,255,0.15); }
+    .loc-input:focus { border-color: rgba(139,92,246,0.3); box-shadow: 0 0 12px rgba(139,92,246,0.06); }
+    .loc-input::placeholder { color: rgba(255,255,255,0.2); }
     .loc-row { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
     .loc-map-wrap {
       border-radius: 12px; overflow: hidden; border: 1px solid rgba(139,92,246,0.15);
+      box-shadow: 0 0 24px rgba(139,92,246,0.04);
       height: 320px; position: relative; background: #1a1a2e;
     }
     .loc-map-wrap #map {
       width: 100%; height: 100%;
+      background: repeating-conic-gradient(#1e1e3a 0% 25%, transparent 0% 50%) 0 0 / 20px 20px;
     }
-    .loc-map-wrap .leaflet-control-attribution { display: none; }
+    .map-placeholder {
+      display: flex; align-items: center; justify-content: center;
+      height: 100%; color: rgba(255,255,255,0.25); font-size: 12px;
+    }
+    .leaflet-container .map-placeholder { display: none; }
+    .loc-map-wrap .leaflet-control-attribution { font-size: 9px; color: rgba(255,255,255,0.2); background: rgba(0,0,0,0.3); padding: 2px 6px; }
     .loc-map-pin-info {
       position: absolute; bottom: 12px; left: 12px; right: 12px;
       padding: 10px 14px; border-radius: 8px;
@@ -319,12 +330,12 @@
     .loc-map-pin-info.show { display: flex; }
     .loc-map-pin-info svg { width: 12px; height: 12px; color: var(--danger); flex-shrink: 0; }
     .loc-use-btn {
-      margin-top: 8px; padding: 10px 20px; border-radius: 8px; border: none;
-      background: rgba(255,255,255,0.04); color: var(--text-muted);
+      margin-top: 8px; padding: 10px 20px; border-radius: 8px; border: 1px solid rgba(139,92,246,0.1);
+      background: rgba(139,92,246,0.06); color: var(--text-muted);
       font-family: inherit; font-size: 11px; font-weight: 600; cursor: pointer;
       transition: all 0.3s ease; align-self: flex-start;
     }
-    .loc-use-btn:hover { background: rgba(255,255,255,0.06); color: #fff; }
+    .loc-use-btn:hover { background: rgba(139,92,246,0.12); color: #fff; box-shadow: 0 0 16px rgba(139,92,246,0.06); }
 
     /* ─── RELATED SUGGESTIONS ─── */
     .cart-suggestions { margin-top: 48px; padding-top: 40px; border-top: 1px solid rgba(255,255,255,0.03); }
@@ -464,6 +475,8 @@
       .cart-header { flex-direction: column; align-items: flex-start; gap: 12px; }
       .cs-grid { grid-template-columns: repeat(2, 1fr); gap: 10px; }
       .loc-map-wrap { height: 240px; }
+      .location-grid { grid-template-columns: 1fr; }
+      .loc-form { padding: 14px; gap: 8px; }
       .loc-row { grid-template-columns: 1fr; }
       .modal-box { padding: 24px; }
     }
@@ -601,8 +614,8 @@
         <div class="cart-layout">
 
           <!-- Left: Cart Items -->
+          <div id="bucket-tabs" style="display:none"></div>
           <div class="cart-items" id="cart-items">
-            <div id="bucket-tabs" style="display:none"></div>
             <!-- Dynamically rendered -->
           </div>
 
@@ -647,11 +660,13 @@
             <div class="loc-form">
               <input type="text" class="loc-input" id="loc-name" placeholder="Full Name *">
               <input type="tel" class="loc-input" id="loc-phone" placeholder="Phone Number *">
+              <input type="text" class="loc-input" id="loc-door" placeholder="Door / Flat / House No. *">
               <input type="text" class="loc-input" id="loc-address" placeholder="Street / Building / Apartment *">
               <div class="loc-row">
                 <input type="text" class="loc-input" id="loc-city" placeholder="City *">
                 <input type="text" class="loc-input" id="loc-pincode" placeholder="Pincode *">
               </div>
+              <input type="text" class="loc-input" id="loc-landmark" placeholder="Landmark (optional)">
               <input type="text" class="loc-input" id="loc-instructions" placeholder="Delivery instructions (optional)">
               <button class="loc-use-btn" id="loc-detect-btn">
                 📡 Detect My Location
@@ -659,7 +674,7 @@
             </div>
             <div>
               <div class="loc-map-wrap">
-                <div id="map"></div>
+                <div id="map"><div class="map-placeholder">Loading map…</div></div>
                 <div class="loc-map-pin-info" id="loc-pin-info">
                   <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/><circle cx="12" cy="10" r="3"/></svg>
                   <span id="loc-pin-coords">Drop a pin by clicking on the map</span>
@@ -904,7 +919,8 @@
         container.innerHTML = '<div class="cart-empty"><div class="cart-empty-icon">🛒</div><div class="cart-empty-text">Your cart is empty</div><div class="cart-empty-sub">Looks like you haven\'t added anything yet</div><a href="store.html" class="cart-empty-btn">Explore Collection</a></div>';
         document.getElementById('cart-clear-btn').style.display = 'none';
         document.getElementById('urgency-timer').style.display = 'none';
-        document.getElementById('bucket-tabs').innerHTML = '';
+        var bt = document.getElementById('bucket-tabs');
+        if (bt) { bt.innerHTML = ''; bt.style.display = 'none'; }
         updateSummary(0);
         return;
       }
@@ -1126,11 +1142,12 @@
 
       var name = document.getElementById('loc-name').value.trim();
       var phone = document.getElementById('loc-phone').value.trim();
+      var door = document.getElementById('loc-door').value.trim();
       var address = document.getElementById('loc-address').value.trim();
       var city = document.getElementById('loc-city').value.trim();
       var pincode = document.getElementById('loc-pincode').value.trim();
 
-      if (!name || !phone || !address || !city || !pincode) {
+      if (!name || !phone || !door || !address || !city || !pincode) {
         showToast('Please fill in your delivery address', 'error');
         document.querySelector('.location-section').scrollIntoView({ behavior: 'smooth', block: 'center' });
         return;
@@ -1212,17 +1229,81 @@
       }, { enableHighAccuracy: true, timeout: 8000 });
     });
 
-    // ─── MAP INIT ───
+    // ─── MAP INIT (Intelligent) ───
+    var MAP_TILE_PROVIDERS = [
+      {
+        url: 'https://tile.openstreetmap.org/{z}/{x}/{y}.png',
+        opts: { maxZoom: 19, attribution: '&copy; <a href="https://openstreetmap.org/copyright">OSM</a>' }
+      },
+      {
+        url: 'https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png',
+        opts: { maxZoom: 19 }
+      }
+    ];
+    var mapTileIndex = 0;
+    var mapFailed = false;
+
+    function tryNextTileProvider() {
+      if (!map || mapFailed) return;
+      mapTileIndex++;
+      if (mapTileIndex >= MAP_TILE_PROVIDERS.length) {
+        console.warn('All tile providers failed');
+        return;
+      }
+      var p = MAP_TILE_PROVIDERS[mapTileIndex];
+      L.tileLayer(p.url, p.opts).addTo(map);
+    }
+
     function initMap() {
       var mapEl = document.getElementById('map');
-      if (!mapEl) return;
-      if (typeof L === 'undefined') return;
-      map = L.map('map', { zoomControl: true, attributionControl: false }).setView([20.5937, 78.9629], 5);
-      L.tileLayer('https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png', {
-        maxZoom: 19
-      }).addTo(map);
-      setTimeout(function() { map.invalidateSize(); }, 300);
+      if (!mapEl) {
+        console.warn('Map element not found, retrying...');
+        setTimeout(initMap, 500);
+        return;
+      }
+      if (typeof L === 'undefined') {
+        console.warn('Leaflet not available, retrying...');
+        setTimeout(initMap, 500);
+        return;
+      }
+      doInitMap();
+    }
 
+    function doInitMap() {
+      var mapEl = document.getElementById('map');
+      if (!mapEl) return;
+      if (leafletFallbackUsed) return;
+
+      // Destroy existing map if any
+      if (map) { map.remove(); map = null; }
+
+      mapTileIndex = 0;
+      mapFailed = false;
+
+      map = L.map('map', {
+        zoomControl: true,
+        attributionControl: true
+      }).setView([20.5937, 78.9629], 5);
+
+      // Load first tile provider
+      var p = MAP_TILE_PROVIDERS[mapTileIndex];
+      var currentLayer = L.tileLayer(p.url, p.opts).addTo(map);
+
+      // Auto-fallback on tile error
+      map.on('tileerror', function() {
+        if (mapFailed) return;
+        mapFailed = true;
+        console.warn('Tile provider failed, trying fallback...');
+        map.eachLayer(function(l) { if (l instanceof L.TileLayer) map.removeLayer(l); });
+        tryNextTileProvider();
+      });
+
+      // Multiple invalidateSize calls at staggered intervals
+      [100, 300, 600, 1000, 2000].forEach(function(d) {
+        setTimeout(function() { if (map) map.invalidateSize(); }, d);
+      });
+
+      // Pin on click
       map.on('click', function(e) {
         mapLat = e.latlng.lat;
         mapLng = e.latlng.lng;
@@ -1238,11 +1319,20 @@
         document.getElementById('loc-pin-info').classList.add('show');
         document.getElementById('loc-pin-coords').textContent = mapLat.toFixed(6) + ', ' + mapLng.toFixed(6);
         reverseGeocode(mapLat, mapLng);
-        showToast('📍 Pin dropped! Address fields updated.', 'success');
+        showToast('📍 Pin dropped!', 'success');
       });
 
-      // Fix map render after modal opens
-      setTimeout(function() { map.invalidateSize(); }, 300);
+      // Re-invalidate on any modal opening
+      var origOpen_ = document.body.appendChild || true;
+      if (window.MutationObserver) {
+        var mapObserver = new MutationObserver(function() {
+          setTimeout(function() { if (map) map.invalidateSize(); }, 200);
+        });
+        setTimeout(function() {
+          var modal = document.querySelector('.modal-overlay');
+          if (modal) mapObserver.observe(modal, { attributes: true, attributeFilter: ['class'] });
+        }, 100);
+      }
     }
 
     // ─── REVERSE GEOCODE ───
@@ -1253,10 +1343,12 @@
         .then(function(data) {
           if (!data || !data.address) return;
           var addr = data.address;
-          var street = [addr.house_number, addr.road, addr.suburb, addr.neighbourhood].filter(Boolean).join(', ');
+          var d = addr.house_number || '';
+          var street = [addr.road, addr.suburb, addr.neighbourhood].filter(Boolean).join(', ');
           var city = addr.city || addr.town || addr.village || addr.county || '';
           var pincode = addr.postcode || '';
           var state = addr.state || '';
+          if (d) document.getElementById('loc-door').value = d;
           document.getElementById('loc-address').value = street;
           document.getElementById('loc-city').value = city;
           document.getElementById('loc-pincode').value = pincode;
@@ -1319,6 +1411,16 @@
     var modalObserver = new MutationObserver(function() {
       // no-op, GSAP handles via CSS transitions already
     });
+
+    // ─── FALLBACK: if Leaflet CDN / tiles are blocked, use OSM iframe ───
+    var leafletFallbackUsed = false;
+    setTimeout(function() {
+      var mapEl = document.getElementById('map');
+      if (mapEl && !mapEl.classList.contains('leaflet-container')) {
+        leafletFallbackUsed = true;
+        mapEl.innerHTML = '<iframe src="https://www.openstreetmap.org/export/embed.html?bbox=68,7,98,37&layer=mapnik&marker=20.5937,78.9629" style="width:100%;height:100%;border:none;border-radius:8px"></iframe>';
+      }
+    }, 3000);
 
     // ─── INIT ───
     window.addEventListener('DOMContentLoaded', function() {
