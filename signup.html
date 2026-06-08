@@ -233,7 +233,7 @@
         } else {
           errEl.textContent = (data && data.error) || 'Signup failed. Try again.';
         }
-      } catch(e) { errEl.textContent = 'Connection error. Please try again.'; }
+      } catch(e) { console.error('signup page error:', e); errEl.textContent = 'Something went wrong. Check console for details.'; }
       btn.classList.remove('loading');
       btn.disabled = false;
     });

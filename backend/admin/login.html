@@ -33,7 +33,7 @@
         if (!res.ok) { errEl.textContent = data.error; return; }
         localStorage.setItem('admin_token', data.token);
         window.location.href = 'index.html';
-      } catch(e) { errEl.textContent = 'Connection error'; }
+      } catch(e) { console.error('admin login error:', e); errEl.textContent = 'Cannot reach server. Check your connection.'; }
     });
   </script>
 </body>

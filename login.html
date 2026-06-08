@@ -245,7 +245,7 @@
         } else {
           errEl.textContent = (data && data.error) || 'Invalid email or password';
         }
-      } catch(e) { errEl.textContent = 'Connection error. Please try again.'; }
+      } catch(e) { console.error('login error:', e); errEl.textContent = 'Something went wrong. Check console for details.'; }
       btn.classList.remove('loading');
       btn.disabled = false;
     });

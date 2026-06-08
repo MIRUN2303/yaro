@@ -119,7 +119,7 @@ const YARO_API = (function() {
         localStorage.setItem('sb_token', data.access_token);
         localStorage.setItem('sb_refresh', data.refresh_token);
         return { user: data.user, session: data };
-      } catch(e) { return { error: 'Connection error' }; }
+      } catch(e) { console.error('signIn error:', e); return { error: e.message || 'Network error — check your connection' }; }
     },
 
     async signUp(email, password, meta) {
@@ -132,9 +132,9 @@ const YARO_API = (function() {
           body: JSON.stringify(body)
         });
         var data = await res.json();
-        if (!res.ok || data.error) return { error: data.msg || 'Signup failed' };
+        if (!res.ok || data.error) return { error: data.msg || 'Signup failed (code ' + res.status + ')' };
         return { user: data };
-      } catch(e) { return { error: 'Connection error' }; }
+      } catch(e) { console.error('signUp error:', e); return { error: e.message || 'Network error — check your connection' }; }
     },
 
     async signOut() {
