@@ -481,62 +481,6 @@
       margin-bottom: 10px;
     }
 
-    .size-stepper {
-      display: flex;
-      align-items: center;
-      gap: 8px;
-      padding: 6px 10px;
-      border-radius: 8px;
-      background: rgba(255,255,255,0.01);
-      border: 1px solid rgba(255,255,255,0.04);
-      flex-shrink: 0;
-    }
-    .size-stepper .size-label {
-      font-size: 9px;
-      font-weight: 700;
-      letter-spacing: 0.08em;
-      text-transform: uppercase;
-      color: var(--text-muted);
-    }
-    .size-stepper .qty-control {
-      display: flex;
-      align-items: center;
-      gap: 0;
-      border: 1px solid rgba(255,255,255,0.06);
-      border-radius: 5px;
-      overflow: hidden;
-      background: rgba(255,255,255,0.02);
-    }
-    .size-stepper .qty-control .qty-btn {
-      width: 28px;
-      height: 28px;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      background: transparent;
-      border: none;
-      color: rgba(255,255,255,0.4);
-      font-size: 13px;
-      cursor: pointer;
-      font-family: inherit;
-      transition: all 0.2s ease;
-      line-height: 1;
-    }
-    .size-stepper .qty-control .qty-btn:hover { color: #fff; background: rgba(255,255,255,0.03); }
-    .size-stepper .qty-control .qty-btn:active { transform: scale(0.9); }
-    .size-stepper .qty-control .qty-value {
-      width: 30px;
-      height: 28px;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      font-size: 12px;
-      font-weight: 600;
-      color: #fff;
-      border-left: 1px solid rgba(255,255,255,0.03);
-      border-right: 1px solid rgba(255,255,255,0.03);
-    }
-
     .sizes-row {
       display: flex;
       align-items: center;
@@ -1739,10 +1683,6 @@
         gap: 8px;
         margin-bottom: 6px;
       }
-      .size-stepper {
-        flex-direction: row;
-        gap: 6px;
-      }
       .actions-section {
         flex-direction: row;
         gap: 8px;
@@ -1873,8 +1813,7 @@
             <!-- Size Section -->
             <div class="size-section-label" style="margin-top: 24px;">Select Fit Size</div>
             <div class="sizes-row">
-              <div class="size-stepper">
-                <span class="size-label">Size</span>
+              <div class="qty-selector">
                 <div class="qty-control">
                   <button class="qty-btn" id="pd-size-dec">−</button>
                   <span class="qty-value" id="pd-size-current">M</span>
