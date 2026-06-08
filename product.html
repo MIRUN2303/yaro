@@ -484,7 +484,14 @@
     .sizes-grid {
       display: flex;
       gap: 10px;
+    }
+
+    .sizes-row {
+      display: flex;
+      align-items: center;
+      gap: 14px;
       margin-bottom: 36px;
+      flex-wrap: wrap;
     }
 
     .size-btn {
@@ -739,17 +746,16 @@
     .qty-selector {
       display: flex;
       align-items: center;
-      gap: 14px;
-      margin-bottom: 16px;
-      padding: 12px 16px;
-      border-radius: 10px;
+      gap: 8px;
+      padding: 6px 10px;
+      border-radius: 8px;
       background: rgba(255,255,255,0.01);
       border: 1px solid rgba(255,255,255,0.04);
     }
     .qty-selector .qty-label {
-      font-size: 11px;
-      font-weight: 600;
-      letter-spacing: 0.06em;
+      font-size: 9px;
+      font-weight: 700;
+      letter-spacing: 0.08em;
       text-transform: uppercase;
       color: var(--text-muted);
     }
@@ -758,21 +764,20 @@
       align-items: center;
       gap: 0;
       border: 1px solid rgba(255,255,255,0.06);
-      border-radius: 6px;
+      border-radius: 5px;
       overflow: hidden;
       background: rgba(255,255,255,0.02);
-      margin-left: auto;
     }
     .qty-selector .qty-control .qty-btn {
-      width: 34px;
-      height: 34px;
+      width: 28px;
+      height: 28px;
       display: flex;
       align-items: center;
       justify-content: center;
       background: transparent;
       border: none;
       color: rgba(255,255,255,0.4);
-      font-size: 16px;
+      font-size: 13px;
       cursor: pointer;
       font-family: inherit;
       transition: all 0.2s ease;
@@ -781,12 +786,12 @@
     .qty-selector .qty-control .qty-btn:hover { color: #fff; background: rgba(255,255,255,0.03); }
     .qty-selector .qty-control .qty-btn:active { transform: scale(0.9); }
     .qty-selector .qty-control .qty-value {
-      width: 36px;
-      height: 34px;
+      width: 30px;
+      height: 28px;
       display: flex;
       align-items: center;
       justify-content: center;
-      font-size: 14px;
+      font-size: 12px;
       font-weight: 600;
       color: #fff;
       border-left: 1px solid rgba(255,255,255,0.03);
@@ -1584,6 +1589,27 @@
         height: 38px;
         font-size: 10px;
       }
+      .sizes-row {
+        gap: 8px;
+        margin-bottom: 20px;
+      }
+      .sizes-row .qty-selector {
+        padding: 4px 8px;
+        gap: 6px;
+      }
+      .sizes-row .qty-selector .qty-label {
+        font-size: 8px;
+      }
+      .sizes-row .qty-selector .qty-control .qty-btn {
+        width: 22px;
+        height: 22px;
+        font-size: 10px;
+      }
+      .sizes-row .qty-selector .qty-control .qty-value {
+        width: 22px;
+        height: 22px;
+        font-size: 10px;
+      }
       .sug-card {
         width: calc(50% - 10px);
         min-width: 150px;
@@ -1819,26 +1845,26 @@
             
             <!-- Size Section -->
             <div class="size-section-label" style="margin-top: 24px;">Select Fit Size</div>
-            <div class="sizes-grid" id="sizes-grid">
-              <button class="size-btn"><span>S</span></button>
-              <button class="size-btn active"><span>M</span></button>
-              <button class="size-btn"><span>L</span></button>
-              <button class="size-btn"><span>XL</span></button>
-              <button class="size-btn"><span>XXL</span></button>
-              <button class="size-chart-btn" onclick="alert('Size chart coming soon')">Size Chart →</button>
-            </div>
-            
-            <!-- Checkout Action Buttons -->
-            <div class="actions-container">
-              <!-- Inline quantity selector -->
+            <div class="sizes-row">
+              <div class="sizes-grid" id="sizes-grid">
+                <button class="size-btn"><span>S</span></button>
+                <button class="size-btn active"><span>M</span></button>
+                <button class="size-btn"><span>L</span></button>
+                <button class="size-btn"><span>XL</span></button>
+                <button class="size-btn"><span>XXL</span></button>
+              </div>
               <div class="qty-selector">
-                <span class="qty-label">Quantity</span>
+                <span class="qty-label">Qty</span>
                 <div class="qty-control">
                   <button class="qty-btn" id="pd-qty-dec">−</button>
                   <span class="qty-value" id="pd-qty-count">0</span>
                   <button class="qty-btn" id="pd-qty-inc">+</button>
                 </div>
               </div>
+            </div>
+            
+            <!-- Checkout Action Buttons -->
+            <div class="actions-container">
               <div class="actions-section">
                 <button class="action-btn -primary" id="buy-btn">
                   <span>Buy Now</span>
