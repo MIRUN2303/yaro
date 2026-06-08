@@ -471,21 +471,29 @@
       letter-spacing: 0.02em;
     }
 
-    /* Size Selector */
-    .size-section-label {
-      font-size: 10px;
-      font-weight: 600;
-      letter-spacing: 0.15em;
-      text-transform: uppercase;
-      color: rgba(255,255,255,0.4);
-      margin-bottom: 10px;
-    }
 
     .sizes-row {
       display: flex;
       align-items: center;
-      gap: 14px;
-      margin-bottom: 36px;
+      justify-content: center;
+      gap: 24px;
+      margin: 24px 0 36px;
+    }
+
+    .size-qty-group {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 6px;
+    }
+
+    .sq-label {
+      font-size: 9px;
+      font-weight: 700;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      color: var(--text-muted);
+      white-space: nowrap;
     }
 
     .showcase-rating {
@@ -692,23 +700,6 @@
       background: rgba(255,255,255,0.01);
       border: 1px solid rgba(255,255,255,0.04);
       flex-shrink: 0;
-    }
-
-    .qty-wrap {
-      display: flex;
-      flex-direction: column;
-      align-items: flex-end;
-      gap: 4px;
-      margin-left: auto;
-    }
-
-    .qty-section-label {
-      font-size: 9px;
-      font-weight: 700;
-      letter-spacing: 0.08em;
-      text-transform: uppercase;
-      color: var(--text-muted);
-      white-space: nowrap;
     }
     .qty-selector .qty-label {
       font-size: 9px;
@@ -1548,44 +1539,24 @@
         font-size: 10px;
       }
       .sizes-row {
-        gap: 8px;
-        margin-bottom: 20px;
+        gap: 16px;
+        margin: 16px 0 24px;
       }
-      .size-stepper {
-        padding: 4px 8px;
-        gap: 6px;
-      }
-      .size-stepper .size-label {
+      .sq-label {
         font-size: 8px;
-      }
-      .size-stepper .qty-control .qty-btn {
-        width: 22px;
-        height: 22px;
-        font-size: 10px;
-      }
-      .size-stepper .qty-control .qty-value {
-        width: 22px;
-        height: 22px;
-        font-size: 10px;
       }
       .sizes-row .qty-selector {
         padding: 4px 8px;
       }
-      .sizes-row .qty-selector .qty-label {
-        font-size: 8px;
-      }
       .sizes-row .qty-selector .qty-control .qty-btn {
-        width: 22px;
-        height: 22px;
-        font-size: 10px;
+        width: 24px;
+        height: 24px;
+        font-size: 11px;
       }
       .sizes-row .qty-selector .qty-control .qty-value {
-        width: 22px;
-        height: 22px;
-        font-size: 10px;
-      }
-      .qty-section-label {
-        font-size: 8px;
+        width: 24px;
+        height: 24px;
+        font-size: 11px;
       }
       .sug-card {
         width: calc(50% - 10px);
@@ -1674,14 +1645,25 @@
       .desktop-read-story {
         display: none !important;
       }
-      .size-section-label {
-        font-size: 8px;
-        margin-top: 0 !important;
-        margin-bottom: 6px;
-      }
       .sizes-row {
-        gap: 8px;
-        margin-bottom: 6px;
+        gap: 12px;
+        margin: 12px 0 6px;
+      }
+      .sq-label {
+        font-size: 8px;
+      }
+      .sizes-row .qty-selector {
+        padding: 3px 6px;
+      }
+      .sizes-row .qty-selector .qty-control .qty-btn {
+        width: 22px;
+        height: 22px;
+        font-size: 10px;
+      }
+      .sizes-row .qty-selector .qty-control .qty-value {
+        width: 22px;
+        height: 22px;
+        font-size: 10px;
       }
       .actions-section {
         flex-direction: row;
@@ -1810,18 +1792,20 @@
             
             <div class="prod-price-tag" id="product-price"></div>
             
-            <!-- Size Section -->
-            <div class="size-section-label" style="margin-top: 24px;">Select Fit Size</div>
+            <!-- Size & Quantity Section -->
             <div class="sizes-row">
-              <div class="qty-selector">
-                <div class="qty-control">
-                  <button class="qty-btn" id="pd-size-dec">−</button>
-                  <span class="qty-value" id="pd-size-current">M</span>
-                  <button class="qty-btn" id="pd-size-inc">+</button>
+              <div class="size-qty-group">
+                <div class="sq-label">Size</div>
+                <div class="qty-selector">
+                  <div class="qty-control">
+                    <button class="qty-btn" id="pd-size-dec">−</button>
+                    <span class="qty-value" id="pd-size-current">M</span>
+                    <button class="qty-btn" id="pd-size-inc">+</button>
+                  </div>
                 </div>
               </div>
-              <div class="qty-wrap">
-                <div class="qty-section-label">Select Quantity</div>
+              <div class="size-qty-group">
+                <div class="sq-label">Quantity</div>
                 <div class="qty-selector">
                   <div class="qty-control">
                     <button class="qty-btn" id="pd-qty-dec">−</button>
