@@ -302,7 +302,7 @@
     .loc-row { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
     .loc-map-wrap {
       border-radius: 12px; overflow: hidden; border: 1px solid rgba(139,92,246,0.15);
-      height: 320px; position: relative; background: #0a0a12;
+      height: 320px; position: relative; background: #1a1a2e;
     }
     .loc-map-wrap #map {
       width: 100%; height: 100%;
@@ -1218,9 +1218,10 @@
       if (!mapEl) { console.warn('Map element not found'); return; }
       if (typeof L === 'undefined') { console.error('Leaflet not loaded'); return; }
       map = L.map('map', { zoomControl: true, attributionControl: false }).setView([20.5937, 78.9629], 5);
-      L.tileLayer('https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png', {
+      L.tileLayer('https://tile.openstreetmap.org/{z}/{x}/{y}.png', {
         maxZoom: 19
       }).addTo(map);
+      L.circleMarker([20.5937, 78.9629], { radius: 6, color: '#a78bfa', fillColor: '#7c3aed', fillOpacity: 0.8 }).addTo(map);
       // Force map to recalculate after layout settles
       setTimeout(function() { map.invalidateSize(); }, 200);
       setTimeout(function() { map.invalidateSize(); }, 600);
