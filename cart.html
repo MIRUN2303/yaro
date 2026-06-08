@@ -358,14 +358,60 @@
     .cs-img-wrap img { width: 100%; height: 100%; object-fit: cover; }
     .cs-name { font-size: 11px; font-weight: 700; color: #fff; margin-bottom: 2px; }
     .cs-price { font-size: 12px; font-weight: 600; color: var(--text-muted); }
-    .cs-add {
-      margin-top: 8px; padding: 6px 16px; border-radius: 6px;
+    .cs-explore {
+      display: inline-block; margin-top: 8px; padding: 6px 16px; border-radius: 6px;
       background: rgba(255,255,255,0.03); border: 1px solid rgba(255,255,255,0.04);
       color: var(--text-very-muted); font-family: inherit; font-size: 9px;
-      font-weight: 600; cursor: pointer; transition: all 0.3s ease;
-      text-transform: uppercase; letter-spacing: 0.08em;
+      font-weight: 600; text-transform: uppercase; letter-spacing: 0.08em;
+      text-decoration: none; transition: all 0.3s ease;
     }
-    .cs-add:hover { background: var(--neon-violet); color: #000; border-color: var(--neon-violet); }
+    .cs-explore:hover { background: var(--neon-violet); color: #000; border-color: var(--neon-violet); }
+
+    /* ─── BUCKET SECTIONS (grouped by bucket) ─── */
+    .cart-bucket-section { margin-bottom: 24px; }
+    .cart-bucket-section:last-child { margin-bottom: 0; }
+    .cart-bucket-header {
+      display: flex; align-items: center; gap: 10px;
+      padding: 14px 18px; margin-bottom: 12px; border-radius: 10px;
+      background: rgba(139,92,246,0.04);
+      border: 1px solid rgba(139,92,246,0.08);
+    }
+    .cart-bucket-header h3 { font-size: 14px; font-weight: 700; color: #fff; }
+    .cart-bucket-header .cart-bucket-count { font-size: 10px; color: var(--text-very-muted); font-weight: 500; }
+    .cart-bucket-header .cart-bucket-subtotal { margin-left: auto; font-size: 12px; color: var(--text-muted); font-weight: 600; }
+    .cart-bucket-header .cart-bucket-rename-btn {
+      background: none; border: none; color: rgba(255,255,255,0.15);
+      font-size: 10px; cursor: pointer; padding: 2px 4px; transition: color 0.3s;
+    }
+    .cart-bucket-header .cart-bucket-rename-btn:hover { color: var(--accent); }
+    .cart-bucket-items { display: flex; flex-direction: column; gap: 10px; }
+    .cart-bucket-items .cart-item { grid-template-columns: 70px 1fr auto; }
+    .cart-bucket-items .cart-item-img-wrap { width: 70px; height: 90px; }
+
+    /* ─── MOVE TO BUCKET DROPDOWN ─── */
+    .cart-item-move { position: relative; }
+    .cart-item-move-btn {
+      font-size: 9px; font-weight: 600; letter-spacing: 0.06em; text-transform: uppercase;
+      color: rgba(255,255,255,0.18); background: transparent;
+      border: 1px solid rgba(255,255,255,0.04); border-radius: 4px;
+      padding: 4px 8px; cursor: pointer; font-family: inherit;
+      transition: all 0.3s ease;
+    }
+    .cart-item-move-btn:hover { color: var(--accent); border-color: rgba(139,92,246,0.15); }
+    .cart-item-move-dropdown {
+      display: none; position: absolute; top: 100%; right: 0; margin-top: 4px;
+      min-width: 140px; padding: 6px; border-radius: 8px;
+      background: rgba(15,10,25,0.98); border: 1px solid rgba(255,255,255,0.06);
+      backdrop-filter: blur(12px); z-index: 100;
+    }
+    .cart-item-move-dropdown.open { display: block; }
+    .cart-item-move-dropdown button {
+      display: block; width: 100%; padding: 8px 10px; border: none; border-radius: 6px;
+      background: transparent; color: var(--text-muted); font-family: inherit;
+      font-size: 11px; font-weight: 500; cursor: pointer; text-align: left;
+      transition: all 0.2s ease;
+    }
+    .cart-item-move-dropdown button:hover { background: rgba(255,255,255,0.03); color: #fff; }
 
     /* ─── MODALS ─── */
     .modal-overlay {
@@ -754,39 +800,6 @@
     </div>
   </div>
 
-  <!-- Quick Add Confirmation Popup — 2 buttons only -->
-  <div class="modal-overlay" id="quick-add-modal">
-    <div class="modal-box" style="max-width:400px">
-      <button class="modal-close" id="quick-add-close">✕</button>
-      <div style="display:flex;align-items:center;gap:14px;margin-bottom:20px">
-        <div class="modal-icon success" style="width:44px;height:44px;font-size:18px;flex-shrink:0">✓</div>
-        <div>
-          <h3 class="modal-title" style="font-size:16px;margin-bottom:2px" id="quick-add-title">Added to Cart!</h3>
-          <p style="font-size:11px;color:rgba(255,255,255,0.3)" id="quick-add-basket-label">Saved in <strong style="color:rgba(255,255,255,0.5)">My Cart</strong></p>
-        </div>
-      </div>
-      <div style="display:flex;align-items:center;gap:12px;padding:12px;border-radius:10px;background:rgba(255,255,255,0.01);border:1px solid rgba(255,255,255,0.03);margin-bottom:20px">
-        <div style="width:50px;height:60px;border-radius:6px;overflow:hidden;background:#0a0a0a;flex-shrink:0" id="quick-add-img-wrap">
-          <img id="quick-add-img" src="" alt="" style="width:100%;height:100%;object-fit:cover">
-        </div>
-        <div style="flex:1">
-          <div style="font-size:13px;font-weight:700;color:#fff" id="quick-add-name"></div>
-          <div style="font-size:10px;color:rgba(255,255,255,0.25)" id="quick-add-meta"></div>
-        </div>
-        <div style="font-size:15px;font-weight:700;color:#fff;white-space:nowrap" id="quick-add-price"></div>
-      </div>
-      <!-- Only 2 buttons -->
-      <div style="display:flex;flex-direction:column;gap:8px">
-        <button class="modal-btn primary" id="quick-add-continue" style="width:100%;padding:14px;font-size:13px">
-          View Cart &amp; Checkout →
-        </button>
-        <button class="modal-btn secondary" id="quick-add-explore" style="width:100%;padding:12px;font-size:12px">
-          Continue Shopping
-        </button>
-      </div>
-    </div>
-  </div>
-
   <!-- Toast Container -->
   <div class="toast-container" id="toast-container"></div>
 
@@ -904,18 +917,9 @@
     function renderCart() {
       var container = document.getElementById('cart-items');
       var names = getBucketNames();
-      var allItems = [];
       var subtotal = 0;
 
-      names.forEach(function(bName) {
-        buckets[bName].items.forEach(function(item, idx) {
-          allItems.push({ bucket: bName, bucketIdx: idx, item: item });
-          var p = productsDB.find(function(p) { return p.id === item.id; });
-          if (p) subtotal += parseInt(p.price.replace(/[^0-9]/g, '')) * item.qty;
-        });
-      });
-
-      if (allItems.length === 0) {
+      if (bucketTotalItems() === 0) {
         container.innerHTML = '<div class="cart-empty"><div class="cart-empty-icon">🛒</div><div class="cart-empty-text">Your cart is empty</div><div class="cart-empty-sub">Looks like you haven\'t added anything yet</div><a href="store.html" class="cart-empty-btn">Explore Collection</a></div>';
         document.getElementById('cart-clear-btn').style.display = 'none';
         document.getElementById('urgency-timer').style.display = 'none';
@@ -928,7 +932,7 @@
       document.getElementById('cart-clear-btn').style.display = '';
       document.getElementById('urgency-timer').style.display = '';
 
-      // Bucket tabs
+      // Bucket tabs (for display / bucket management)
       var tabsHtml = '';
       names.forEach(function(name) {
         var cnt = buckets[name].items.reduce(function(s, i) { return s + i.qty; }, 0);
@@ -939,42 +943,78 @@
       });
       if (names.length < 3)
         tabsHtml += '<button id="bucket-add-tab" style="display:flex;align-items:center;justify-content:center;gap:4px;padding:8px 14px;border-radius:8px;border:1px dashed rgba(255,255,255,0.08);background:transparent;color:rgba(255,255,255,0.2);font-family:inherit;font-size:11px;font-weight:600;cursor:pointer;transition:all 0.3s ease">+ Add Basket</button>';
-      document.getElementById('bucket-tabs').innerHTML = tabsHtml;
-      document.getElementById('bucket-tabs').style.display = 'flex';
-      document.getElementById('bucket-tabs').style.flexWrap = 'wrap';
-      document.getElementById('bucket-tabs').style.gap = '8px';
-      document.getElementById('bucket-tabs').style.marginBottom = '20px';
+      var btEl = document.getElementById('bucket-tabs');
+      btEl.innerHTML = tabsHtml;
+      btEl.style.display = 'flex';
+      btEl.style.flexWrap = 'wrap';
+      btEl.style.gap = '8px';
+      btEl.style.marginBottom = '20px';
 
-      // Items
-      var html = '';
-      allItems.forEach(function(ref, idx) {
-        var item = ref.item;
-        var prod = productsDB.find(function(p) { return p.id === item.id; });
-        if (!prod) return;
-        var itemTotal = parseInt(prod.price.replace(/[^0-9]/g, '')) * item.qty;
-        var stockMsg = '';
-        if (item.stock && item.stock <= 3) stockMsg = '<div class="stock-warning ' + (item.stock === 1 ? 'low' : '') + '"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>' + (item.stock === 1 ? 'Only 1 left!' : 'Only ' + item.stock + ' left') + '</div>';
-        html += '<div class="cart-item" data-idx="' + idx + '">' +
-          '<div class="cart-item-img-wrap"><img src="' + prod.image + '" alt="' + prod.name + '"></div>' +
-          '<div class="cart-item-info">' +
-            '<div class="cart-item-name">' + prod.name + '</div>' +
-            '<div class="cart-item-meta">' + (item.size || 'One Size') + ' · <span style="color:rgba(255,255,255,0.15)">' + ref.bucket + '</span></div>' +
-            '<div class="cart-item-price">' + prod.price + '</div>' +
-            '<div class="cart-item-subtotal">Subtotal: ₹' + itemTotal + '</div>' +
-            stockMsg +
-          '</div>' +
-          '<div class="cart-item-right">' +
-            '<button class="cart-item-remove" data-bucket="' + ref.bucket.replace(/"/g, '&quot;') + '" data-idx="' + ref.bucketIdx + '">Remove</button>' +
-            '<div class="qty-control">' +
-              '<button class="qty-btn -minus" data-bucket="' + ref.bucket.replace(/"/g, '&quot;') + '" data-idx="' + ref.bucketIdx + '">−</button>' +
-              '<span class="qty-value">' + item.qty + '</span>' +
-              '<button class="qty-btn -plus" data-bucket="' + ref.bucket.replace(/"/g, '&quot;') + '" data-idx="' + ref.bucketIdx + '">+</button>' +
+      // Group items by bucket
+      var bucketsHtml = '';
+      names.forEach(function(bName) {
+        var items = buckets[bName].items;
+        if (items.length === 0) return;
+        var bucketSubtotal = 0;
+        var itemsHtml = '';
+        items.forEach(function(item, idx) {
+          var prod = productsDB.find(function(p) { return p.id === item.id; });
+          if (!prod) return;
+          var itemTotal = parseInt(prod.price.replace(/[^0-9]/g, '')) * item.qty;
+          bucketSubtotal += itemTotal;
+          subtotal += itemTotal;
+          var stockMsg = '';
+          if (item.stock && item.stock <= 3) stockMsg = '<div class="stock-warning ' + (item.stock === 1 ? 'low' : '') + '"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>' + (item.stock === 1 ? 'Only 1 left!' : 'Only ' + item.stock + ' left') + '</div>';
+
+          // Move-to-bucket dropdown
+          var otherBuckets = names.filter(function(n) { return n !== bName; });
+          var moveHtml = '';
+          if (otherBuckets.length > 0) {
+            moveHtml = '<div class="cart-item-move">' +
+              '<button class="cart-item-move-btn" data-bucket="' + bName.replace(/"/g, '&quot;') + '" data-idx="' + idx + '">Move to</button>' +
+              '<div class="cart-item-move-dropdown" data-bucket="' + bName.replace(/"/g, '&quot;') + '" data-idx="' + idx + '">';
+            otherBuckets.forEach(function(on) {
+              moveHtml += '<button class="move-option" data-from="' + bName.replace(/"/g, '&quot;') + '" data-idx="' + idx + '" data-to="' + on.replace(/"/g, '&quot;') + '">→ ' + on + '</button>';
+            });
+            moveHtml += '</div></div>';
+          }
+
+          itemsHtml += '<div class="cart-item" data-bucket="' + bName.replace(/"/g, '&quot;') + '" data-idx="' + idx + '">' +
+            '<div class="cart-item-img-wrap"><img src="' + prod.image + '" alt="' + prod.name + '"></div>' +
+            '<div class="cart-item-info">' +
+              '<div class="cart-item-name">' + prod.name + '</div>' +
+              '<div class="cart-item-meta">' + (item.size || 'One Size') + '</div>' +
+              '<div class="cart-item-price">' + prod.price + '</div>' +
+              '<div class="cart-item-subtotal">Subtotal: ₹' + itemTotal + '</div>' +
+              stockMsg +
             '</div>' +
-          '</div>' +
-        '</div>';
+            '<div class="cart-item-right">' +
+              moveHtml +
+              '<button class="cart-item-remove" data-bucket="' + bName.replace(/"/g, '&quot;') + '" data-idx="' + idx + '">Remove</button>' +
+              '<div class="qty-control">' +
+                '<button class="qty-btn -minus" data-bucket="' + bName.replace(/"/g, '&quot;') + '" data-idx="' + idx + '">−</button>' +
+                '<span class="qty-value">' + item.qty + '</span>' +
+                '<button class="qty-btn -plus" data-bucket="' + bName.replace(/"/g, '&quot;') + '" data-idx="' + idx + '">+</button>' +
+              '</div>' +
+            '</div>' +
+          '</div>';
+        });
+
+        if (itemsHtml) {
+          var itemCount = items.reduce(function(s, i) { return s + i.qty; }, 0);
+          bucketsHtml += '<div class="cart-bucket-section">' +
+            '<div class="cart-bucket-header">' +
+              '<h3>' + bName + '</h3>' +
+              '<span class="cart-bucket-count">' + itemCount + ' item' + (itemCount !== 1 ? 's' : '') + '</span>' +
+              '<button class="cart-bucket-rename-btn" data-bucket="' + bName.replace(/"/g, '&quot;') + '" title="Rename">✎</button>' +
+              '<span class="cart-bucket-subtotal">Subtotal: ₹' + bucketSubtotal + '</span>' +
+            '</div>' +
+            '<div class="cart-bucket-items">' + itemsHtml + '</div>' +
+          '</div>';
+        }
       });
 
-      container.innerHTML = html;
+      container.innerHTML = bucketsHtml;
       updateSummary(subtotal);
 
       // Qty events
@@ -1002,12 +1042,38 @@
         });
       });
 
-      // Bucket tab events
-      document.querySelectorAll('.bucket-tab').forEach(function(tab) {
-        tab.addEventListener('click', function(e) {
-          if (e.target.closest('.bucket-rename-btn')) return;
+      // Move-to-bucket events
+      container.querySelectorAll('.cart-item-move-btn').forEach(function(btn) {
+        btn.addEventListener('click', function(e) {
+          e.stopPropagation();
+          var dropdown = this.nextElementSibling;
+          document.querySelectorAll('.cart-item-move-dropdown.open').forEach(function(d) { if (d !== dropdown) d.classList.remove('open'); });
+          dropdown.classList.toggle('open');
         });
       });
+      container.querySelectorAll('.move-option').forEach(function(btn) {
+        btn.addEventListener('click', function() {
+          var fromBucket = this.getAttribute('data-from');
+          var idx = parseInt(this.getAttribute('data-idx'));
+          var toBucket = this.getAttribute('data-to');
+          if (fromBucket === toBucket) return;
+          var item = buckets[fromBucket].items[idx];
+          if (!item) return;
+          // Remove from source
+          buckets[fromBucket].items.splice(idx, 1);
+          if (buckets[fromBucket].items.length === 0) delete buckets[fromBucket];
+          // Add to destination
+          if (!buckets[toBucket]) buckets[toBucket] = { items: [] };
+          var existing = buckets[toBucket].items.findIndex(function(i) { return i.id === item.id; });
+          if (existing >= 0) buckets[toBucket].items[existing].qty += item.qty;
+          else buckets[toBucket].items.push(item);
+          saveBuckets();
+          renderCart();
+          showToast('Moved to "' + toBucket + '"', 'success');
+        });
+      });
+
+      // Bucket rename events
       document.querySelectorAll('.bucket-rename-btn').forEach(function(btn) {
         btn.addEventListener('click', function(e) {
           e.stopPropagation();
@@ -1016,6 +1082,22 @@
           if (!newName || newName.trim() === '' || newName === oldName) return;
           newName = newName.trim();
           if (buckets[newName]) { showToast('Basket "' + newName + '" already exists', 'error'); return; }
+          buckets[newName] = buckets[oldName];
+          delete buckets[oldName];
+          saveBuckets();
+          renderCart();
+          showToast('Renamed to "' + newName + '"', 'success');
+        });
+      });
+      // Bucket header rename
+      document.querySelectorAll('.cart-bucket-rename-btn').forEach(function(btn) {
+        btn.addEventListener('click', function(e) {
+          e.stopPropagation();
+          var oldName = this.getAttribute('data-bucket');
+          var newName = prompt('Rename "' + oldName + '":', oldName);
+          if (!newName || newName.trim() === '' || newName === oldName) return;
+          newName = newName.trim();
+          if (buckets[newName]) { showToast('Bucket "' + newName + '" already exists', 'error'); return; }
           buckets[newName] = buckets[oldName];
           delete buckets[oldName];
           saveBuckets();
@@ -1038,6 +1120,13 @@
         });
       }
     }
+
+    // Close move-to-bucket dropdowns on outside click
+    document.addEventListener('click', function(e) {
+      if (!e.target.closest('.cart-item-move')) {
+        document.querySelectorAll('.cart-item-move-dropdown.open').forEach(function(d) { d.classList.remove('open'); });
+      }
+    });
 
     // ─── UPDATE SUMMARY ───
     function updateSummary(subtotal) {
@@ -1371,32 +1460,10 @@
           '<div class="cs-img-wrap"><img src="' + prod.image + '" alt="' + prod.name + '"></div>' +
           '<div class="cs-name">' + prod.name + '</div>' +
           '<div class="cs-price">' + prod.price + '</div>' +
-          '<button class="cs-add" data-id="' + prod.id + '"' + (inCart ? ' disabled style="opacity:0.3;cursor:default"' : '') + '>' + (inCart ? 'Added ✓' : 'Add to Cart') + '</button>' +
+          '<a class="cs-explore" href="product.html?id=' + prod.id + '">Explore Now</a>' +
         '</div>';
       });
       grid.innerHTML = html;
-      grid.querySelectorAll('.cs-add:not([disabled])').forEach(function(btn) {
-        btn.addEventListener('click', function() {
-          var id = this.getAttribute('data-id');
-          // Add to first available bucket
-          var names = getBucketNames();
-          if (names.length === 0) { buckets['My Cart'] = { items: [] }; names = ['My Cart']; }
-          var added = false;
-          names.forEach(function(bName) {
-            if (added) return;
-            var existing = buckets[bName].items.findIndex(function(i) { return i.id === id; });
-            if (existing >= 0) { buckets[bName].items[existing].qty++; added = true; }
-            else if (!added && names.indexOf(bName) === 0) { buckets[bName].items.push({ id: id, qty: 1, size: 'M', stock: 5 }); added = true; }
-          });
-          saveBuckets();
-          renderCart();
-          this.textContent = 'Added ✓';
-          this.disabled = true;
-          this.style.opacity = '0.3';
-          this.style.cursor = 'default';
-          showToast('Added to cart!', 'success');
-        });
-      });
     }
 
     // ─── OVERLAY CLOSE ON BACKDROP ───
@@ -1429,35 +1496,6 @@
       renderSuggestions();
       initMap();
       updateCartCount();
-
-      // Check for ?added param (from Buy Now redirect)
-      var params = new URLSearchParams(window.location.search);
-      var addedId = params.get('added');
-      if (addedId) {
-        var prod = productsDB.find(function(p) { return p.id === addedId; });
-        var qty = parseInt(params.get('qty')) || 1;
-        if (prod) {
-          setTimeout(function() {
-            document.getElementById('quick-add-img').src = prod.image;
-            document.getElementById('quick-add-name').textContent = prod.name;
-            document.getElementById('quick-add-meta').textContent = 'Qty: ' + qty + ' | ' + (prod.category || '');
-            document.getElementById('quick-add-price').textContent = prod.price;
-            document.getElementById('quick-add-modal').classList.add('open');
-          }, 600);
-        }
-      }
-
-      // Quick add modal events — 2 buttons only
-      document.getElementById('quick-add-close').addEventListener('click', function() { document.getElementById('quick-add-modal').classList.remove('open'); });
-      document.getElementById('quick-add-continue').addEventListener('click', function() {
-        document.getElementById('quick-add-modal').classList.remove('open');
-        // Scroll to cart items to review before checkout
-        document.querySelector('.cart-items').scrollIntoView({ behavior: 'smooth' });
-      });
-      document.getElementById('quick-add-explore').addEventListener('click', function() {
-        document.getElementById('quick-add-modal').classList.remove('open');
-        window.location.href = 'store.html';
-      });
 
       // Entrance animation
       gsap.fromTo('.frame-content > *', { opacity: 0, y: 20 }, { opacity: 1, y: 0, duration: 0.6, stagger: 0.06, ease: 'power3.out' });

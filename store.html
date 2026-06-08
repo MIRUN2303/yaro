@@ -1801,7 +1801,6 @@ background: url("data:image/svg+xml,%3Csvg viewBox='0 0 400 400' xmlns='http://w
       }
     }
 
-    
   </style>
   <link rel="stylesheet" href="css/styles.css">
 </head>
@@ -2132,7 +2131,15 @@ background: url("data:image/svg+xml,%3Csvg viewBox='0 0 400 400' xmlns='http://w
 
     window.addEventListener('pageshow', function() {
       var o = document.getElementById('page-transition');
-      if (o) o.classList.remove('active');
+      if (o) {
+        o.classList.remove('active');
+        // Force immediate hide (bypass CSS transitions from bfcache restore)
+        o.style.transition = 'none';
+        o.style.opacity = '0';
+        o.style.visibility = 'hidden';
+        // Re-enable transitions after paint
+        requestAnimationFrame(function() { o.style.transition = ''; });
+      }
     });
 
     // Intercept internal links — refined minimal exit
@@ -2145,6 +2152,8 @@ background: url("data:image/svg+xml,%3Csvg viewBox='0 0 400 400' xmlns='http://w
         var overlay = document.getElementById('page-transition');
         var frame = document.querySelector('.glass-frame');
         if (overlay) {
+          // Re-enable transitions (in case pageshow disabled them)
+          overlay.style.transition = '';
           // Content shrinks and dissolves
           gsap.to(frame, { scale: 0.96, opacity: 0, duration: 0.18, ease: 'power2.in', overwrite: 'auto' });
           gsap.to('.reveal-item', { opacity: 0, y: -4, filter: 'blur(6px)', duration: 0.12, ease: 'power2.in', overwrite: 'auto' });
