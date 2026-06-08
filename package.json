@@ -1,5 +1,6 @@
 {
   "devDependencies": {
+    "netlify-cli": "^26.1.0",
     "supabase": "^2.105.0"
   }
 }
