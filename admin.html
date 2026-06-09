@@ -1001,6 +1001,7 @@ img.thumb {
       <a data-page="collections"><span class="nav-icon">◈</span>Collections</a>
       <a data-page="products"><span class="nav-icon">◉</span>Products</a>
       <a data-page="orders"><span class="nav-icon">◻</span>Orders</a>
+      <a data-page="settings"><span class="nav-icon">⚙</span>Settings</a>
     </nav>
     <div class="sidebar-footer">
       <span class="admin-email" id="admin-email"></span>
@@ -1149,6 +1150,7 @@ function loadPage(page) {
       case 'collections': renderCollections(c); break;
       case 'products': renderProducts(c); break;
       case 'orders': renderOrders(c); break;
+      case 'settings': renderSettings(c); break;
     }
     requestAnimationFrame(function() {
       c.style.transition = 'opacity 0.35s ease, transform 0.35s cubic-bezier(0.22,1,0.36,1)';
@@ -1584,6 +1586,94 @@ async function adminCancelAction(id, action) {
   showToast(action === 'approved' ? 'Order cancelled and locked' : 'Cancellation rejected', 'success');
   closeModal();
   loadPage('orders');
+}
+
+// ─── SETTINGS ───
+var SETTINGS_DEF = {
+  'announcement': {
+    label: 'Announcement Bar',
+    desc: 'Site-wide announcement shown at the top of every page',
+    fields: [
+      { key: 'enabled', label: 'Show Announcement', type: 'toggle' },
+      { key: 'text', label: 'Announcement Text', type: 'text' }
+    ]
+  },
+  'store_banner': {
+    label: 'Store Banner',
+    desc: 'Heading and subheading on the store page',
+    fields: [
+      { key: 'enabled', label: 'Show Banner', type: 'toggle' },
+      { key: 'heading', label: 'Heading', type: 'text' },
+      { key: 'subheading', label: 'Subheading', type: 'text' }
+    ]
+  },
+  'social_links': {
+    label: 'Social Links',
+    desc: 'Social media profile URLs shown in the footer',
+    fields: [
+      { key: 'instagram', label: 'Instagram URL', type: 'text', placeholder: 'https://instagram.com/yourpage' },
+      { key: 'facebook', label: 'Facebook URL', type: 'text', placeholder: 'https://facebook.com/yourpage' },
+      { key: 'twitter', label: 'Twitter URL', type: 'text', placeholder: 'https://twitter.com/yourpage' }
+    ]
+  }
+};
+
+async function renderSettings(c) {
+  var all = await YARO_API.getAllSettings();
+  var map = {};
+  (Array.isArray(all) ? all : []).forEach(function(s) { map[s.id] = s.value; });
+
+  var html = '<div class="page-hdr"><h2>Site Settings<small>Control your website content</small></h2></div>';
+  html += '<div style="display:grid;gap:20px;max-width:700px">';
+
+  var ids = Object.keys(SETTINGS_DEF);
+  ids.forEach(function(id) {
+    var def = SETTINGS_DEF[id];
+    var val = map[id] || {};
+    html += '<div style="background:rgba(255,255,255,0.015);border:1px solid var(--border-light);border-radius:var(--radius);padding:24px">';
+    html += '<div style="margin-bottom:16px"><strong style="font-size:14px;color:rgba(255,255,255,0.85)">' + esc(def.label) + '</strong>';
+    html += '<div style="font-size:10px;color:var(--muted);margin-top:4px">' + esc(def.desc) + '</div></div>';
+    html += '<form class="sf" data-id="' + id + '">';
+    def.fields.forEach(function(f) {
+      html += '<div class="fg" style="margin-bottom:12px">';
+      if (f.type === 'toggle') {
+        var checked = val[f.key] ? ' checked' : '';
+        html += '<label style="display:flex;align-items:center;gap:10px;cursor:pointer;margin-bottom:0">';
+        html += '<input type="checkbox" ' + checked + ' data-key="' + f.key + '" style="width:18px;height:18px;accent-color:var(--accent);cursor:pointer">';
+        html += '<span style="font-size:12px;text-transform:none;letter-spacing:0;color:var(--text);font-weight:400">' + esc(f.label) + '</span>';
+        html += '</label>';
+      } else {
+        html += '<label style="font-size:10px;color:var(--muted);margin-bottom:4px;display:block;letter-spacing:0.05em;text-transform:uppercase">' + esc(f.label) + '</label>';
+        html += '<input type="text" value="' + esc(typeof val[f.key] === 'string' ? val[f.key] : '') + '" data-key="' + f.key + '" placeholder="' + esc(f.placeholder || '') + '" style="width:100%;padding:10px 12px;background:rgba(255,255,255,0.025);border:1px solid rgba(255,255,255,0.06);border-radius:var(--radius-sm);color:var(--text);font-size:13px;font-family:inherit">';
+      }
+      html += '</div>';
+    });
+    html += '<button type="submit" class="btn btn-pri btn-sm" style="margin-top:4px">Save ' + esc(def.label) + '</button>';
+    html += '</form></div>';
+  });
+
+  html += '</div>';
+  c.innerHTML = html;
+
+  c.querySelectorAll('.sf').forEach(function(form) {
+    form.addEventListener('submit', async function(e) {
+      e.preventDefault();
+      var id = form.getAttribute('data-id');
+      var def = SETTINGS_DEF[id];
+      var val = {};
+      def.fields.forEach(function(f) {
+        var el = form.querySelector('[data-key="' + f.key + '"]');
+        if (f.type === 'toggle') {
+          val[f.key] = el.checked;
+        } else {
+          val[f.key] = el.value;
+        }
+      });
+      var r = await YARO_API.updateSetting(id, val);
+      if (r.error) { showToast('Error saving ' + def.label, 'error'); return; }
+      showToast(def.label + ' saved', 'success');
+    });
+  });
 }
 
 // ─── DELETE ───

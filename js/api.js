@@ -200,8 +200,10 @@ const YARO_API = (function() {
       return [];
     },
 
-    async getProduct(slug) {
-      var p = await sbSingle('products', 'slug', slug);
+    async getProduct(slugOrId) {
+      var p = await sbSingle('products', 'slug', slugOrId);
+      if (p && !p.error) return p;
+      p = await sbSingle('products', 'id', slugOrId);
       if (p && !p.error) return p;
       return null;
     },
@@ -397,6 +399,27 @@ const YARO_API = (function() {
         authUser = user;
         return user;
       } catch(e) { return null; }
+    },
+
+    // ── Site Settings (admin-controlled bridge) ──
+    async getSetting(id) {
+      var data = await sbSingle('site_settings', 'id', id);
+      if (data && data.value) return data.value;
+      return null;
+    },
+
+    async getAllSettings() {
+      var data = await sbGet('site_settings', { select: '*', order: 'id.asc' });
+      if (data && Array.isArray(data)) return data;
+      return [];
+    },
+
+    async updateSetting(id, value) {
+      return sbWrite('PATCH', 'site_settings', { value: value, updated_at: new Date().toISOString() }, 'id=eq.' + id);
+    },
+
+    async createSetting(id, label, value, description) {
+      return sbInsert('site_settings', { id: id, value: value || {}, label: label || '', description: description || '' });
     },
 
     // ── Utility ──

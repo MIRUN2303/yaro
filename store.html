@@ -1857,6 +1857,9 @@ background: url("data:image/svg+xml,%3Csvg viewBox='0 0 400 400' xmlns='http://w
 
       <div class="frame-content">
 
+        <!-- Announcement Bar (controlled by admin settings) -->
+        <div id="announcement-bar" class="announcement-bar" style="display:none;text-align:center;padding:10px 16px;background:rgba(196,181,253,0.06);border-bottom:1px solid rgba(196,181,253,0.08);font-size:11px;color:var(--accent);letter-spacing:0.08em"></div>
+
         <!-- Hero Banner -->
         <div class="hero-banner reveal-item">
           <div class="hb-orb -o1"></div>
@@ -1867,8 +1870,8 @@ background: url("data:image/svg+xml,%3Csvg viewBox='0 0 400 400' xmlns='http://w
           <div class="banner-illust -right"></div>
           <div class="banner-dust"></div>
           <div class="banner-sweep"></div>
-          <div class="hero-logo">YARO</div>
-          <div class="hero-sub">WEAR WHAT STAYS WITH YOU.</div>
+          <div class="hero-logo" id="hero-logo">YARO</div>
+          <div class="hero-sub" id="hero-sub">WEAR WHAT STAYS WITH YOU.</div>
         </div>
 
         <!-- Collections -->
@@ -2216,6 +2219,24 @@ background: url("data:image/svg+xml,%3Csvg viewBox='0 0 400 400' xmlns='http://w
         }
       });
     });
+
+    // ─── LOAD SITE SETTINGS (admin bridge) ───
+    (function() {
+      YARO_API.getSetting('announcement').then(function(val) {
+        if (val && val.enabled && val.text) {
+          var bar = document.getElementById('announcement-bar');
+          if (bar) { bar.textContent = val.text; bar.style.display = 'block'; }
+        }
+      });
+      YARO_API.getSetting('store_banner').then(function(val) {
+        if (val && val.enabled) {
+          var logo = document.getElementById('hero-logo');
+          var sub = document.getElementById('hero-sub');
+          if (logo && val.heading) logo.textContent = val.heading;
+          if (sub && val.subheading) sub.textContent = val.subheading;
+        }
+      });
+    })();
 
     // ─── DYNAMIC PRODUCT LOADER FROM API ───
     (function() {

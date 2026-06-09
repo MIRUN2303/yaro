@@ -29,6 +29,12 @@
   ].join('');
   document.body.prepend(h);
 
+  // Add announcement bar below header
+  var ab = document.createElement('div');
+  ab.id = 'announcement-bar';
+  ab.style.cssText = 'display:none;text-align:center;padding:8px 16px;background:rgba(196,181,253,0.06);border-bottom:1px solid rgba(196,181,253,0.08);font-size:11px;color:#c4b5fd;letter-spacing:0.08em;font-family:"Clash Display",sans-serif';
+  h.parentNode.insertBefore(ab, h.nextSibling);
+
   // Show admin link if admin is logged in
   (function() {
     try {
@@ -48,6 +54,20 @@
         }
       }).catch(function() {});
     } catch(e) {}
+  })();
+
+  // Load announcement from site settings (deferred for YARO_API availability)
+  (function() {
+    function loadAnnouncement() {
+      if (typeof YARO_API === 'undefined' || !YARO_API.getSetting) { setTimeout(loadAnnouncement, 100); return; }
+      YARO_API.getSetting('announcement').then(function(val) {
+        if (val && val.enabled && val.text) {
+          var bar = document.getElementById('announcement-bar');
+          if (bar) { bar.textContent = val.text; bar.style.display = 'block'; }
+        }
+      });
+    }
+    setTimeout(loadAnnouncement, 200);
   })();
 
   document.querySelectorAll('.sh-search').forEach(function(w) {

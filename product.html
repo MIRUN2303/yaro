@@ -1,4 +1,4 @@
-﻿<!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="en">
 <head>
   <!-- YARO Product — Gender system: activeProduct.gender mapped via genderMap (His→For the Gents, Hers→For the Ladies, Any→For the Soul, Mini→For the Little, Mini-Gent→For the Little Gents, Mini-Lady→For the Little Ladies) shown in .prod-action-gender below action buttons. Static productsDB and API map both include gender field. -->
@@ -2134,38 +2134,103 @@
     // ─── COLOUR MAP ───
     var COLOUR_MAP = { 'black':'#000000','white':'#ffffff','grey':'#6b7280','gray':'#6b7280','navy':'#1a2744','olive':'#808000','burgundy':'#800020','green':'#166534','blue':'#1d4ed8','red':'#dc2626','brown':'#78350f','beige':'#d6d3c1','cream':'#f5f0e1','pink':'#db2777','purple':'#7c3aed','maroon':'#7f1d1d','tan':'#b8966e','khaki':'#b5a88a','charcoal':'#374151','coral':'#e87968','sage':'#84a98c','mustard':'#eab308','teal':'#0d9488' };
 
-    // ─── PRODUCT METADATA DATABASE ───
+    // ─── PRODUCT METADATA DATABASE & STATE ───
     let productsDB = [];
+    let activeProduct = null;
+    let productImages = [];
+    let activeImageIndex = 0;
+    let selectedColour = null;
+    var sizes = ['S','M','L','XL','XXL'];
+    var currentSizeIndex = 1;
 
-    YARO_API.getProducts().then(function(apiProducts) {
-      if (apiProducts && apiProducts.length) {
-        // Map API data to match frontend's expected format
-        productsDB = apiProducts.map(function(p) {
-          return {
-            id: p.slug || p.id,
-            name: p.name || '',
-            category: p.category || '',
-            price: p.price ? '₹' + p.price : '',
-            originalPrice: p.original_price ? '₹' + p.original_price : '',
-            offerName: p.offer_name || '',
-            badge: p.badge || '',
-            badgeClass: p.badge_class || '',
-            image: (Array.isArray(p.images) && p.images[0]) || (typeof p.images === 'string' ? p.images : '') || p.image || '',
-            story: p.story_text || '',
-            desc: p.description || '',
-            additionalImages: Array.isArray(p.images) ? p.images.slice(1) : [],
-            sizes: p.sizes || ['S','M','L','XL','XXL'],
-            colours: p.colours || [],
-            colourData: p.colour_data || {},
-            stock: p.stock || 0,
-            gender: p.gender || 'Any'
-          };
-        });
-        // Re-resolve active product with API data
+    // ─── DOM ELEMENT REFERENCES ───
+    const showcaseImg = document.getElementById('showcase-img');
+    const thumbsRow = document.getElementById('thumbs-row');
+    const categoryLabel = document.getElementById('category-label');
+    const productBadge = document.getElementById('product-badge');
+    const productTitle = document.getElementById('product-title');
+    const productPrice = document.getElementById('product-price');
+    const productDesc = document.getElementById('product-desc');
+    const productGender = document.getElementById('product-gender');
+    const sugTrack = document.getElementById('sug-track');
+
+    // Get active product ID from URL query parameters
+    const urlParams = new URLSearchParams(window.location.search);
+    const productId = urlParams.get('id') || '';
+
+    // Helper to map API product data to the frontend format
+    function mapProduct(p) {
+      return {
+        id: p.slug || p.id,
+        name: p.name || '',
+        category: p.category || '',
+        price: p.price ? '₹' + p.price : '',
+        originalPrice: p.original_price ? '₹' + p.original_price : '',
+        offerName: p.offer_name || '',
+        badge: p.badge || '',
+        badgeClass: p.badge_class || '',
+        image: (Array.isArray(p.images) && p.images[0]) || (typeof p.images === 'string' ? p.images : '') || p.image || '',
+        story: p.story_text || '',
+        desc: p.description || '',
+        additionalImages: Array.isArray(p.images) ? p.images.slice(1) : [],
+        sizes: p.sizes || ['S','M','L','XL','XXL'],
+        colours: p.colours || [],
+        colourData: p.colour_data || {},
+        stock: p.stock || 0,
+        gender: p.gender || 'Any'
+      };
+    }
+
+    // Fetch products from API asynchronously
+    YARO_API.getProducts().then(async function(apiProducts) {
+      productsDB = (apiProducts || []).map(mapProduct);
+
+      // Resolve active product
+      if (productId) {
         activeProduct = productsDB.find(function(p) { return p.id === productId; });
-        if (!activeProduct) activeProduct = productsDB[0];
-        if (!activeProduct) return;
-        // Re-render the page with updated data
+        
+        // If not found in active products list, try fetching directly by ID/Slug (to handle draft or newly created products)
+        if (!activeProduct) {
+          try {
+            var singleProd = await YARO_API.getProduct(productId);
+            if (singleProd) {
+              activeProduct = mapProduct(singleProd);
+              // Prepend to productsDB so autocomplete/related items can access it
+              productsDB.unshift(activeProduct);
+            }
+          } catch (e) {
+            console.error('Error fetching single product:', e);
+          }
+        }
+      }
+
+      if (!activeProduct && productsDB.length) {
+        activeProduct = productsDB[0];
+      }
+
+      if (!activeProduct) {
+        showNoProducts();
+        return;
+      }
+
+
+
+        // Populate details
+        categoryLabel.textContent = activeProduct.category;
+        productBadge.textContent = activeProduct.badge;
+        productBadge.className = 'prod-badge ' + activeProduct.badgeClass;
+        productTitle.textContent = activeProduct.name;
+        productPrice.innerHTML = activeProduct.price.replace(/₹/g, '<span class="rupee">₹</span>');
+        productDesc.textContent = activeProduct.desc || '';
+        document.title = 'YARO | ' + activeProduct.name;
+
+        if (productGender && activeProduct.gender) {
+          var g = activeProduct.gender;
+          var genderMap = { 'His': 'For the Gents', 'Hers': 'For the Ladies', 'Any': 'For the Soul', 'Mini': 'For the Little', 'Mini-Gent': 'For the Little Gents', 'Mini-Lady': 'For the Little Ladies' };
+          productGender.textContent = genderMap[g] || g;
+        }
+
+        // Initialize images
         var firstColourImgs = null;
         if (activeProduct.colourData) {
           var ckeys = Object.keys(activeProduct.colourData);
@@ -2178,86 +2243,69 @@
         }
         productImages = firstColourImgs || [activeProduct.image, ...activeProduct.additionalImages];
         activeImageIndex = 0;
-        renderGallery();
-        categoryLabel.textContent = activeProduct.category;
-        productBadge.textContent = activeProduct.badge;
-        productBadge.className = 'prod-badge ' + activeProduct.badgeClass;
-        productTitle.textContent = activeProduct.name;
-        productPrice.innerHTML = activeProduct.price.replace(/₹/g, '<span class="rupee">₹</span>');
-        productDesc.textContent = activeProduct.desc || '';
-        document.title = 'YARO | ' + activeProduct.name;
-        if (productGender && activeProduct.gender) {
-          var g = activeProduct.gender;
-          var genderMap = { 'His': 'For the Gents', 'Hers': 'For the Ladies', 'Any': 'For the Soul', 'Mini': 'For the Little', 'Mini-Gent': 'For the Little Gents', 'Mini-Lady': 'For the Little Ladies' };
-          productGender.textContent = genderMap[g] || g;
-        }
-        var sizes = activeProduct.sizes && activeProduct.sizes.length ? activeProduct.sizes : ['S','M','L','XL','XXL'];
+
+        // Initialize sizes
+        sizes = activeProduct.sizes && activeProduct.sizes.length ? activeProduct.sizes : ['S','M','L','XL','XXL'];
         currentSizeIndex = Math.min(1, sizes.length - 1);
         if (currentSizeIndex < 0) currentSizeIndex = 0;
         updateSizeDisplay();
+
+        // Populate related products
+        relatedProducts = productsDB.filter(p => p.id !== activeProduct.id);
+
+        // Render page views
+        renderGallery();
         if (typeof renderColours === 'function') renderColours();
+        renderRelatedItems();
+        renderReviews();
+        renderProductRating();
+
+        // Entrance animation for content
+        gsap.fromTo('.prod-gallery-wrap', 
+          { opacity: 0, x: -30, filter: 'blur(8px)' },
+          { opacity: 1, x: 0, filter: 'none', duration: 0.65, delay: 0.2, ease: 'power3.out' }
+        );
+
+        gsap.fromTo('#prod-info-wrap', 
+          { opacity: 0, x: 30, filter: 'blur(8px)' },
+          { opacity: 1, x: 0, filter: 'none', duration: 0.65, delay: 0.2, ease: 'power3.out' }
+        );
+      } else {
+        showNoProducts();
       }
-    }).catch(function() {});
+    }).catch(function(err) {
+      console.error('getProducts error:', err);
+      showNoProducts();
+    });
 
-    // ─── GET ACTIVE PRODUCT FROM QUERY ───
-    const urlParams = new URLSearchParams(window.location.search);
-    const productId = urlParams.get('id') || '';
-    
-    // Find active product
-    let activeProduct = productsDB.find(p => p.id === productId);
-    if (!activeProduct) {
-      activeProduct = productsDB[0]; // fallback
-    }
-    if (!activeProduct) {
-      document.getElementById('page-main-content').innerHTML = '<div style="text-align:center;padding:80px 20px;color:rgba(255,255,255,0.3)"><h2>No products available</h2><p style="margin-top:12px">Check back soon.</p></div>';
-      return;
-    }
-
-    // Set page title dynamically
-    document.title = `YARO | ${activeProduct.name}`;
-
-    // ─── STATE MANAGEMENT ───
-    let productImages = [activeProduct.image, ...activeProduct.additionalImages];
-    let activeImageIndex = 0;
-
-    // ─── RENDER DOM ELEMENTS ───
-    const showcaseImg = document.getElementById('showcase-img');
-    const thumbsRow = document.getElementById('thumbs-row');
-    const categoryLabel = document.getElementById('category-label');
-    const productBadge = document.getElementById('product-badge');
-    const productTitle = document.getElementById('product-title');
-    const productPrice = document.getElementById('product-price');
-    const productDesc = document.getElementById('product-desc');
-    const productGender = document.getElementById('product-gender');
-
-    categoryLabel.textContent = activeProduct.category;
-    productBadge.textContent = activeProduct.badge;
-    productBadge.className = `prod-badge ${activeProduct.badgeClass}`;
-    productTitle.textContent = activeProduct.name;
-    productPrice.innerHTML = activeProduct.price.replace(/₹/g, '<span class="rupee">₹</span>');
-    productDesc.textContent = activeProduct.description || activeProduct.desc || activeProduct.notes || '';
-    if (productGender && activeProduct.gender) {
-      var g = activeProduct.gender;
-      var genderMap = { 'His': 'For the Gents', 'Hers': 'For the Ladies', 'Any': 'For the Soul', 'Mini': 'For the Little', 'Mini-Gent': 'For the Little Gents', 'Mini-Lady': 'For the Little Ladies' };
-      productGender.textContent = genderMap[g] || g;
+    function showNoProducts() {
+      var contentEl = document.querySelector('.frame-content');
+      if (contentEl) {
+        contentEl.innerHTML = '<div style="text-align:center;padding:80px 20px;color:rgba(255,255,255,0.3)"><h2>No products available</h2><p style="margin-top:12px">Check back soon.</p></div>';
+      }
     }
 
     // ─── SIZE STEPPER ───
-    var sizes = activeProduct.sizes && activeProduct.sizes.length ? activeProduct.sizes : ['S','M','L','XL','XXL'];
-    var currentSizeIndex = Math.min(1, sizes.length - 1);
-    if (currentSizeIndex < 0) currentSizeIndex = 0;
-    function updateSizeDisplay() { document.getElementById('pd-size-current').textContent = sizes[currentSizeIndex]; }
+    function updateSizeDisplay() { 
+      const sizeEl = document.getElementById('pd-size-current');
+      if (sizeEl && sizes[currentSizeIndex]) {
+        sizeEl.textContent = sizes[currentSizeIndex]; 
+      }
+    }
+
     document.getElementById('pd-size-inc').addEventListener('click', function() {
+      if (!activeProduct) return;
       if (currentSizeIndex < sizes.length - 1) currentSizeIndex++;
       updateSizeDisplay();
     });
     document.getElementById('pd-size-dec').addEventListener('click', function() {
+      if (!activeProduct) return;
       if (currentSizeIndex > 0) currentSizeIndex--;
       updateSizeDisplay();
     });
 
     // ─── COLOUR CHIPS ───
-    var selectedColour = null;
+    selectedColour = null;
     function renderColours() {
       var cols = activeProduct.colours;
       var row = document.getElementById('colour-row');
@@ -2280,7 +2328,6 @@
       var first = container.querySelector('.colour-chip');
       if (first) { first.classList.add('selected'); selectedColour = first.getAttribute('data-colour'); switchColourImages(selectedColour); }
     }
-    renderColours();
 
     // ─── COLOUR-SPECIFIC IMAGES ───
     function switchColourImages(colour) {
@@ -2429,11 +2476,12 @@
 
     // ─── PAGE QUANTITY SELECTOR ───
     var pageQty = 0;
-    document.getElementById('pd-qty-inc').addEventListener('click', function() { pageQty++; document.getElementById('pd-qty-count').textContent = pageQty; });
-    document.getElementById('pd-qty-dec').addEventListener('click', function() { if (pageQty <= 0) return; pageQty--; document.getElementById('pd-qty-count').textContent = pageQty; });
+    document.getElementById('pd-qty-inc').addEventListener('click', function() { if (!activeProduct) return; pageQty++; document.getElementById('pd-qty-count').textContent = pageQty; });
+    document.getElementById('pd-qty-dec').addEventListener('click', function() { if (!activeProduct) return; if (pageQty <= 0) return; pageQty--; document.getElementById('pd-qty-count').textContent = pageQty; });
 
     // ─── BUY NOW ───
     document.getElementById('buy-btn').addEventListener('click', function() {
+      if (!activeProduct) return;
       if (pageQty < 1) { showToast('Quantity must be at least 1', 'error'); return; }
       var buyItem = {
         id: activeProduct.id,
@@ -2504,6 +2552,7 @@
     }
 
     document.getElementById('cart-btn').addEventListener('click', function() {
+      if (!activeProduct) return;
       var names = getBucketNames();
       if (names.length === 0) { buckets['My Cart'] = { items: [] }; saveBuckets(); names = ['My Cart']; }
       // Default: select first bucket
@@ -2572,8 +2621,7 @@
     });
 
     // ─── RENDER SUGGESTED / RELATED ESSENTIALS ───
-    const sugTrack = document.getElementById('sug-track');
-    const relatedProducts = productsDB.filter(p => p.id !== activeProduct.id);
+    // relatedProducts is declared and updated globally on API load
 
     function renderRelatedItems() {
       sugTrack.innerHTML = '';
@@ -2790,6 +2838,7 @@
 
     // Submit review
     document.getElementById('review-submit').addEventListener('click', () => {
+      if (!activeProduct) return;
       if (selectedStars === 0) {
         starRequired.classList.add('visible');
         return;
@@ -2928,23 +2977,7 @@
       }
     });
 
-    window.addEventListener('DOMContentLoaded', () => {
-      renderGallery();
-      renderRelatedItems();
-      renderReviews();
-      renderProductRating();
 
-      // Entrance animation for content
-      gsap.fromTo('.prod-gallery-wrap', 
-        { opacity: 0, x: -30, filter: 'blur(8px)' },
-        { opacity: 1, x: 0, filter: 'none', duration: 0.65, delay: 0.2, ease: 'power3.out' }
-      );
-
-      gsap.fromTo('#prod-info-wrap', 
-        { opacity: 0, x: 30, filter: 'blur(8px)' },
-        { opacity: 1, x: 0, filter: 'none', duration: 0.65, delay: 0.2, ease: 'power3.out' }
-      );
-    });
 
     // Cart count badge (sync with buckets)
     function updateCartBadge() {
@@ -2972,6 +3005,7 @@
       const storyText = document.getElementById('story-popup-text');
 
       const openStory = function() {
+        if (!activeProduct) return;
         if (storyTitle) storyTitle.textContent = activeProduct.name;
         if (storyText) storyText.textContent = `"${activeProduct.story}"`;
         if (storyPopup) {
