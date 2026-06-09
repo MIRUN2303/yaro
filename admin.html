@@ -999,7 +999,6 @@ img.thumb {
     <nav class="sidebar-nav">
       <a class="active" data-page="dashboard"><span class="nav-icon">◆</span>Dashboard</a>
       <a data-page="collections"><span class="nav-icon">◈</span>Collections</a>
-      <a data-page="stories"><span class="nav-icon">◇</span>Stories</a>
       <a data-page="products"><span class="nav-icon">◉</span>Products</a>
       <a data-page="orders"><span class="nav-icon">◻</span>Orders</a>
     </nav>
@@ -1148,7 +1147,6 @@ function loadPage(page) {
     switch(page) {
       case 'dashboard': renderDashboard(c); break;
       case 'collections': renderCollections(c); break;
-      case 'stories': renderStories(c); break;
       case 'products': renderProducts(c); break;
       case 'orders': renderOrders(c); break;
     }
@@ -1212,58 +1210,6 @@ async function saveCol(id) {
   closeModal(); loadPage('collections');
 }
 
-// ─── STORIES ───
-async function renderStories(c) {
-  var [stories, cols] = await Promise.all([YARO_API.getStories(), YARO_API.getCollections()]);
-  var items = Array.isArray(stories) ? stories : [];
-  var cm = {}; (Array.isArray(cols)?cols:[]).forEach(function(x) { cm[x.id] = x.name; });
-  c.innerHTML = '<div class="page-hdr"><h2>Stories<small>' + items.length + ' total</small></h2><button class="btn btn-pri" onclick="openStoryModal()">+ Add</button></div>' +
-    (!items.length ? '<div class="tbl-wrap"><div class="no-data"><span>◇</span>No stories yet</div></div>' :
-    '<div class="tbl-wrap"><table><thead><tr><th>Title</th><th>Slug</th><th>Collection</th><th>Actions</th></tr></thead><tbody>' +
-    items.map(function(s) {
-      return '<tr><td><strong style="color:rgba(255,255,255,0.85)">' + esc(s.title) + '</strong></td><td style="color:rgba(255,255,255,0.3)">' + esc(s.slug) + '</td><td style="color:rgba(255,255,255,0.45)">' + esc(cm[s.collection_id]||'-') + '</td><td class="acts"><div class="acts-inner"><button class="btn btn-sm btn-pri" onclick="openStoryModal(\'' + s.id + '\')">Edit</button><button class="btn btn-sm btn-del" onclick="delItem(\'stories\',\'' + s.id + '\')">Delete</button></div></td></tr>';
-    }).join('') + '</tbody></table></div>');
-}
-
-async function openStoryModal(id) {
-  var cols = await YARO_API.getCollections();
-  var h = '<h3>' + (id?'Edit':'Add') + ' Story</h3><form id="mf">';
-  h += '<div class="fg"><label>Collection</label><select id="f-collection">';
-  (Array.isArray(cols)?cols:[]).forEach(function(c) { h += '<option value="' + c.id + '">' + esc(c.name) + '</option>'; });
-  h += '</select></div>';
-  h += '<div class="fg"><label>Title</label><input type="text" id="f-title" required></div>';
-  h += '<div class="fg"><label>Description</label><input type="text" id="f-desc"></div>';
-  h += '<div class="fg"><label>Story Content</label><textarea id="f-content"></textarea></div>';
-  h += '<button type="submit" class="btn btn-pri">Save</button></form>';
-  openModal(h);
-  if (id) loadStory(id);
-  document.getElementById('mf').addEventListener('submit', function(e) { e.preventDefault(); saveStory(id); });
-}
-
-async function loadStory(id) {
-  var stories = await YARO_API.getStories();
-  var d = null;
-  for (var i = 0; i < stories.length; i++) { if (stories[i].id === id) { d = stories[i]; break; } }
-  if (!d) return;
-  document.getElementById('f-collection').value = d.collection_id || '';
-  document.getElementById('f-title').value = d.title || '';
-  document.getElementById('f-desc').value = d.description || '';
-  document.getElementById('f-content').value = d.story_content || '';
-}
-
-async function saveStory(id) {
-  var body = {
-    collection_id: document.getElementById('f-collection').value || null,
-    title: document.getElementById('f-title').value,
-    slug: document.getElementById('f-title').value.toLowerCase().replace(/[^a-z0-9]+/g,'-').replace(/^-|-$/g,''),
-    description: document.getElementById('f-desc').value,
-    story_content: document.getElementById('f-content').value
-  };
-  var r = id ? await YARO_API.updateStory(id, body) : await YARO_API.createStory(body);
-  if (r.error) { alert('Error: ' + JSON.stringify(r.error)); return; }
-  closeModal(); loadPage('stories');
-}
-
 // ─── PRODUCTS ───
 async function renderProducts(c) {
   var [prods, cols] = await Promise.all([YARO_API.getAllProducts(), YARO_API.getCollections()]);
@@ -1294,7 +1240,6 @@ async function openProdModal(id) {
   h += '<div class="fg full" id="f-colour-section-wrap" style="display:none"><label>Colour Images (required)</label><div id="f-colour-sections"></div></div>';
   h += '<div class="fg"><label>Badge</label><input type="text" id="f-badge"></div>';
   h += '<div class="fg"><label>Offer Name</label><input type="text" id="f-offer"></div>';
-  h += '<div class="fg full"><label>Story Text</label><textarea id="f-story-text"></textarea></div>';
   h += '<div class="fg"><label>Status</label><select id="f-status"><option value="active">Active</option><option value="draft">Draft</option></select></div>';
   h += '<div class="fg" style="display:flex;align-items:flex-end"><button type="submit" class="btn btn-pri" style="width:100%">Save</button></div>';
   h += '</div></form>';
@@ -1335,7 +1280,6 @@ async function loadProd(id) {
   document.getElementById('f-gender').value = d.gender || 'Any';
   document.getElementById('f-badge').value = d.badge || '';
   document.getElementById('f-offer').value = d.offer_name || '';
-  document.getElementById('f-story-text').value = d.story_text || '';
   document.getElementById('f-status').value = d.status || 'active';
 }
 
@@ -1354,7 +1298,6 @@ async function saveProd(id) {
     gender: document.getElementById('f-gender').value,
     badge: document.getElementById('f-badge').value,
     offer_name: document.getElementById('f-offer').value,
-    story_text: document.getElementById('f-story-text').value,
     colour_data: window._colourData,
     status: document.getElementById('f-status').value
   };
@@ -1650,7 +1593,6 @@ async function delItem(type, id) {
   var r;
   switch(type) {
     case 'collections': r = await YARO_API.deleteCollection(id); break;
-    case 'stories': r = await YARO_API.deleteStory(id); break;
     case 'products': r = await YARO_API.deleteProduct(id); break;
     case 'orders': r = await YARO_API.updateOrder(id, { fulfillment_status: 'cancelled' }); break;
   }
