@@ -1291,22 +1291,20 @@ async function renderOrders(c) {
   var items = Array.isArray(data) ? data : [];
   c.innerHTML = '<div class="page-hdr"><h2>Orders<small>' + items.length + ' total</small></h2></div>' +
     (!items.length ? '<div class="tbl-wrap"><div class="no-data"><span>◻</span>No orders yet</div></div>' :
-    '<div class="tbl-wrap"><table><thead><tr><th>Order</th><th>Customer</th><th>Total</th><th>Payment</th><th>Fulfillment</th><th>Date</th><th>Actions</th></tr></thead><tbody>' +
+    '<div class="tbl-wrap"><table><thead><tr><th>Order</th><th>Customer</th><th>Total</th><th>Status</th><th>Date</th><th>Actions</th></tr></thead><tbody>' +
     items.map(function(o) {
-      return '<tr><td><strong style="color:rgba(255,255,255,0.85)">' + esc(o.order_number) + '</strong></td><td style="color:rgba(255,255,255,0.45)">' + esc(o.user_id||'-') + '</td><td>₹' + ((o.total||0)/100).toFixed(2) + '</td><td><span class="badge ' + (o.payment_status==='confirmed'?'badge-suc':o.payment_status==='failed'?'badge-dng':'badge-warn') + '">' + esc(o.payment_status) + '</span></td><td><span class="badge ' + (o.fulfillment_status==='shipped'||o.fulfillment_status==='delivered'?'badge-suc':'badge-warn') + '">' + esc(o.fulfillment_status) + '</span></td><td style="color:rgba(255,255,255,0.3)">' + (o.created_at?new Date(o.created_at).toLocaleDateString():'-') + '</td><td class="acts"><div class="acts-inner"><button class="btn btn-sm btn-pri" onclick="updateOrder(\'' + o.id + '\')">Update</button></div></td></tr>';
+      return '<tr><td><strong style="color:rgba(255,255,255,0.85)">' + esc(o.order_number) + '</strong></td><td style="color:rgba(255,255,255,0.45)">' + esc(o.customer_name || o.user_id || '-') + '</td><td>₹' + ((o.total||0)/100).toFixed(2) + '</td><td><span class="badge ' + (o.fulfillment_status==='shipped'||o.fulfillment_status==='delivered'?'badge-suc':'badge-warn') + '">' + esc(o.fulfillment_status) + '</span></td><td style="color:rgba(255,255,255,0.3)">' + (o.created_at?new Date(o.created_at).toLocaleDateString():'-') + '</td><td class="acts"><div class="acts-inner"><button class="btn btn-sm btn-pri" onclick="updateOrder(\'' + o.id + '\')">Update</button></div></td></tr>';
     }).join('') + '</tbody></table></div>');
 }
 
 function updateOrder(id) {
   var h = '<h3>Update Order Status</h3><form id="mf">';
-  h += '<div class="fg"><label>Payment</label><select id="f-pstatus"><option value="pending">Pending</option><option value="confirmed">Confirmed</option><option value="failed">Failed</option><option value="refunded">Refunded</option></select></div>';
   h += '<div class="fg"><label>Fulfillment</label><select id="f-fstatus"><option value="pending">Pending</option><option value="processing">Processing</option><option value="shipped">Shipped</option><option value="delivered">Delivered</option></select></div>';
   h += '<button type="submit" class="btn btn-pri">Update</button></form>';
   openModal(h);
   document.getElementById('mf').addEventListener('submit', async function(e) {
     e.preventDefault();
     var body = {
-      payment_status: document.getElementById('f-pstatus').value,
       fulfillment_status: document.getElementById('f-fstatus').value
     };
     var r = await YARO_API.updateOrder(id, body);
