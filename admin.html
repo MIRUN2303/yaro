@@ -1288,7 +1288,7 @@ async function openProdModal(id) {
 }
 
 async function loadProd(id) {
-  var prods = await YARO_API.getProducts();
+  var prods = await YARO_API.getAllProducts();
   var d = null;
   for (var i = 0; i < prods.length; i++) { if (prods[i].id === id) { d = prods[i]; break; } }
   if (!d) return;
