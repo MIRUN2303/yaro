@@ -90,6 +90,14 @@
   .toast { position: fixed; top: 80px; right: 20px; z-index: 6000; padding: 14px 20px; border-radius: 10px; background: rgba(15,10,25,0.95); border: 1px solid rgba(196,181,253,0.15); backdrop-filter: blur(12px); display: flex; align-items: center; gap: 10px; font-size: 12px; color: #fff; min-width: 280px; transform: translateX(120%); opacity: 0; transition: all 0.4s cubic-bezier(0.22,1,0.36,1); }
   .toast.show { transform: translateX(0); opacity: 1; }
 
+  .cancel-btn {
+    display: inline-block; margin-top: 8px; padding: 6px 14px; border-radius: 100px;
+    border: 1px solid rgba(239,68,68,0.2); background: rgba(239,68,68,0.06);
+    color: #f87171; font-family: inherit; font-size: 10px; font-weight: 600;
+    letter-spacing: 0.5px; cursor: pointer; transition: all 0.3s ease;
+  }
+  .cancel-btn:hover { background: rgba(239,68,68,0.12); border-color: rgba(239,68,68,0.3); }
+
   @media (max-width: 600px) { .ord-container { padding: 0; } .ord-card { padding: 16px 18px; } }
 
   * { cursor: none !important; }
@@ -259,6 +267,10 @@ function showToast(msg, type) {
   setTimeout(function() { t.classList.remove('show'); setTimeout(function() { t.remove(); }, 400); }, 3500);
 }
 
+function hoursSince(dateStr) {
+  return (new Date() - new Date(dateStr)) / (1000 * 60 * 60);
+}
+
 async function loadOrders() {
   try {
     var token = YARO_API.getToken();
@@ -291,14 +303,65 @@ function renderOrders() {
     var itemCount = items.reduce(function(s, i) { return s + (i.quantity || 1); }, 0);
     var itemsSummary = items.map(function(i) { return i.product_name + (i.size ? ' (' + i.size : '') + (i.colour ? ', ' + i.colour : '') + (i.size || i.colour ? ')' : ''); }).join(', ');
     var orderNum = o.order_number || ('#' + (o.id ? o.id.substring(0,6).toUpperCase() : '000000'));
+
+    // Cancel logic
+    var canCancel = false;
+    var cancelMsg = '';
+    var cancelStatus = o.cancellation && o.cancellation.status;
+    if (cancelStatus === 'requested') {
+      cancelMsg = '<span style="font-size:10px;color:#f59e0b">Cancellation requested</span>';
+    } else if (cancelStatus === 'approved') {
+      cancelMsg = '<span style="font-size:10px;color:#f87171">Cancellation approved</span>';
+    } else if (cancelStatus === 'rejected') {
+      cancelMsg = '<span style="font-size:10px;color:#f87171">Cancellation rejected' + (o.cancellation.admin_note ? ': ' + o.cancellation.admin_note : '') + '</span>';
+    } else if (['pending','placed','processing'].indexOf(status) > -1 && hoursSince(o.created_at) <= 24) {
+      canCancel = true;
+    }
+
     html += '<div class="ord-card" style="opacity:0;transform:translateY(10px)">';
     html += '<div class="ord-card-row">';
     html += '<div class="ord-card-left"><div class="ord-id">' + orderNum + '</div><div class="ord-date">' + date + '</div><div class="ord-meta">' + itemCount + ' item' + (itemCount > 1 ? 's' : '') + (itemsSummary ? '<br><span style="font-size:10px;color:#555">' + itemsSummary + '</span>' : '') + '</div></div>';
-    html += '<div class="ord-card-right"><div class="ord-total">' + total + '</div><span class="ord-badge ' + status + '">' + status + '</span></div>';
-    html += '</div></div>';
+    html += '<div class="ord-card-right"><div class="ord-total">' + total + '</div><span class="ord-badge ' + status + '">' + status + '</span>';
+    if (canCancel) {
+      html += '<button class="cancel-btn" onclick="showCancelModal(\'' + o.id + '\')">Cancel</button>';
+    } else if (cancelMsg) {
+      html += '<div style="margin-top:6px">' + cancelMsg + '</div>';
+    }
+    html += '</div></div></div>';
   });
   list.innerHTML = html;
   gsap.to('.ord-card', { opacity: 1, y: 0, duration: 0.4, stagger: 0.05, ease: 'power2.out', overwrite: 'auto' });
+}
+
+// ─── CANCEL MODAL ───
+function showCancelModal(orderId) {
+  var overlay = document.getElementById('cancel-overlay');
+  if (!overlay) {
+    overlay = document.createElement('div');
+    overlay.id = 'cancel-overlay';
+    overlay.style.cssText = 'position:fixed;inset:0;z-index:8000;background:rgba(0,0,0,0.7);backdrop-filter:blur(8px);display:flex;align-items:center;justify-content:center;opacity:0;pointer-events:none;transition:opacity 0.3s ease';
+    overlay.addEventListener('click', function(e) { if (e.target === overlay) closeCancelModal(); });
+    document.body.appendChild(overlay);
+  }
+  overlay.innerHTML = '<div style="background:#0c0c0c;border:1px solid rgba(255,255,255,0.08);border-radius:16px;padding:28px 24px;max-width:420px;width:90%"><h3 style="font-size:18px;font-weight:500;margin-bottom:4px">Cancel Order</h3><p style="font-size:12px;color:#666;margin-bottom:20px">Please tell us why you\'d like to cancel.</p><textarea id="cancel-reason" placeholder="Reason for cancellation..." style="width:100%;padding:14px 16px;border-radius:10px;background:rgba(255,255,255,0.02);border:1px solid rgba(255,255,255,0.08);color:#fff;font-family:inherit;font-size:13px;resize:vertical;min-height:100px;outline:none;margin-bottom:16px;box-sizing:border-box"></textarea><div style="display:flex;gap:10px"><button onclick="closeCancelModal()" style="flex:1;padding:12px;border-radius:10px;border:1px solid rgba(255,255,255,0.08);background:transparent;color:#888;font-family:inherit;font-size:12px;font-weight:600;cursor:pointer">Keep Order</button><button onclick="submitCancel(\'' + orderId + '\')" id="cancel-submit-btn" style="flex:1;padding:12px;border-radius:10px;border:none;background:#ef4444;color:#fff;font-family:inherit;font-size:12px;font-weight:600;cursor:pointer">Request Cancellation</button></div></div>';
+  requestAnimationFrame(function() { overlay.style.opacity = '1'; overlay.style.pointerEvents = 'all'; });
+}
+
+function closeCancelModal() {
+  var overlay = document.getElementById('cancel-overlay');
+  if (overlay) { overlay.style.opacity = '0'; overlay.style.pointerEvents = 'none'; }
+}
+
+async function submitCancel(orderId) {
+  var reason = document.getElementById('cancel-reason').value.trim();
+  if (!reason) { showToast('Please provide a reason for cancellation', 'error'); return; }
+  var btn = document.getElementById('cancel-submit-btn');
+  btn.textContent = 'Submitting...'; btn.disabled = true;
+  var r = await YARO_API.cancelOrder(orderId, reason);
+  if (r.error) { showToast('Error: ' + (r.error.message || JSON.stringify(r.error)), 'error'); btn.textContent = 'Request Cancellation'; btn.disabled = false; return; }
+  closeCancelModal();
+  showToast('Cancellation request submitted', 'success');
+  loadOrders();
 }
 
 loadOrders();

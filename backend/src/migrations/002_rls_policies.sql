@@ -76,6 +76,10 @@ DROP POLICY IF EXISTS "Users insert own orders" ON orders;
 CREATE POLICY "Users insert own orders" ON orders
   FOR INSERT WITH CHECK (auth.uid() = user_id);
 
+DROP POLICY IF EXISTS "Users update own orders" ON orders;
+CREATE POLICY "Users update own orders" ON orders
+  FOR UPDATE USING (auth.uid() = user_id);
+
 DROP POLICY IF EXISTS "Users view own orders" ON orders;
 CREATE POLICY "Users view own orders" ON orders
   FOR SELECT USING (auth.uid() = user_id);

@@ -285,6 +285,27 @@ const YARO_API = (function() {
       return sbInsert('order_items', items);
     },
 
+    async cancelOrder(id, reason) {
+      var cancellation = {
+        reason: reason,
+        status: 'requested',
+        requested_at: new Date().toISOString()
+      };
+      return sbUpdate('orders', { cancellation: cancellation }, 'id=eq.' + id);
+    },
+
+    async adminCancelAction(id, action, adminNote) {
+      var o = await sbSingle('orders', 'id', id, { select: 'cancellation' });
+      if (!o) return { error: 'Order not found' };
+      var canc = o.cancellation || {};
+      canc.status = action;
+      canc.reviewed_at = new Date().toISOString();
+      if (adminNote) canc.admin_note = adminNote;
+      var body = { cancellation: canc };
+      if (action === 'approved') body.fulfillment_status = 'cancelled';
+      return sbUpdate('orders', body, 'id=eq.' + id);
+    },
+
     // ── Cart (localStorage) ──
     async getCart() {
       return getCartFromStorage();
