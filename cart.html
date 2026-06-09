@@ -1629,11 +1629,9 @@
         items.push({
           product_id: prod.slug || prod.id,
           product_name: prod.name,
-          product_image: prod.image,
           price: price,
           quantity: item.qty,
-          size: item.size || null,
-          colour: item.colour || null
+          size: item.size || null
         });
       });
       return items;
@@ -1703,29 +1701,23 @@
       var totalPaise = total * 100;
 
       // ─── BUILD ORDER ───
-      var orderId = 'YARO-' + Date.now();
       var orderNumber = 'YARO-' + new Date().toISOString().slice(0,8).replace(/-/g,'') + '-' + Math.random().toString(36).substr(2,4).toUpperCase();
-      var deliveryAddr = JSON.stringify({ door: door, address: address, city: city, pincode: pincode, landmark: landmark });
+      var shippingAddr = { door: door, address: address, city: city, pincode: pincode, landmark: landmark };
 
       var orderData = {
-        id: orderId,
         order_number: orderNumber,
         user_id: userId,
-        status: 'placed',
         payment_status: 'pending',
         fulfillment_status: 'pending',
         subtotal: subtotalPaise,
         shipping: shippingPaise,
         tax: taxPaise,
         total: totalPaise,
-        delivery_address: deliveryAddr,
-        customer_email: userEmail,
-        customer_phone: phone,
-        customer_name: name
+        shipping_address: shippingAddr
       };
 
       var orderItems = buildOrderItems(cartItems);
-      orderItems.forEach(function(item) { item.order_id = orderId; });
+      // Order ID will be returned from createOrder; set it after
 
       // ─── PERSIST ───
       btn.classList.add('loading');
@@ -1733,9 +1725,12 @@
       YARO_API.createOrder(orderData).then(function(orderResult) {
         if (!orderResult || orderResult.error) {
           btn.classList.remove('loading');
+          console.error('Create order failed:', orderResult && orderResult.error);
           showToast('Failed to place order. Please try again.', 'error');
           return;
         }
+        var savedOrderId = orderResult.id || orderResult[0] && orderResult[0].id;
+        orderItems.forEach(function(item) { item.order_id = savedOrderId; });
         YARO_API.createOrderItems(orderItems).then(function(itemsResult) {
           btn.classList.remove('loading');
           if (itemsResult && itemsResult.error) {
