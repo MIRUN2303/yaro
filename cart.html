@@ -1081,7 +1081,7 @@
           return { id: p.slug || p.id, name: p.name, price: p.price ? '₹' + p.price : p.price, originalPrice: p.original_price ? '₹' + p.original_price : '', category: p.category, image: (p.images && p.images[0]) || p.image || '' };
         });
         renderCart();
-        updateSummary();
+        updateSummary(bucketTotals && bucketTotals[activeBucket] || 0);
       }
     }).catch(function() {});
 
@@ -1495,6 +1495,7 @@
 
     // ─── UPDATE SUMMARY ───
     function updateSummary(subtotal) {
+      subtotal = parseInt(subtotal) || 0;
       var shippingThreshold = 699;
       var taxRate = 0.05;
       var shipping = subtotal >= shippingThreshold ? 0 : 99;
