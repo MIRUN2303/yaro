@@ -1903,14 +1903,7 @@
                 <div class="spec-label">About</div>
                 <div class="spec-value" id="product-desc"></div>
               </div>
-              <div class="spec-item">
-                <div class="spec-label">Fabric</div>
-                <div class="spec-value" id="product-fabric">Heavyweight organic ringspun cotton, premium combed weave. High-durability structured shoulder stitch. Made for longevity and maximum street luxury drape.</div>
-              </div>
-              <div class="spec-item">
-                <div class="spec-label">Care</div>
-                <div class="spec-value">Machine wash cold inside out. Tumble dry low or air dry. Do not iron directly on print custom graphics.</div>
-              </div>
+
             </div>
             
           </div>
@@ -2032,6 +2025,7 @@
         <a href="contact.html">Contact</a>
         <a href="profile.html">Profile</a>
         <a href="orders.html">Orders</a>
+        <a href="admin.html" id="mobile-admin-link" style="display:none">Admin</a>
         <a href="cart.html" class="cart-link">Cart</a>
       </nav>
     </div>
@@ -2272,7 +2266,7 @@
     productBadge.className = `prod-badge ${activeProduct.badgeClass}`;
     productTitle.textContent = activeProduct.name;
     productPrice.innerHTML = activeProduct.price.replace(/₹/g, '<span class="rupee">₹</span>');
-    productDesc.textContent = activeProduct.desc;
+    productDesc.textContent = activeProduct.description || activeProduct.desc || activeProduct.notes || '';
     if (productGender && activeProduct.gender) {
       var g = activeProduct.gender;
       var genderMap = { 'His': 'For the Gents', 'Hers': 'For the Ladies', 'Any': 'For the Soul', 'Mini': 'For the Little', 'Mini-Gent': 'For the Little Gents', 'Mini-Lady': 'For the Little Ladies' };

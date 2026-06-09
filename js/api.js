@@ -81,7 +81,7 @@ const YARO_API = (function() {
 
   async function sbInsert(table, body) { return sbWrite('POST', table, body); }
   async function sbUpdate(table, body, filter) { return sbWrite('PATCH', table, body, filter); }
-  async function sbDelete(table, filter) { return sbWrite('DELETE', null, null, filter); }
+  async function sbDelete(table, filter) { return sbWrite('DELETE', table, null, filter); }
 
   // ─── AUTH HELPERS ───
   function isAdmin() {
@@ -180,6 +180,12 @@ const YARO_API = (function() {
     // ── Products ──
     async getProducts() {
       var data = await sbGet('products', { select: '*', filter: 'status=eq.active', order: 'created_at.desc' });
+      if (data && Array.isArray(data) && data.length) return data;
+      return FALLBACK_PRODUCTS;
+    },
+
+    async getAllProducts() {
+      var data = await sbGet('products', { select: '*', order: 'created_at.desc' });
       if (data && Array.isArray(data) && data.length) return data;
       return FALLBACK_PRODUCTS;
     },

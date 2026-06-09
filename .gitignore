@@ -2,3 +2,5 @@
 node_modules/
 .env
 backend/.env
+supabase/.temp/
+docs/SUPABASE*.txt

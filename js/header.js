@@ -23,10 +23,32 @@
     '<a href="contact.html" ' + a('contact') + '>Contact</a>',
     '<a href="profile.html" ' + a('profile') + '>Profile</a>',
     '<a href="orders.html" ' + a('orders') + '>Orders</a>',
+    '<a href="admin.html" id="admin-header-link" class="admin-nav-link" style="display:none">Admin</a>',
     '<a href="cart.html" class="cart-link' + (p === 'cart' ? ' active' : '') + '">Cart <span class="cart-count" id="cart-count">0</span></a>',
     '</nav>'
   ].join('');
   document.body.prepend(h);
+
+  // Show admin link if admin is logged in
+  (function() {
+    try {
+      var token = localStorage.getItem('sb_token');
+      if (!token) return;
+      fetch('https://hggaxgdiritrawbpyues.supabase.co/auth/v1/user', {
+        headers: { 'apikey': 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImhnZ2F4Z2Rpcml0cmF3YnB5dWVzIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODA4NTE1NjIsImV4cCI6MjA5NjQyNzU2Mn0.huBcWXCsLlTVW-_6VLOI4FRppb_72QJl-bhwsw2zynI', 'Authorization': 'Bearer ' + token }
+      }).then(function(r) { return r.json(); }).then(function(u) {
+        if (u && u.email === 'yarodrops@gmail.com') {
+          var link = document.getElementById('admin-header-link');
+          if (link) { link.style.display = ''; link.classList.add('visible'); }
+          var mLink = document.getElementById('mobile-admin-link');
+          if (mLink) { mLink.style.display = ''; mLink.classList.add('visible'); }
+          var s = document.createElement('style');
+          s.textContent = '.admin-nav-link.visible{display:inline-flex!important;align-items:center;gap:4px;padding:4px 12px!important;background:rgba(196,181,253,0.1);border:1px solid rgba(196,181,253,0.2);border-radius:6px;color:#c4b5fd!important;font-weight:600!important}.admin-nav-link.visible:hover{background:rgba(196,181,253,0.18)!important;border-color:rgba(196,181,253,0.35)!important;color:#d8ccff!important}.admin-nav-link.visible::after{display:none!important}';
+          document.head.appendChild(s);
+        }
+      }).catch(function() {});
+    } catch(e) {}
+  })();
 
   document.querySelectorAll('.sh-search').forEach(function(w) {
     var input = w.querySelector('.header-search-input');

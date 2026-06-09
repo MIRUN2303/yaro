@@ -1,6 +1,12 @@
 {
+  "scripts": {
+    "start": "serve . -l 3000 --no-clipboard"
+  },
   "devDependencies": {
-    "netlify-cli": "^26.1.0",
+    "serve": "^14.2.6",
     "supabase": "^2.105.0"
+  },
+  "dependencies": {
+    "pg": "^8.21.0"
   }
 }

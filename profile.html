@@ -10,7 +10,7 @@
 <link href="https://api.fontshare.com/v2/css?f[]=clash-display@200,300,400,500,600,700&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="css/styles.css">
 <style>
-:root { --border: rgba(255,255,255,0.08); --accent: #c4b5fd; --accent2: #a78bfa; --accent-dim: rgba(196,181,253,0.15); --bg-card: rgba(255,255,255,0.02); }
+:root { --border: rgba(255,255,255,0.08); --accent: #c4b5fd; --accent2: #a78bfa; --bg-card: rgba(255,255,255,0.02); --radius-sm: 8px; }
 *, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
 html, body { width: 100%; min-height: 100vh; background: #050505; font-family: 'Clash Display', sans-serif; color: #fff; overflow-x: hidden; }
 
@@ -37,7 +37,7 @@ body { min-height: 100vh; display: flex; flex-direction: column; }
   background: var(--bg-card);
   border: 1px solid var(--border);
   border-radius: 16px;
-  padding: 24px 0;
+  padding: 28px 0 12px;
   position: sticky;
   top: 88px;
 }
@@ -49,26 +49,76 @@ body { min-height: 100vh; display: flex; flex-direction: column; }
   border-bottom: 1px solid var(--border);
   margin-bottom: 8px;
 }
-.prof-avatar-circle {
-  width: 56px; height: 56px;
+.prof-avatar-wrap {
+  position: relative;
+  width: 72px; height: 72px;
+  margin-bottom: 12px;
   border-radius: 50%;
-  background: linear-gradient(135deg, rgba(196,181,253,0.15), rgba(167,139,250,0.08));
-  border: 1px solid rgba(196,181,253,0.2);
+  overflow: hidden;
+  border: 2px solid rgba(196,181,253,0.2);
+}
+.prof-avatar-wrap img {
+  width: 100%; height: 100%;
+  object-fit: cover;
+  display: block;
+  transition: opacity 0.3s ease;
+}
+.prof-avatar-overlay {
+  position: absolute;
+  inset: 0;
+  background: rgba(0,0,0,0.55);
+  backdrop-filter: blur(4px);
   display: flex;
   align-items: center;
   justify-content: center;
+  opacity: 0;
+  transition: opacity 0.3s ease;
+  cursor: pointer;
+  flex-direction: column;
+  gap: 4px;
+  color: rgba(255,255,255,0.6);
+  font-size: 10px;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+.prof-avatar-wrap:hover .prof-avatar-overlay { opacity: 1; }
+.prof-avatar-wrap:hover img { opacity: 0.7; }
+.prof-avatar-overlay svg { width: 20px; height: 20px; opacity: 0.7; }
+.prof-avatar-name {
   font-family: 'Clash Display', sans-serif;
   font-weight: 600;
-  font-size: 20px;
-  color: var(--accent);
-  margin-bottom: 10px;
+  font-size: 15px;
+  color: rgba(255,255,255,0.85);
+  margin-bottom: 2px;
+  text-align: center;
 }
 .prof-avatar-email {
   font-size: 11px;
-  color: rgba(255,255,255,0.35);
+  color: rgba(255,255,255,0.3);
   letter-spacing: 0.05em;
   text-align: center;
   word-break: break-all;
+}
+.prof-customer-id {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  margin-top: 8px;
+  padding: 4px 12px;
+  background: rgba(196,181,253,0.06);
+  border: 1px solid rgba(196,181,253,0.1);
+  border-radius: 100px;
+  font-size: 9px;
+  letter-spacing: 0.15em;
+  text-transform: uppercase;
+  color: var(--accent);
+  cursor: pointer;
+  transition: all 0.25s ease;
+}
+.prof-customer-id:hover {
+  background: rgba(196,181,253,0.1);
+  border-color: rgba(196,181,253,0.25);
 }
 .prof-sidebar-nav { padding: 4px 12px; display: flex; flex-direction: column; gap: 2px; }
 .prof-sidebar-nav a {
@@ -79,31 +129,20 @@ body { min-height: 100vh; display: flex; flex-direction: column; }
   border-radius: 8px;
   color: rgba(255,255,255,0.4);
   text-decoration: none;
-  font-size: 12px;
-  letter-spacing: 0.1em;
+  font-size: 11px;
+  letter-spacing: 0.12em;
   text-transform: uppercase;
   transition: all 0.25s ease;
 }
-.prof-sidebar-nav a:hover {
-  background: rgba(196,181,253,0.06);
-  color: var(--accent);
-}
-.prof-sidebar-nav a.active {
-  background: rgba(196,181,253,0.08);
-  color: var(--accent);
-}
-.prof-sidebar-nav a .ico { font-size: 14px; width: 20px; text-align: center; opacity: 0.5; }
-.prof-sidebar-nav a:hover .ico,
-.prof-sidebar-nav a.active .ico { opacity: 1; }
+.prof-sidebar-nav a:hover { background: rgba(196,181,253,0.06); color: var(--accent); }
+.prof-sidebar-nav a.active { background: rgba(196,181,253,0.08); color: var(--accent); }
+.prof-sidebar-nav a .ico { font-size: 12px; width: 18px; text-align: center; opacity: 0.5; }
+.prof-sidebar-nav a:hover .ico, .prof-sidebar-nav a.active .ico { opacity: 1; }
 .prof-sidebar-nav a.danger { color: rgba(239,68,68,0.5); }
 .prof-sidebar-nav a.danger:hover { background: rgba(239,68,68,0.08); color: #ef4444; }
 
 /* ─── MAIN CONTENT ─── */
-.prof-main {
-  display: flex;
-  flex-direction: column;
-  gap: 28px;
-}
+.prof-main { display: flex; flex-direction: column; gap: 24px; }
 .prof-card {
   background: var(--bg-card);
   border: 1px solid var(--border);
@@ -123,12 +162,12 @@ body { min-height: 100vh; display: flex; flex-direction: column; }
   pointer-events: none;
 }
 .prof-card-title {
-  font-size: 16px;
+  font-size: 15px;
   font-weight: 500;
   letter-spacing: 0.12em;
   text-transform: uppercase;
   color: rgba(255,255,255,0.8);
-  margin-bottom: 24px;
+  margin-bottom: 20px;
 }
 .prof-card-title .sub {
   display: block;
@@ -137,14 +176,10 @@ body { min-height: 100vh; display: flex; flex-direction: column; }
   color: rgba(255,255,255,0.25);
   letter-spacing: 0.08em;
   text-transform: none;
-  margin-top: 4px;
+  margin-top: 3px;
 }
 
-.form-grid {
-  display: grid;
-  grid-template-columns: 1fr 1fr;
-  gap: 18px;
-}
+.form-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
 .form-grid .full { grid-column: 1 / -1; }
 .fg label {
   display: block;
@@ -152,11 +187,11 @@ body { min-height: 100vh; display: flex; flex-direction: column; }
   color: rgba(255,255,255,0.3);
   text-transform: uppercase;
   letter-spacing: 0.12em;
-  margin-bottom: 6px;
+  margin-bottom: 5px;
 }
 .fg input {
   width: 100%;
-  padding: 12px 14px;
+  padding: 11px 14px;
   background: rgba(255,255,255,0.03);
   border: 1px solid var(--border);
   border-radius: 10px;
@@ -171,152 +206,286 @@ body { min-height: 100vh; display: flex; flex-direction: column; }
   background: rgba(196,181,253,0.04);
   box-shadow: 0 0 12px rgba(196,181,253,0.04);
 }
-.fg input:disabled {
-  opacity: 0.4;
-  cursor: not-allowed;
-}
+.fg input:disabled { opacity: 0.4; cursor: not-allowed; }
+.fg input[readonly] { opacity: 0.5; cursor: default; }
 
 /* ─── BUTTONS ─── */
 .btn {
   display: inline-flex;
   align-items: center;
   gap: 6px;
-  padding: 12px 24px;
+  padding: 11px 22px;
   border: none;
   border-radius: 8px;
   cursor: pointer;
-  font-size: 11px;
+  font-size: 10px;
   font-weight: 600;
   letter-spacing: 0.12em;
   text-transform: uppercase;
   font-family: 'Clash Display', sans-serif;
   transition: all 0.3s ease;
 }
-.btn-pri {
-  background: linear-gradient(135deg, var(--accent), var(--accent2));
-  color: #000;
-}
-.btn-pri:hover {
-  opacity: 0.85;
-  transform: translateY(-1px);
-  box-shadow: 0 6px 20px rgba(139,92,246,0.2);
-}
-.btn-outline {
-  background: transparent;
-  border: 1px solid var(--border);
-  color: rgba(255,255,255,0.6);
-}
-.btn-outline:hover {
-  border-color: var(--accent);
-  color: var(--accent);
-}
-.btn-danger {
-  background: rgba(239,68,68,0.1);
-  color: #ef4444;
-  border: 1px solid rgba(239,68,68,0.15);
-}
-.btn-danger:hover {
-  background: rgba(239,68,68,0.18);
-}
-.btn-sm { padding: 8px 16px; font-size: 10px; }
-
+.btn-pri { background: linear-gradient(135deg, var(--accent), var(--accent2)); color: #000; }
+.btn-pri:hover { opacity: 0.85; transform: translateY(-1px); box-shadow: 0 6px 20px rgba(139,92,246,0.2); }
+.btn-outline { background: transparent; border: 1px solid var(--border); color: rgba(255,255,255,0.5); }
+.btn-outline:hover { border-color: var(--accent); color: var(--accent); }
+.btn-danger { background: rgba(239,68,68,0.1); color: #ef4444; border: 1px solid rgba(239,68,68,0.15); }
+.btn-danger:hover { background: rgba(239,68,68,0.18); }
+.btn-sm { padding: 8px 14px; font-size: 9px; }
+.btn:disabled { opacity: 0.4; cursor: not-allowed; transform: none !important; }
 .prof-divider { border: none; border-top: 1px solid var(--border); margin: 20px 0; }
 
-/* ─── ORDERS GRID ─── */
-.orders-grid {
-  display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
-  gap: 12px;
-}
-.order-card {
+/* ─── TOGGLE SWITCH ─── */
+.toggle-row {
   display: flex;
-  flex-direction: column;
-  padding: 18px 20px;
+  justify-content: space-between;
+  align-items: center;
+  padding: 16px 20px;
   background: rgba(255,255,255,0.015);
   border: 1px solid var(--border);
-  border-radius: 12px;
-  text-decoration: none;
-  color: #fff;
-  transition: all 0.25s ease;
+  border-radius: 10px;
 }
-.order-card:hover {
-  border-color: rgba(196,181,253,0.2);
-  background: rgba(196,181,253,0.03);
-  transform: translateY(-2px);
-}
-.order-card-top {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  margin-bottom: 8px;
-}
-.order-card-num {
-  font-size: 13px;
-  font-weight: 600;
-  color: rgba(255,255,255,0.85);
-}
-.order-card-date {
-  font-size: 10px;
-  color: rgba(255,255,255,0.25);
-}
-.order-card-mid {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  margin-top: auto;
-}
-.order-card-status {
-  font-size: 10px;
-  padding: 3px 10px;
+.toggle-row-left {}
+.toggle-row-label { font-size: 13px; color: rgba(255,255,255,0.75); }
+.toggle-row-desc { font-size: 11px; color: rgba(255,255,255,0.25); margin-top: 2px; }
+.toggle-switch {
+  width: 40px; height: 22px;
+  background: rgba(255,255,255,0.08);
   border-radius: 100px;
-  text-transform: capitalize;
-  letter-spacing: 0.05em;
+  position: relative;
+  cursor: pointer;
+  transition: background 0.3s ease;
+  flex-shrink: 0;
 }
-.order-card-status.confirmed,
-.order-card-status.delivered { background: rgba(34,197,94,0.1); color: #22c55e; border: 1px solid rgba(34,197,94,0.15); }
-.order-card-status.pending,
-.order-card-status.processing { background: rgba(245,158,11,0.08); color: #f59e0b; border: 1px solid rgba(245,158,11,0.12); }
-.order-card-status.shipped { background: rgba(59,130,246,0.08); color: #3b82f6; border: 1px solid rgba(59,130,246,0.12); }
-.order-card-total {
+.toggle-switch.active { background: var(--accent); }
+.toggle-switch::after {
+  content: '';
+  position: absolute;
+  top: 2px; left: 2px;
+  width: 18px; height: 18px;
+  border-radius: 50%;
+  background: #fff;
+  transition: transform 0.3s cubic-bezier(0.22,1,0.36,1);
+}
+.toggle-switch.active::after { transform: translateX(18px); }
+
+/* ─── RE-AUTH MODAL ─── */
+.reauth-overlay {
+  display: none;
+  position: fixed;
+  inset: 0;
+  background: rgba(5,5,5,0.6);
+  backdrop-filter: blur(20px);
+  align-items: center;
+  justify-content: center;
+  z-index: 9999;
+}
+.reauth-overlay.open { display: flex; }
+.reauth-card {
+  background: rgba(15,10,25,0.75);
+  backdrop-filter: blur(40px);
+  border: 1px solid rgba(196,181,253,0.12);
+  border-radius: 18px;
+  width: 90%;
+  max-width: 380px;
+  padding: 32px 28px 28px;
+  box-shadow: 0 30px 100px rgba(0,0,0,0.9), inset 0 1px 0 rgba(255,255,255,0.05);
+  position: relative;
+  text-align: center;
+}
+.reauth-card::before {
+  content: '';
+  position: absolute;
+  top: -1px; left: 50%;
+  transform: translateX(-50%);
+  width: 50%;
+  max-width: 160px;
+  height: 1px;
+  background: linear-gradient(90deg, transparent, rgba(196,181,253,0.2), transparent);
+}
+.reauth-card h3 {
   font-size: 14px;
-  font-weight: 600;
-  color: var(--accent);
+  font-weight: 500;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: rgba(255,255,255,0.8);
+  margin-bottom: 6px;
 }
+.reauth-card p {
+  font-size: 11px;
+  color: rgba(255,255,255,0.3);
+  margin-bottom: 20px;
+}
+.reauth-card input {
+  width: 100%;
+  padding: 12px 14px;
+  background: rgba(255,255,255,0.03);
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  color: #fff;
+  font-size: 13px;
+  font-family: 'Clash Display', sans-serif;
+  outline: none;
+  transition: all 0.3s ease;
+  text-align: center;
+  margin-bottom: 14px;
+}
+.reauth-card input:focus {
+  border-color: var(--accent);
+  background: rgba(196,181,253,0.04);
+}
+.reauth-card .reauth-err {
+  font-size: 11px;
+  color: #ef4444;
+  margin-bottom: 10px;
+  display: none;
+}
+.reauth-card .reauth-err.show { display: block; }
 
 /* ─── LOGGED OUT ─── */
 .prof-logged-out { display: none; }
 .prof-logged-in { display: none; }
-body.logged-out .prof-logged-out { display: flex; align-items: center; justify-content: center; min-height: 60vh; }
-body.logged-in .prof-logged-in { display: block; }
+body.logged-out .prof-logged-out { display: flex; align-items: center; justify-content: center; min-height: 70vh; padding: 20px; }
+body.logged-in .prof-logged-in { display: contents; }
 .prof-auth {
   text-align: center;
-  max-width: 400px;
+  max-width: 420px;
+  width: 100%;
+  background: rgba(255,255,255,0.015);
+  backdrop-filter: blur(24px);
+  -webkit-backdrop-filter: blur(24px);
+  border: 1px solid var(--border);
+  border-radius: 20px;
+  padding: 52px 40px 44px;
+  position: relative;
+  box-shadow: 0 32px 80px rgba(0,0,0,0.6), 0 0 60px rgba(139,92,246,0.03), inset 0 1px 0 rgba(255,255,255,0.04);
+  transition: border-color 0.4s ease, box-shadow 0.4s ease;
+}
+.prof-auth:hover {
+  border-color: rgba(196,181,253,0.2);
+  box-shadow: 0 32px 80px rgba(0,0,0,0.6), 0 0 80px rgba(139,92,246,0.06), inset 0 1px 0 rgba(255,255,255,0.04);
+}
+.prof-auth::before {
+  content: '';
+  position: absolute;
+  top: -1px; left: 50%;
+  transform: translateX(-50%);
+  width: 50%; max-width: 160px;
+  height: 1px;
+  background: linear-gradient(90deg, transparent, rgba(196,181,253,0.3), transparent);
+  pointer-events: none;
+}
+.prof-auth::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: radial-gradient(ellipse at 50% 0%, rgba(139,92,246,0.04) 0%, transparent 60%);
+  pointer-events: none;
+  border-radius: 20px;
+}
+.prof-auth .corner {
+  position: absolute;
+  width: 10px; height: 10px;
+  border-color: rgba(196,181,253,0.15);
+  border-style: solid;
+  transition: all 0.4s ease;
+  pointer-events: none;
+}
+.prof-auth:hover .corner { border-color: rgba(196,181,253,0.35); }
+.prof-auth .corner-tl { top: 5px; left: 5px; border-width: 1px 0 0 1px; border-radius: 4px 0 0 0; }
+.prof-auth .corner-tr { top: 5px; right: 5px; border-width: 1px 1px 0 0; border-radius: 0 4px 0 0; }
+.prof-auth .corner-bl { bottom: 5px; left: 5px; border-width: 0 0 1px 1px; border-radius: 0 0 0 4px; }
+.prof-auth .corner-br { bottom: 5px; right: 5px; border-width: 0 1px 1px 0; border-radius: 0 0 4px 0; }
+.prof-auth .auth-icon {
+  font-size: 32px;
+  margin-bottom: 16px;
+  display: inline-block;
+  width: 56px; height: 56px;
+  line-height: 56px;
+  background: rgba(196,181,253,0.06);
+  border: 1px solid rgba(196,181,253,0.1);
+  border-radius: 16px;
+  position: relative;
+  z-index: 1;
+  transition: border-color 0.3s ease, background 0.3s ease, transform 0.3s ease;
+}
+.prof-auth:hover .auth-icon {
+  border-color: rgba(196,181,253,0.25);
+  background: rgba(196,181,253,0.1);
+  transform: scale(1.04);
 }
 .prof-auth h3 {
   font-size: 22px;
   font-weight: 500;
-  letter-spacing: 0.1em;
+  letter-spacing: 0.04em;
   margin-bottom: 8px;
-  text-transform: uppercase;
+  color: rgba(255,255,255,0.85);
+  position: relative;
+  z-index: 1;
 }
 .prof-auth p {
   font-size: 13px;
-  color: rgba(255,255,255,0.35);
-  margin-bottom: 28px;
+  color: var(--muted);
+  margin-bottom: 32px;
+  line-height: 1.6;
+  position: relative;
+  z-index: 1;
 }
-.auth-links { display: flex; gap: 12px; justify-content: center; }
+.auth-links {
+  display: flex;
+  gap: 12px;
+  justify-content: center;
+  position: relative;
+  z-index: 1;
+}
+.auth-links .btn-cnr {
+  position: relative;
+  transition: transform 0.3s ease;
+}
+.auth-links .btn-cnr:hover { transform: translateY(-1px); }
+.auth-links .btn-cnr .cnr {
+  position: absolute;
+  width: 6px; height: 6px;
+  border-color: rgba(255,255,255,0.15);
+  border-style: solid;
+  transition: border-color 0.35s ease;
+  pointer-events: none;
+}
+.auth-links .btn-cnr:hover .cnr { border-color: rgba(255,255,255,0.35); }
+.auth-links .btn-cnr .cnr-tl { top: 3px; left: 3px; border-width: 1px 0 0 1px; border-radius: 3px 0 0 0; }
+.auth-links .btn-cnr .cnr-tr { top: 3px; right: 3px; border-width: 1px 1px 0 0; border-radius: 0 3px 0 0; }
+.auth-links .btn-cnr .cnr-bl { bottom: 3px; left: 3px; border-width: 0 0 1px 1px; border-radius: 0 0 0 3px; }
+.auth-links .btn-cnr .cnr-br { bottom: 3px; right: 3px; border-width: 0 1px 1px 0; border-radius: 0 0 3px 0; }
 .auth-links a {
-  padding: 12px 28px;
-  border-radius: 8px;
+  padding: 13px 30px;
+  border-radius: var(--radius-sm);
   font-size: 11px;
   font-weight: 600;
   letter-spacing: 0.12em;
   text-transform: uppercase;
   text-decoration: none;
-  transition: all 0.3s;
+  transition: var(--transition);
+  display: block;
 }
-.auth-links a:first-child { background: linear-gradient(135deg, var(--accent), var(--accent2)); color: #000; }
-.auth-links a:last-child { border: 1px solid var(--border); color: rgba(255,255,255,0.6); }
+.auth-links a:first-child {
+  background: linear-gradient(135deg, var(--accent), var(--accent2));
+  color: #0a0a0a;
+  box-shadow: 0 2px 12px rgba(139,92,246,0.15);
+}
+.auth-links a:first-child:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 6px 24px rgba(139,92,246,0.3);
+}
+.auth-links a:last-child {
+  border: 1px solid var(--border);
+  color: var(--text-dim);
+  background: rgba(255,255,255,0.02);
+}
+.auth-links a:last-child:hover {
+  border-color: rgba(255,255,255,0.15);
+  color: var(--text);
+  background: rgba(255,255,255,0.04);
+}
 .auth-links a:hover { transform: translateY(-1px); }
 
 /* ─── TOAST ─── */
@@ -342,13 +511,13 @@ body.logged-in .prof-logged-in { display: block; }
   position: fixed; top: 0; left: 0; width: 3px; height: 3px;
   background: #fff; border-radius: 50%; pointer-events: none;
   z-index: 99999; will-change: transform;
-  transition: width 0.4s cubic-bezier(0.22,1,0.36,1), height 0.4s cubic-bezier(0.22,1,0.36,1), background 0.3s ease, opacity 0.3s ease;
+  transition: width 0.4s, height 0.4s, background 0.3s, opacity 0.3s;
 }
 .cursor-ring {
   position: fixed; top: 0; left: 0; width: 24px; height: 24px;
   border: 0.5px solid rgba(255,255,255,0.12); border-radius: 50%;
   pointer-events: none; z-index: 99998; will-change: transform;
-  transition: width 0.6s cubic-bezier(0.22,1,0.36,1), height 0.6s cubic-bezier(0.22,1,0.36,1), border-color 0.5s ease, border-width 0.5s ease, opacity 0.4s ease, background 0.5s ease;
+  transition: width 0.6s, height 0.6s, border-color 0.5s, border-width 0.5s, opacity 0.4s, background 0.5s;
 }
 .cursor-ring::after {
   content: '';
@@ -359,72 +528,40 @@ body.logged-in .prof-logged-in { display: block; }
   opacity: 0; transition: opacity 0.5s ease;
   pointer-events: none; animation: lavaSpin 2.5s linear infinite;
 }
-body:has(a:hover, button:hover) .cursor-dot { width: 3px; height: 3px; background: rgba(139, 92, 246, 1); }
-body:has(a:hover, button:hover) .cursor-ring {
-  width: 40px; height: 40px; border-width: 1.5px; border-color: rgba(168, 85, 247, 0.6);
-  background: rgba(139, 92, 246, 0.06);
-  box-shadow: 0 0 22px rgba(168, 85, 247, 0.3), 0 0 50px rgba(139, 92, 246, 0.12);
-}
+body:has(a:hover, button:hover) .cursor-dot { width: 3px; height: 3px; background: rgba(139,92,246,1); }
+body:has(a:hover, button:hover) .cursor-ring { width: 40px; height: 40px; border-width: 1.5px; border-color: rgba(168,85,247,0.6); background: rgba(139,92,246,0.06); box-shadow: 0 0 22px rgba(168,85,247,0.3), 0 0 50px rgba(139,92,246,0.12); }
 body:has(a:hover, button:hover) .cursor-ring::after { opacity: 1; }
 .cursor-dot.hovering, .cursor-dot.on-logo { width: 3px; height: 3px; background: rgba(168, 85, 247, 1); box-shadow: 0 0 8px rgba(168, 85, 247, 0.7); }
-.cursor-ring.hovering, .cursor-ring.on-logo {
-  width: 40px; height: 40px; border-width: 1.5px; border-color: rgba(168, 85, 247, 0.6);
-  background: rgba(139, 92, 246, 0.06);
-  box-shadow: 0 0 22px rgba(168, 85, 247, 0.3), 0 0 50px rgba(139, 92, 246, 0.12);
-}
+.cursor-ring.hovering, .cursor-ring.on-logo { width: 40px; height: 40px; border-width: 1.5px; border-color: rgba(168, 85, 247, 0.6); background: rgba(139, 92, 246, 0.06); box-shadow: 0 0 22px rgba(168, 85, 247, 0.3), 0 0 50px rgba(139, 92, 246, 0.12); }
 .cursor-ring.hovering::after, .cursor-ring.on-logo::after { opacity: 1; }
 body:active .cursor-dot, .cursor-dot.clicking { width: 2px; height: 2px; opacity: 0.6; }
 body:active .cursor-ring, .cursor-ring.clicking { width: 20px; height: 20px; border-color: rgba(139, 92, 246, 0.15); border-width: 0.5px; }
 .cursor-dot.hidden, .cursor-ring.hidden { opacity: 0; }
+.cursor-label { display: none; }
 #cursor-canvas { position: fixed; top: 0; left: 0; width: 100%; height: 100%; pointer-events: none; z-index: 99997; }
-@keyframes lavaSpin { 0% { transform: translate(-50%, -50%) rotate(0deg); } 100% { transform: translate(-50%, -50%) rotate(360deg); } }
+@keyframes lavaSpin { 0% { transform: translate(-50%,-50%) rotate(0deg); } 100% { transform: translate(-50%,-50%) rotate(360deg); } }
 
 /* ─── RESPONSIVE ─── */
 @media (max-width: 820px) {
   .page-wrap { padding-top: 64px; }
-  .prof-container {
-    grid-template-columns: 1fr;
-    padding: 0 12px 32px;
-    gap: 12px;
-    max-width: 480px;
-  }
-  .prof-sidebar {
-    position: static;
-    padding: 12px 0;
-    display: flex;
-    align-items: center;
-    gap: 12px;
-    border-radius: 12px;
-    padding: 10px 14px;
-  }
-  .prof-avatar {
-    flex-direction: row;
-    gap: 10px;
-    padding: 0;
-    border: none;
-    margin: 0;
-    flex-shrink: 0;
-  }
-  .prof-avatar-circle { margin-bottom: 0; width: 34px; height: 34px; font-size: 14px; flex-shrink: 0; }
-  .prof-avatar-email { text-align: left; font-size: 10px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; max-width: 120px; }
-  .prof-sidebar-nav {
-    flex-direction: row;
-    padding: 0;
-    margin-left: auto;
-    gap: 2px;
-  }
-  .prof-sidebar-nav a { font-size: 9px; padding: 6px 10px; letter-spacing: 0.08em; white-space: nowrap; }
+  .prof-container { grid-template-columns: 1fr; padding: 0 12px 32px; gap: 12px; max-width: 480px; }
+  .prof-sidebar { position: static; padding: 16px; display: flex; align-items: center; gap: 14px; border-radius: 12px; }
+  .prof-avatar { flex-direction: row; padding: 0; border: none; margin: 0; gap: 12px; }
+  .prof-avatar-wrap { width: 48px; height: 48px; margin-bottom: 0; flex-shrink: 0; }
+  .prof-avatar-name { font-size: 13px; text-align: left; }
+  .prof-avatar-email { text-align: left; font-size: 10px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; max-width: 140px; }
+  .prof-customer-id { margin-top: 4px; font-size: 8px; padding: 3px 8px; }
+  .prof-sidebar-nav { flex-direction: row; padding: 0; margin-left: auto; gap: 2px; }
+  .prof-sidebar-nav a { font-size: 9px; padding: 6px 10px; white-space: nowrap; }
   .prof-sidebar-nav a .ico { font-size: 11px; width: 14px; }
-  .prof-card { padding: 18px; }
+  .prof-card { padding: 20px; }
   .prof-card-title { font-size: 13px; margin-bottom: 16px; }
-  .prof-card-title .sub { font-size: 10px; }
   .form-grid { grid-template-columns: 1fr; gap: 12px; }
-  .fg input { padding: 10px 12px; font-size: 13px; }
-  .orders-grid { grid-template-columns: 1fr; }
-  .btn { padding: 10px 18px; font-size: 10px; }
-  .prof-auth h3 { font-size: 17px; }
+  .fg input { padding: 10px 12px; }
+  .toggle-row { padding: 12px 14px; }
   .auth-links { flex-direction: column; align-items: center; gap: 8px; }
   .auth-links a { width: 100%; max-width: 220px; text-align: center; }
+  .prof-avatar-overlay { opacity: 1; background: rgba(0,0,0,0.35); }
 }
 </style>
 </head>
@@ -440,26 +577,45 @@ body:active .cursor-ring, .cursor-ring.clicking { width: 20px; height: 20px; bor
       <!-- LOGGED OUT -->
       <div class="prof-logged-out" style="grid-column:1/-1">
         <div class="prof-auth">
+          <i class="corner corner-tl"></i>
+          <i class="corner corner-tr"></i>
+          <i class="corner corner-bl"></i>
+          <i class="corner corner-br"></i>
+          <div class="auth-icon">◇</div>
           <h3>Welcome to YARO</h3>
-          <p>Sign in to view your profile, orders, and more.</p>
+          <p>Sign in to access your profile, track orders, and manage your account.</p>
           <div class="auth-links">
-            <a href="login.html">Sign In</a>
-            <a href="signup.html">Create Account</a>
+            <span class="btn-cnr"><a href="login.html">Sign In</a><i class="cnr cnr-tl"></i><i class="cnr cnr-tr"></i><i class="cnr cnr-bl"></i><i class="cnr cnr-br"></i></span>
+            <span class="btn-cnr"><a href="signup.html">Create Account</a><i class="cnr cnr-tl"></i><i class="cnr cnr-tr"></i><i class="cnr cnr-bl"></i><i class="cnr cnr-br"></i></span>
           </div>
         </div>
       </div>
 
       <!-- LOGGED IN -->
-      <div class="prof-logged-in" style="grid-column:1/-1;display:contents">
+      <div class="prof-logged-in">
 
         <!-- SIDEBAR -->
-        <aside class="prof-sidebar" id="prof-sidebar">
+        <aside class="prof-sidebar">
           <div class="prof-avatar">
-            <div class="prof-avatar-circle" id="prof-avatar-initials">Y</div>
-            <div class="prof-avatar-email" id="prof-avatar-email">user@yaro.com</div>
+            <div class="prof-avatar-wrap">
+              <img id="prof-avatar-img" src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='72' height='72' viewBox='0 0 72 72'%3E%3Crect width='72' height='72' fill='%231a1a2e'/%3E%3Ctext x='36' y='44' text-anchor='middle' fill='%23c4b5fd' font-size='28' font-family='Clash Display' font-weight='600'%3EY%3C/text%3E%3C/svg%3E" alt="Avatar">
+              <label for="avatar-upload" class="prof-avatar-overlay">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path stroke-linecap="round" stroke-linejoin="round" d="M6.827 6.175A2.31 2.31 0 015.186 7.23c-.38.054-.757.112-1.134.175C2.999 7.58 2.25 8.507 2.25 9.574V18a2.25 2.25 0 002.25 2.25h15A2.25 2.25 0 0021.75 18V9.574c0-1.067-.75-1.994-1.802-2.169a47.865 47.865 0 00-1.134-.175 2.31 2.31 0 01-1.64-1.055l-.822-1.316a2.192 2.192 0 00-1.736-1.039 48.774 48.774 0 00-5.232 0 2.192 2.192 0 00-1.736 1.039l-.821 1.316z"/><path stroke-linecap="round" stroke-linejoin="round" d="M16.5 12.75a4.5 4.5 0 11-9 0 4.5 4.5 0 019 0z"/></svg>
+                <span>Change</span>
+              </label>
+              <input type="file" id="avatar-upload" accept="image/*" style="display:none">
+            </div>
+            <div>
+              <div class="prof-avatar-name" id="prof-display-name">User</div>
+              <div class="prof-avatar-email" id="prof-display-email">user@yaro.com</div>
+              <div class="prof-customer-id" id="prof-customer-id" title="Copy ID">
+                <span id="prof-customer-id-text">ID: --------</span>
+                <span style="font-size:8px;opacity:0.5">&#x2398;</span>
+              </div>
+            </div>
           </div>
           <nav class="prof-sidebar-nav">
-            <a href="#" class="active" data-section="profile"><span class="ico">&#9679;</span> Profile</a>
+            <a href="#" class="active"><span class="ico">&#9679;</span> Profile</a>
             <a href="orders.html"><span class="ico">&#9776;</span> Orders</a>
             <a href="#" class="danger" id="prof-logout-btn"><span class="ico">&#8617;</span> Sign Out</a>
           </nav>
@@ -468,46 +624,75 @@ body:active .cursor-ring, .cursor-ring.clicking { width: 20px; height: 20px; bor
         <!-- MAIN -->
         <div class="prof-main">
 
-          <!-- PROFILE FORM CARD -->
+          <!-- PERSONAL INFO -->
           <div class="prof-card">
             <div class="prof-card-title">
-              My Profile
+              Personal Information
               <span class="sub">Manage your account details</span>
             </div>
             <div class="form-grid">
               <div class="fg full">
                 <label>Email</label>
-                <input type="email" id="prof-email" disabled>
+                <input type="email" id="prof-email" readonly>
               </div>
               <div class="fg">
                 <label>Full Name</label>
-                <input type="text" id="prof-name" placeholder="Your name">
+                <input type="text" id="prof-name" placeholder="Your full name">
               </div>
               <div class="fg">
                 <label>Phone</label>
                 <input type="tel" id="prof-phone" placeholder="Phone number">
               </div>
             </div>
-            <div style="margin-top:22px;display:flex;gap:10px;">
+            <div style="margin-top:20px;">
               <button class="btn btn-pri" id="prof-save-btn">Save Changes</button>
             </div>
           </div>
 
-          <!-- RECENT ORDERS CARD -->
+          <!-- PREFERENCES -->
           <div class="prof-card">
             <div class="prof-card-title">
-              Recent Orders
-              <span class="sub">Your latest purchases</span>
+              Email Preferences
+              <span class="sub">Manage your subscriptions</span>
             </div>
-            <div id="prof-orders-list"><p style="font-size:13px;color:rgba(255,255,255,0.2);text-align:center;padding:20px;">Loading...</p></div>
-            <div style="margin-top:16px;">
-              <a href="orders.html" class="btn btn-outline btn-sm">View All Orders &rarr;</a>
+            <div class="toggle-row">
+              <div class="toggle-row-left">
+                <div class="toggle-row-label">Newsletter</div>
+                <div class="toggle-row-desc" id="sub-status-text">Loading status...</div>
+              </div>
+              <div class="toggle-switch" id="sub-toggle"></div>
+            </div>
+          </div>
+
+          <!-- QUICK LINKS -->
+          <div class="prof-card">
+            <div class="prof-card-title" style="margin-bottom:16px;">
+              Quick Links
+              <span class="sub">Navigate your account</span>
+            </div>
+            <div style="display:flex;flex-wrap:wrap;gap:10px;">
+              <a href="orders.html" class="btn btn-outline btn-sm">View Orders &rarr;</a>
+              <a href="store.html" class="btn btn-outline btn-sm">Shop Now &rarr;</a>
             </div>
           </div>
 
         </div>
       </div>
 
+    </div>
+  </div>
+
+  <!-- RE-AUTH MODAL -->
+  <div class="reauth-overlay" id="reauth-overlay">
+    <div class="reauth-card">
+      <h3>Confirm Password</h3>
+      <p>Enter your current password to save changes</p>
+      <input type="password" id="reauth-pass" placeholder="Current password">
+      <div class="reauth-err" id="reauth-err">Incorrect password</div>
+      <div style="display:flex;gap:10px;">
+        <button class="btn btn-outline" style="flex:1" id="reauth-cancel">Cancel</button>
+        <button class="btn btn-pri" style="flex:1" id="reauth-confirm">Confirm</button>
+      </div>
     </div>
   </div>
 
@@ -523,6 +708,7 @@ body:active .cursor-ring, .cursor-ring.clicking { width: 20px; height: 20px; bor
         <a href="contact.html">Contact</a>
         <a href="profile.html" class="active">Profile</a>
         <a href="orders.html">Orders</a>
+        <a href="admin.html" id="mobile-admin-link" style="display:none">Admin</a>
         <a href="cart.html" class="cart-link">Cart</a>
       </nav>
     </div>
@@ -564,10 +750,8 @@ body:active .cursor-ring, .cursor-ring.clicking { width: 20px; height: 20px; bor
         if (!href || href === '#' || href.startsWith('http') || href.startsWith('file:')) return;
         e.preventDefault();
         var overlay = document.getElementById('page-transition');
-        if (overlay) {
-          overlay.classList.add('active');
-          setTimeout(function() { window.location.href = href; }, 280);
-        } else { window.location.href = href; }
+        if (overlay) { overlay.classList.add('active'); setTimeout(function() { window.location.href = href; }, 280); }
+        else { window.location.href = href; }
       });
     });
 
@@ -618,10 +802,7 @@ body:active .cursor-ring, .cursor-ring.clicking { width: 20px; height: 20px; bor
       var close = document.getElementById('mobile-menu-close');
       var nameEl = document.getElementById('mobile-user-name');
       if (nameEl) {
-        try {
-          var stored = localStorage.getItem('yaro_user');
-          if (stored) nameEl.textContent = stored;
-        } catch(e) {}
+        try { var stored = localStorage.getItem('yaro_user'); if (stored) nameEl.textContent = stored; } catch(e) {}
       }
       function openMenu() { if (panel) { panel.classList.add('open'); if (btn) btn.classList.add('open'); } }
       function closeMenu() { if (panel) { panel.classList.remove('open'); if (btn) btn.classList.remove('open'); } }
@@ -630,68 +811,168 @@ body:active .cursor-ring, .cursor-ring.clicking { width: 20px; height: 20px; bor
       if (panel) panel.addEventListener('click', function(e) { if (e.target === panel) closeMenu(); });
     })();
 
+    // ─── PROFILE LOGIC ───
+    var pendingChanges = null;
+    var isSubscribed = false;
+
     async function loadProfile() {
       try {
         var data = await YARO_API.me();
         if (data && data.id) {
           document.body.className = 'logged-in';
+          var meta = data.user_metadata || {};
           document.getElementById('prof-email').value = data.email || '';
-          document.getElementById('prof-name').value = data.name || '';
-          document.getElementById('prof-phone').value = data.phone || '';
-          var initial = (data.name && data.name[0]) || (data.email && data.email[0].toUpperCase()) || 'Y';
-          document.getElementById('prof-avatar-initials').textContent = initial;
-          document.getElementById('prof-avatar-email').textContent = data.email || '';
-          loadOrders();
+          document.getElementById('prof-name').value = meta.name || '';
+          document.getElementById('prof-phone').value = meta.phone || '';
+          var displayName = meta.name || data.email.split('@')[0] || 'User';
+          document.getElementById('prof-display-name').textContent = displayName;
+          document.getElementById('prof-display-email').textContent = data.email || '';
+          if (meta.avatar_url) { document.getElementById('prof-avatar-img').src = meta.avatar_url; }
+          else {
+            var initial = (meta.name && meta.name[0].toUpperCase()) || (data.email && data.email[0].toUpperCase()) || 'Y';
+            document.getElementById('prof-avatar-img').src = 'data:image/svg+xml,' + encodeURIComponent('<svg xmlns="http://www.w3.org/2000/svg" width="72" height="72" viewBox="0 0 72 72"><rect width="72" height="72" fill="#1a1a2e"/><text x="36" y="44" text-anchor="middle" fill="#c4b5fd" font-size="28" font-family="Clash Display" font-weight="600">' + initial + '</text></svg>');
+          }
+          var cid = data.id.substring(0, 8).toUpperCase();
+          document.getElementById('prof-customer-id-text').textContent = 'ID: ' + cid;
+          checkSubscription();
         }
       } catch(e) {}
-      if (!YARO_API.getToken()) {
-        document.body.className = 'logged-out';
-        document.getElementById('prof-orders-list').innerHTML = '';
-      }
+      if (!YARO_API.getToken()) { document.body.className = 'logged-out'; }
     }
 
-    async function loadOrders() {
-      var list = document.getElementById('prof-orders-list');
-      try {
-        var orders = await YARO_API.getOrders();
-        if (!orders || !orders.length) {
-          list.innerHTML = '<p style="font-size:13px;color:rgba(255,255,255,0.2);text-align:center;padding:20px;">No orders yet</p>';
-          return;
-        }
-        var recent = orders.slice(0, 6);
-        var html = '<div class="orders-grid">';
-        recent.forEach(function(o) {
-          var total = o.total ? '&#8377;' + (o.total / 100).toFixed(2) : '-';
-          var date = o.created_at ? new Date(o.created_at).toLocaleDateString('en-IN', { day: 'numeric', month: 'short', year: 'numeric' }) : '';
-          html += '<a href="orders.html?id=' + o.id + '" class="order-card">';
-          html += '<div class="order-card-top"><span class="order-card-num">' + (o.order_number || 'Order') + '</span><span class="order-card-date">' + date + '</span></div>';
-          html += '<div class="order-card-mid"><span class="order-card-status ' + (o.fulfillment_status || 'pending') + '">' + (o.fulfillment_status || 'pending') + '</span><span class="order-card-total">' + total + '</span></div>';
-          html += '</a>';
-        });
-        html += '</div>';
-        list.innerHTML = html;
-      } catch(e) {
-        list.innerHTML = '<p style="font-size:13px;color:rgba(255,255,255,0.2);text-align:center;padding:20px;">Sign in to see orders</p>';
-      }
-    }
-
-    document.getElementById('prof-save-btn').addEventListener('click', async function() {
-      var name = document.getElementById('prof-name').value.trim();
-      var phone = document.getElementById('prof-phone').value.trim();
-      try {
-        var token = YARO_API.getToken();
-        if (!token) { showToast('Please sign in first', 'error'); return; }
-        var result = await YARO_API.updateProfile({ name: name || undefined, phone: phone || undefined });
-        if (result.error) { showToast(result.error, 'error'); return; }
-        if (name) { document.getElementById('prof-avatar-initials').textContent = name[0]; }
-        showToast('Profile updated', 'success');
-      } catch(e) { showToast('Could not save profile', 'error'); }
+    // ─── AVATAR UPLOAD ───
+    document.getElementById('avatar-upload').addEventListener('change', function(e) {
+      var file = e.target.files[0];
+      if (!file) return;
+      showToast('Uploading...', 'success');
+      var reader = new FileReader();
+      reader.onload = function(event) {
+        var img = new Image();
+        img.onload = async function() {
+          var canvas = document.createElement('canvas');
+          var MAX = 256;
+          var scale = MAX / Math.max(img.width, img.height);
+          canvas.width = img.width * scale;
+          canvas.height = img.height * scale;
+          var ctx = canvas.getContext('2d');
+          ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
+          var dataUrl = canvas.toDataURL('image/jpeg', 0.6);
+          document.getElementById('prof-avatar-img').src = dataUrl;
+          try {
+            await YARO_API.updateProfile({ avatar_url: dataUrl });
+            showToast('Profile picture updated', 'success');
+          } catch(e) { showToast('Failed to save image', 'error'); }
+        };
+        img.src = event.target.result;
+      };
+      reader.readAsDataURL(file);
     });
 
+    // ─── SAVE WITH RE-AUTH ───
+    document.getElementById('prof-save-btn').addEventListener('click', function() {
+      var name = document.getElementById('prof-name').value.trim();
+      var phone = document.getElementById('prof-phone').value.trim();
+      var token = YARO_API.getToken();
+      if (!token) { showToast('Please sign in first', 'error'); return; }
+      pendingChanges = { name: name || undefined, phone: phone || undefined };
+      document.getElementById('reauth-pass').value = '';
+      document.getElementById('reauth-err').classList.remove('show');
+      document.getElementById('reauth-overlay').classList.add('open');
+      setTimeout(function() { document.getElementById('reauth-pass').focus(); }, 100);
+    });
+
+    document.getElementById('reauth-cancel').addEventListener('click', function() {
+      document.getElementById('reauth-overlay').classList.remove('open');
+      pendingChanges = null;
+    });
+
+    document.getElementById('reauth-confirm').addEventListener('click', async function() {
+      var pass = document.getElementById('reauth-pass').value;
+      var btn = document.getElementById('reauth-confirm');
+      if (!pass) { document.getElementById('reauth-err').textContent = 'Please enter your password'; document.getElementById('reauth-err').classList.add('show'); return; }
+      btn.disabled = true;
+      btn.textContent = 'Verifying...';
+      try {
+        var email = document.getElementById('prof-email').value;
+        var result = await YARO_API.signIn(email, pass);
+        if (result && result.error) { throw new Error(result.error); }
+        var r = await YARO_API.updateProfile(pendingChanges);
+        if (r && r.error) { throw new Error(r.error); }
+        document.getElementById('reauth-overlay').classList.remove('open');
+        if (pendingChanges && pendingChanges.name) {
+          document.getElementById('prof-display-name').textContent = pendingChanges.name;
+          var initial = pendingChanges.name[0];
+          if (!document.getElementById('prof-avatar-img').src.includes('data:image')) {
+            document.getElementById('prof-avatar-img').src = 'data:image/svg+xml,' + encodeURIComponent('<svg xmlns="http://www.w3.org/2000/svg" width="72" height="72" viewBox="0 0 72 72"><rect width="72" height="72" fill="#1a1a2e"/><text x="36" y="44" text-anchor="middle" fill="#c4b5fd" font-size="28" font-family="Clash Display" font-weight="600">' + initial + '</text></svg>');
+          }
+        }
+        showToast('Profile updated', 'success');
+        pendingChanges = null;
+      } catch(e) {
+        document.getElementById('reauth-err').textContent = e.message.includes('Invalid login') ? 'Incorrect password' : e.message;
+        document.getElementById('reauth-err').classList.add('show');
+      }
+      btn.disabled = false;
+      btn.textContent = 'Confirm';
+    });
+
+    document.getElementById('reauth-pass').addEventListener('keydown', function(e) {
+      if (e.key === 'Enter') document.getElementById('reauth-confirm').click();
+    });
+
+    // ─── NEWSLETTER SUBSCRIPTION ───
+    async function checkSubscription() {
+      try {
+        var email = document.getElementById('prof-email').value;
+        if (!email) return;
+        var result = await YARO_API.getSubscribers ? YARO_API.getSubscribers() : null;
+        if (!result) return;
+        var subs = Array.isArray(result) ? result : [];
+        isSubscribed = subs.some(function(s) { return s.email === email; });
+        updateSubUI();
+      } catch(e) {}
+    }
+
+    function updateSubUI() {
+      var toggle = document.getElementById('sub-toggle');
+      var text = document.getElementById('sub-status-text');
+      if (isSubscribed) {
+        toggle.classList.add('active');
+        text.textContent = 'You are subscribed to exclusive offers and updates.';
+      } else {
+        toggle.classList.remove('active');
+        text.textContent = 'You are not subscribed. Stay updated with our latest drops.';
+      }
+    }
+
+    document.getElementById('sub-toggle').addEventListener('click', async function() {
+      var email = document.getElementById('prof-email').value;
+      if (!email) return;
+      try {
+        if (isSubscribed) {
+          if (YARO_API.unsubscribeSubscriber) await YARO_API.unsubscribeSubscriber(email);
+          showToast('Unsubscribed', 'success');
+        } else {
+          if (YARO_API.addSubscriber) await YARO_API.addSubscriber(email);
+          showToast('Subscribed to newsletter!', 'success');
+        }
+        isSubscribed = !isSubscribed;
+        updateSubUI();
+      } catch(e) { showToast('Could not update subscription', 'error'); }
+    });
+
+    // ─── CUSTOMER ID COPY ───
+    document.getElementById('prof-customer-id').addEventListener('click', function() {
+      var text = document.getElementById('prof-customer-id-text').textContent.replace('ID: ', '');
+      navigator.clipboard.writeText(text).then(function() {
+        showToast('Customer ID copied', 'success');
+      }).catch(function() {});
+    });
+
+    // ─── LOGOUT ───
     document.getElementById('prof-logout-btn').addEventListener('click', async function() {
       await YARO_API.logout();
       document.body.className = 'logged-out';
-      document.getElementById('prof-orders-list').innerHTML = '';
       showToast('Signed out', 'success');
     });
 

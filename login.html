@@ -236,8 +236,6 @@
         if (data && data.user) {
           if (data.user.email && data.user.email === 'yarodrops@gmail.com') {
             try { localStorage.setItem('admin_token', data.session.access_token); } catch(e) {}
-            window.location.href = 'admin.html';
-            return;
           }
           var params = new URLSearchParams(window.location.search);
           var redirect = params.get('redirect') || 'profile.html';

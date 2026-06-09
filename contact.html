@@ -215,6 +215,16 @@
       background: rgba(196, 181, 253, 0.04);
       box-shadow: 0 0 20px rgba(139, 92, 246, 0.15);
     }
+    .form-input[readonly] {
+      opacity: 0.6;
+      cursor: default;
+      background: rgba(255,255,255,0.01);
+      border-color: rgba(255,255,255,0.04);
+    }
+    .form-input[readonly]:focus {
+      border-color: rgba(255,255,255,0.04);
+      box-shadow: none;
+    }
 
     .form-input::placeholder {
       color: rgba(255,255,255,0.15);
@@ -391,12 +401,12 @@
         <form id="contact-form" onsubmit="return false;" class="reveal-item">
           <div class="form-group">
             <label class="form-label" for="contact-name">Your Name</label>
-            <input type="text" id="contact-name" class="form-input" placeholder="e.g. Liam Cross" required>
+            <input type="text" id="contact-name" class="form-input" placeholder="e.g. Liam Cross" readonly required>
           </div>
 
           <div class="form-group">
             <label class="form-label" for="contact-email">Email Address</label>
-            <input type="email" id="contact-email" class="form-input" placeholder="e.g. liam@domain.com" required>
+            <input type="email" id="contact-email" class="form-input" placeholder="e.g. liam@domain.com" readonly required>
           </div>
 
           <div class="form-group">
@@ -440,6 +450,7 @@
         <a href="contact.html" class="active">Contact</a>
         <a href="profile.html">Profile</a>
         <a href="orders.html">Orders</a>
+        <a href="admin.html" id="mobile-admin-link" style="display:none">Admin</a>
         <a href="cart.html" class="cart-link">Cart</a>
       </nav>
     </div>
@@ -589,17 +600,46 @@
       setTimeout(function() { toast.classList.remove('show'); setTimeout(function() { toast.remove(); }, 400); }, 3500);
     }
 
-    // Form submission simulation
+    // ─── PRE-FILL NAME & EMAIL FROM PROFILE ───
+    (function() {
+      try {
+        var token = localStorage.getItem('sb_token');
+        if (!token) return;
+        fetch('https://hggaxgdiritrawbpyues.supabase.co/auth/v1/user', {
+          headers: { 'apikey': 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImhnZ2F4Z2Rpcml0cmF3YnB5dWVzIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODA4NTE1NjIsImV4cCI6MjA5NjQyNzU2Mn0.huBcWXCsLlTVW-_6VLOI4FRppb_72QJl-bhwsw2zynI', 'Authorization': 'Bearer ' + token }
+        }).then(function(r) { return r.json(); }).then(function(u) {
+          if (!u || u.error || !u.id) return;
+          var meta = u.user_metadata || {};
+          var name = meta.name || '';
+          var email = u.email || '';
+          if (name) document.getElementById('contact-name').value = name;
+          if (email) document.getElementById('contact-email').value = email;
+        }).catch(function() {});
+      } catch(e) {}
+    })();
+
+    // ─── FORM SUBMISSION ───
     document.getElementById('contact-form').addEventListener('submit', function(e) {
       e.preventDefault();
       var btn = document.getElementById('contact-submit');
+      var name = document.getElementById('contact-name').value.trim();
+      var email = document.getElementById('contact-email').value.trim();
+      var order = document.getElementById('contact-order').value.trim();
+      var message = document.getElementById('contact-message').value.trim();
+      if (!name || !email || !message) { showToast('Please fill in all required fields', 'error'); return; }
       var originalText = btn.innerHTML;
       btn.disabled = true;
       btn.innerHTML = '<span>Sending...</span>';
       
+      // ─── SEND TO BACKEND (placeholder — YARO email TBD) ───
+      var payload = { name: name, email: email, order: order, message: message };
+      console.log('Contact form:', payload);
+      // TODO: POST payload to YARO email endpoint once mail ID is provided
+
       setTimeout(function() {
-        showToast('Your message has been sent successfully. We will respond within 24 hours. 🎉', 'success');
-        document.getElementById('contact-form').reset();
+        showToast('Your message has been sent successfully. We will respond within 24 hours.', 'success');
+        document.getElementById('contact-message').value = '';
+        document.getElementById('contact-order').value = '';
         btn.disabled = false;
         btn.innerHTML = originalText;
       }, 1500);
