@@ -11,418 +11,369 @@
 <link rel="stylesheet" href="css/styles.css">
 <style>
   * { margin: 0; padding: 0; box-sizing: border-box; }
-  :root { --border: rgba(255,255,255,0.08); --accent: #c4b5fd; --accent-dim: rgba(196,181,253,0.15); }
+  :root { --border: rgba(255,255,255,0.08); --accent: #c4b5fd; --accent2: #a78bfa; }
   html, body { width: 100%; min-height: 100vh; background: #050505; font-family: 'Clash Display', sans-serif; color: #fff; overflow-x: hidden; }
+  body { display: flex; flex-direction: column; }
 
-  /* ─── PAGE TRANSITION ─── */
   .page-transition { position: fixed; inset: 0; z-index: 9997; background: #070509; backdrop-filter: blur(20px); opacity: 0; pointer-events: none; transition: opacity 0.3s ease; }
   .page-transition.active { opacity: 1; pointer-events: all; }
   .page-transition::after { content: ''; position: absolute; inset: 0; background: radial-gradient(ellipse at center, rgba(139,92,246,0.08) 0%, transparent 70%); }
 
-  body { min-height: 100vh; display: flex; flex-direction: column; }
-  .page-wrap { flex: 1; display: flex; flex-direction: column; align-items: center; justify-content: center; padding: 76px 0 0; }
-  .glass-frame { max-width: 640px; margin: 0 auto; background: radial-gradient(ellipse at 50% 0%, rgba(139,92,246,0.08) 0%, transparent 70%), radial-gradient(ellipse at 80% 100%, rgba(196,181,253,0.05) 0%, transparent 50%); border: 1px solid var(--border); border-radius: 24px; padding: 36px 32px; position: relative; }
-  .glass-frame::before { content: ''; position: absolute; inset: 0; border-radius: 24px; padding: 1px; background: linear-gradient(135deg, rgba(255,255,255,0.12) 0%, transparent 40%, transparent 60%, rgba(255,255,255,0.04) 100%); -webkit-mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0); mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0); -webkit-mask-composite: xor; mask-composite: exclude; pointer-events: none; }
+  .page-wrap { flex: 1; display: flex; flex-direction: column; align-items: center; padding: 80px 20px 40px; }
 
-  .ord-title { font-size: 22px; font-weight: 500; letter-spacing: 2px; margin-bottom: 4px; text-align: center; }
-  .ord-sub { font-size: 12px; color: #a1a1aa; text-align: center; margin-bottom: 24px; letter-spacing: 0.5px; }
+  .ord-container { width: 100%; max-width: 560px; }
 
-  .ord-states { display: flex; gap: 6px; margin-bottom: 24px; flex-wrap: wrap; justify-content: center; }
-  .ord-state-btn { padding: 8px 18px; border: 1px solid var(--border); border-radius: 100px; background: transparent; color: #a1a1aa; font-family: 'Clash Display', sans-serif; font-size: 12px; cursor: pointer; transition: all 0.3s; letter-spacing: 0.3px; }
-  .ord-state-btn:hover { border-color: var(--accent); color: var(--accent); }
-  .ord-state-btn.active { background: var(--accent); color: #050505; border-color: var(--accent); font-weight: 600; }
+  .ord-head { text-align: center; margin-bottom: 32px; }
+  .ord-head h1 { font-size: 20px; font-weight: 500; letter-spacing: 3px; margin-bottom: 6px; }
+  .ord-head p { font-size: 12px; color: #666; letter-spacing: 0.5px; }
 
-  .ord-card { background: rgba(255,255,255,0.02); border: 1px solid var(--border); border-radius: 14px; padding: 18px 20px; margin-bottom: 14px; transition: all 0.3s; }
-  .ord-card:hover { border-color: rgba(196,181,253,0.2); background: rgba(196,181,253,0.03); }
-  .ord-card-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px; }
-  .ord-card-num { font-size: 14px; font-weight: 500; letter-spacing: 0.5px; }
-  .ord-card-date { font-size: 11px; color: #a1a1aa; }
-  .ord-card-body { display: flex; flex-direction: column; gap: 8px; }
-  .ord-item { display: flex; justify-content: space-between; align-items: center; font-size: 13px; padding: 6px 0; border-bottom: 1px solid rgba(255,255,255,0.04); }
-  .ord-item:last-child { border-bottom: none; }
-  .ord-item-left { display: flex; align-items: center; gap: 10px; }
-  .ord-item-name { font-size: 13px; }
-  .ord-item-qty { font-size: 11px; color: #a1a1aa; }
-  .ord-item-price { font-size: 13px; font-weight: 500; }
-  .ord-card-footer { display: flex; justify-content: space-between; align-items: center; margin-top: 12px; padding-top: 12px; border-top: 1px solid var(--border); }
-  .ord-total { font-size: 15px; font-weight: 600; }
-  .ord-status { font-size: 11px; padding: 4px 14px; border-radius: 100px; text-transform: capitalize; font-weight: 500; }
-  .ord-status.pending { background: rgba(245,158,11,0.1); color: #f59e0b; border: 1px solid rgba(245,158,11,0.15); }
-  .ord-status.confirmed { background: rgba(34,197,94,0.1); color: #22c55e; border: 1px solid rgba(34,197,94,0.15); }
-  .ord-status.processing { background: rgba(59,130,246,0.1); color: #3b82f6; border: 1px solid rgba(59,130,246,0.15); }
-  .ord-status.shipped { background: rgba(139,92,246,0.1); color: #c4b5fd; border: 1px solid rgba(139,92,246,0.15); }
-  .ord-status.delivered { background: rgba(34,197,94,0.15); color: #22c55e; border: 1px solid rgba(34,197,94,0.2); }
-  .ord-status.cancelled { background: rgba(239,68,68,0.1); color: #ef4444; border: 1px solid rgba(239,68,68,0.15); }
+  .ord-tabs { display: flex; gap: 4px; justify-content: center; margin-bottom: 28px; background: rgba(255,255,255,0.02); border: 1px solid var(--border); border-radius: 100px; padding: 3px; max-width: 420px; margin-left: auto; margin-right: auto; }
+  .ord-tab { flex: 1; padding: 7px 0; border: none; border-radius: 100px; background: transparent; color: #666; font-family: 'Clash Display', sans-serif; font-size: 11px; letter-spacing: 0.5px; cursor: pointer; transition: all 0.3s; }
+  .ord-tab:hover { color: var(--accent); }
+  .ord-tab.active { background: rgba(196,181,253,0.1); color: var(--accent); font-weight: 600; }
 
-  .ord-empty { text-align: center; padding: 48px 20px; }
-  .ord-empty p { font-size: 14px; color: #666; margin-bottom: 16px; }
-  .ord-empty a { display: inline-block; padding: 12px 28px; background: var(--accent); color: #050505; text-decoration: none; border-radius: 100px; font-size: 13px; font-weight: 600; }
+  .ord-card {
+    background: rgba(255,255,255,0.015);
+    border: 1px solid var(--border);
+    border-radius: 16px;
+    padding: 20px 22px;
+    margin-bottom: 12px;
+    position: relative;
+    transition: border-color 0.3s ease, background 0.3s ease;
+  }
+  .ord-card:hover { border-color: rgba(196,181,253,0.18); background: rgba(196,181,253,0.02); }
 
-  .ord-pay-status { font-size: 10px; color: #a1a1aa; letter-spacing: 0.5px; text-transform: uppercase; }
-  .ord-pay-status.paid { color: #22c55e; }
+  .ord-card-row { display: flex; justify-content: space-between; align-items: flex-start; }
+  .ord-card-left { flex: 1; min-width: 0; }
+  .ord-card-right { text-align: right; flex-shrink: 0; margin-left: 16px; }
 
-  .ord-auth-required { text-align: center; padding: 60px 20px; display: none; }
-  .ord-auth-required h3 { font-size: 18px; font-weight: 400; margin-bottom: 8px; }
-  .ord-auth-required p { font-size: 13px; color: #a1a1aa; margin-bottom: 20px; }
-  .ord-auth-required a { display: inline-block; padding: 12px 28px; background: var(--accent); color: #050505; text-decoration: none; border-radius: 100px; font-size: 13px; font-weight: 600; }
-  body.logged-out .ord-auth-required { display: block; }
+  .ord-id { font-size: 13px; font-weight: 500; letter-spacing: 0.5px; margin-bottom: 3px; color: rgba(255,255,255,0.8); }
+  .ord-date { font-size: 11px; color: #555; letter-spacing: 0.3px; margin-bottom: 6px; }
+  .ord-meta { font-size: 11px; color: #555; display: flex; align-items: center; gap: 6px; }
+
+  .ord-total { font-size: 16px; font-weight: 600; letter-spacing: 0.5px; margin-bottom: 6px; color: rgba(255,255,255,0.9); }
+
+  .ord-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 5px;
+    font-size: 10px;
+    font-weight: 500;
+    letter-spacing: 0.5px;
+    padding: 4px 12px;
+    border-radius: 100px;
+    text-transform: capitalize;
+  }
+  .ord-badge::before { content: ''; width: 5px; height: 5px; border-radius: 50%; }
+  .ord-badge.pending { background: rgba(245,158,11,0.08); color: #f59e0b; border: 1px solid rgba(245,158,11,0.12); }
+  .ord-badge.pending::before { background: #f59e0b; }
+  .ord-badge.confirmed { background: rgba(59,130,246,0.08); color: #60a5fa; border: 1px solid rgba(59,130,246,0.12); }
+  .ord-badge.confirmed::before { background: #60a5fa; }
+  .ord-badge.shipped { background: rgba(139,92,246,0.08); color: var(--accent); border: 1px solid rgba(139,92,246,0.12); }
+  .ord-badge.shipped::before { background: var(--accent); }
+  .ord-badge.delivered { background: rgba(34,197,94,0.08); color: #4ade80; border: 1px solid rgba(34,197,94,0.12); }
+  .ord-badge.delivered::before { background: #4ade80; }
+  .ord-badge.cancelled { background: rgba(239,68,68,0.08); color: #f87171; border: 1px solid rgba(239,68,68,0.12); }
+  .ord-badge.cancelled::before { background: #f87171; }
+
+  .ord-empty { text-align: center; padding: 60px 20px; }
+  .ord-empty .empty-icon { font-size: 32px; margin-bottom: 12px; opacity: 0.3; }
+  .ord-empty p { font-size: 13px; color: #555; margin-bottom: 20px; }
+  .ord-empty a { display: inline-block; padding: 11px 28px; background: var(--accent); color: #050505; text-decoration: none; border-radius: 100px; font-size: 12px; font-weight: 600; transition: all 0.3s; }
+  .ord-empty a:hover { background: var(--accent2); transform: translateY(-1px); }
+
+  .ord-auth { text-align: center; padding: 60px 20px; display: none; }
+  .ord-auth .auth-icon { font-size: 28px; margin-bottom: 12px; opacity: 0.3; }
+  .ord-auth h3 { font-size: 17px; font-weight: 400; margin-bottom: 6px; }
+  .ord-auth p { font-size: 12px; color: #666; margin-bottom: 20px; }
+  .ord-auth a { display: inline-block; padding: 11px 28px; background: var(--accent); color: #050505; text-decoration: none; border-radius: 100px; font-size: 12px; font-weight: 600; }
+  body.logged-out .ord-auth { display: block; }
   body.logged-out .ord-content { display: none; }
-  body.logged-in .ord-auth-required { display: none; }
+  body.logged-in .ord-auth { display: none; }
   body.logged-in .ord-content { display: block; }
 
   .toast { position: fixed; top: 80px; right: 20px; z-index: 6000; padding: 14px 20px; border-radius: 10px; background: rgba(15,10,25,0.95); border: 1px solid rgba(196,181,253,0.15); backdrop-filter: blur(12px); display: flex; align-items: center; gap: 10px; font-size: 12px; color: #fff; min-width: 280px; transform: translateX(120%); opacity: 0; transition: all 0.4s cubic-bezier(0.22,1,0.36,1); }
   .toast.show { transform: translateX(0); opacity: 1; }
 
-  @media (max-width: 600px) { .glass-frame { margin: 0 12px; padding: 24px 16px; } .ord-states { gap: 4px; } .ord-state-btn { padding: 6px 12px; font-size: 11px; } }
+  @media (max-width: 600px) { .ord-container { padding: 0; } .ord-card { padding: 16px 18px; } .ord-tabs { border-radius: 50px; padding: 2px; } .ord-tab { font-size: 10px; padding: 6px 0; } }
 
-  /* ─── CURSOR ─── */
   * { cursor: none !important; }
-
   @media (max-width: 820px), (hover: none) and (pointer: coarse) {
-    .cursor-dot, .cursor-ring, #cursor-canvas {
-      display: none !important;
-      opacity: 0 !important;
-      visibility: hidden !important;
-      pointer-events: none !important;
-    }
+    .cursor-dot, .cursor-ring, #cursor-canvas { display: none !important; opacity: 0 !important; visibility: hidden !important; pointer-events: none !important; }
     * { cursor: auto !important; }
   }
-
-  .cursor-dot {
-    position: fixed; top: 0; left: 0; width: 3px; height: 3px;
-    background: #fff; border-radius: 50%; pointer-events: none;
-    z-index: 99999; will-change: transform;
-    transition: width 0.4s cubic-bezier(0.22,1,0.36,1), height 0.4s cubic-bezier(0.22,1,0.36,1), background 0.3s ease, opacity 0.3s ease;
-  }
-
-  .cursor-ring {
-    position: fixed; top: 0; left: 0; width: 24px; height: 24px;
-    border: 0.5px solid rgba(255,255,255,0.12); border-radius: 50%;
-    pointer-events: none; z-index: 99998; will-change: transform;
-    transition: width 0.6s cubic-bezier(0.22,1,0.36,1), height 0.6s cubic-bezier(0.22,1,0.36,1), border-color 0.5s ease, border-width 0.5s ease, opacity 0.4s ease, background 0.5s ease;
-  }
-
-  .cursor-ring::after {
-    content: '';
-    position: absolute; top: 50%; left: 50%;
-    width: calc(100% - 2px); height: calc(100% - 2px);
-    border-radius: 50%; transform: translate(-50%, -50%);
-    background: conic-gradient(from 0deg, transparent 0deg, rgba(139,92,246,0.15) 50deg, rgba(168,85,247,0.2) 90deg, rgba(192,132,252,0.1) 140deg, rgba(139,92,246,0.18) 200deg, rgba(168,85,247,0.12) 260deg, transparent 320deg);
-    opacity: 0; transition: opacity 0.5s ease;
-    pointer-events: none; animation: lavaSpin 2.5s linear infinite;
-  }
-
-  body:has(a:hover, button:hover) .cursor-dot {
-    width: 3px; height: 3px; background: rgba(139, 92, 246, 1);
-  }
-  body:has(a:hover, button:hover) .cursor-ring {
-    width: 40px; height: 40px; border-width: 1.5px; border-color: rgba(168, 85, 247, 0.6);
-    background: rgba(139, 92, 246, 0.06);
-    box-shadow: 0 0 22px rgba(168, 85, 247, 0.3), 0 0 50px rgba(139, 92, 246, 0.12);
-  }
-    body:has(a:hover, button:hover) .cursor-ring::after {
-      opacity: 1;
-    }
-
-  .cursor-dot.hovering, .cursor-dot.on-logo {
-    width: 3px; height: 3px; background: rgba(168, 85, 247, 1);
-    box-shadow: 0 0 8px rgba(168, 85, 247, 0.7);
-  }
-  .cursor-ring.hovering, .cursor-ring.on-logo {
-    width: 40px; height: 40px; border-width: 1.5px; border-color: rgba(168, 85, 247, 0.6);
-    background: rgba(139, 92, 246, 0.06);
-    box-shadow: 0 0 22px rgba(168, 85, 247, 0.3), 0 0 50px rgba(139, 92, 246, 0.12);
-  }
-    .cursor-ring.hovering::after, .cursor-ring.on-logo::after { opacity: 1; }
-
+  .cursor-dot { position: fixed; top: 0; left: 0; width: 3px; height: 3px; background: #fff; border-radius: 50%; pointer-events: none; z-index: 99999; will-change: transform; transition: width 0.4s, height 0.4s, background 0.3s, opacity 0.3s; }
+  .cursor-ring { position: fixed; top: 0; left: 0; width: 24px; height: 24px; border: 0.5px solid rgba(255,255,255,0.12); border-radius: 50%; pointer-events: none; z-index: 99998; will-change: transform; transition: width 0.6s, height 0.6s, border-color 0.5s, border-width 0.5s, opacity 0.4s, background 0.5s; }
+  .cursor-ring::after { content: ''; position: absolute; top: 50%; left: 50%; width: calc(100% - 2px); height: calc(100% - 2px); border-radius: 50%; transform: translate(-50%, -50%); background: conic-gradient(from 0deg, transparent 0deg, rgba(139,92,246,0.15) 50deg, rgba(168,85,247,0.2) 90deg, rgba(192,132,252,0.1) 140deg, rgba(139,92,246,0.18) 200deg, rgba(168,85,247,0.12) 260deg, transparent 320deg); opacity: 0; transition: opacity 0.5s ease; pointer-events: none; animation: lavaSpin 2.5s linear infinite; }
+  body:has(a:hover, button:hover) .cursor-dot { width: 3px; height: 3px; background: rgba(139,92,246,1); }
+  body:has(a:hover, button:hover) .cursor-ring { width: 40px; height: 40px; border-width: 1.5px; border-color: rgba(168,85,247,0.6); background: rgba(139,92,246,0.06); box-shadow: 0 0 22px rgba(168,85,247,0.3), 0 0 50px rgba(139,92,246,0.12); }
+  body:has(a:hover, button:hover) .cursor-ring::after { opacity: 1; }
+  .cursor-dot.hovering, .cursor-dot.on-logo { width: 3px; height: 3px; background: rgba(168,85,247,1); box-shadow: 0 0 8px rgba(168,85,247,0.7); }
+  .cursor-ring.hovering, .cursor-ring.on-logo { width: 40px; height: 40px; border-width: 1.5px; border-color: rgba(168,85,247,0.6); background: rgba(139,92,246,0.06); box-shadow: 0 0 22px rgba(168,85,247,0.3), 0 0 50px rgba(139,92,246,0.12); }
+  .cursor-ring.hovering::after, .cursor-ring.on-logo::after { opacity: 1; }
   body:active .cursor-dot, .cursor-dot.clicking { width: 2px; height: 2px; opacity: 0.6; }
-  body:active .cursor-ring, .cursor-ring.clicking {
-    width: 20px; height: 20px; border-color: rgba(139, 92, 246, 0.15); border-width: 0.5px;
-  }
-
+  body:active .cursor-ring, .cursor-ring.clicking { width: 20px; height: 20px; border-color: rgba(139,92,246,0.15); border-width: 0.5px; }
   .cursor-dot.hidden, .cursor-ring.hidden { opacity: 0; }
   .cursor-label { display: none; }
-
-  #cursor-canvas {
-    position: fixed; top: 0; left: 0; width: 100%; height: 100%;
-    pointer-events: none; z-index: 99997;
-  }
-
-  @keyframes lavaSpin {
-    0% { transform: translate(-50%, -50%) rotate(0deg); }
-    100% { transform: translate(-50%, -50%) rotate(360deg); }
-  }
-
+  #cursor-canvas { position: fixed; top: 0; left: 0; width: 100%; height: 100%; pointer-events: none; z-index: 99997; }
+  @keyframes lavaSpin { 0% { transform: translate(-50%,-50%) rotate(0deg); } 100% { transform: translate(-50%,-50%) rotate(360deg); } }
 </style>
 </head>
 <body class="logged-out">
 
-  <script src="js/header.js"></script>
+<script src="js/header.js"></script>
 
-  <div class="page-wrap">
-    <div class="glass-frame">
+<div class="page-wrap">
+  <div class="ord-container">
 
-      <div class="ord-title">My Orders</div>
-      <div class="ord-sub">Track your orders and view history</div>
-
-      <div class="ord-auth-required">
-        <h3>Sign in to view orders</h3>
-        <p>You need to be signed in to see your order history.</p>
-        <a href="login.html">Sign In</a>
-      </div>
-
-      <div class="ord-content">
-        <div class="ord-states" id="ord-states">
-          <button class="ord-state-btn active" data-state="all">All</button>
-          <button class="ord-state-btn" data-state="pending">Pending</button>
-          <button class="ord-state-btn" data-state="confirmed">Confirmed</button>
-          <button class="ord-state-btn" data-state="shipped">Shipped</button>
-          <button class="ord-state-btn" data-state="delivered">Delivered</button>
-        </div>
-        <div id="ord-list">
-          <div class="ord-empty"><p>Loading...</p></div>
-        </div>
-      </div>
-
+    <div class="ord-head">
+      <h1>My Orders</h1>
+      <p>Track your orders and view history</p>
     </div>
-  </div>
 
-  <!-- Page Transition Overlay -->
-  <div class="page-transition" id="page-transition"></div>
-
-  <!-- Mobile Menu -->
-  <div class="mobile-menu-overlay" id="mobile-menu">
-    <div class="mobile-menu-drawer">
-      <button class="mobile-menu-close" id="mobile-menu-close">&#10005;</button>
-      <div class="mobile-menu-user">Welcome, <strong id="mobile-user-name">Guest</strong></div>
-      <nav class="mobile-menu-nav">
-        <a href="index.html">Home</a>
-        <a href="store.html" class="store-nav-trigger">Store</a>
-        <a href="about.html">About</a>
-        <a href="contact.html">Contact</a>
-        <a href="profile.html">Profile</a>
-        <a href="orders.html" class="active">Orders</a>
-        <a href="admin.html" id="mobile-admin-link" style="display:none">Admin</a>
-        <a href="cart.html" class="cart-link">Cart</a>
-      </nav>
+    <div class="ord-auth">
+      <div class="auth-icon">◇</div>
+      <h3>Sign in to view orders</h3>
+      <p>You need to be signed in to see your order history.</p>
+      <a href="login.html">Sign In</a>
     </div>
-  </div>
 
-  <!-- Store Modal Overlay -->
-  <div class="store-modal-overlay" id="store-modal">
-    <div class="store-modal">
-      <button class="store-modal-close" id="store-modal-close" title="Close">✕</button>
-      <h3 class="store-modal-title">Our Store</h3>
-      <p class="store-modal-subtitle">Choose a Collection</p>
-      <div class="store-collections-list">
-        <a href="store.html" class="store-collection-opt"><span class="dot">◎</span> General</a>
-        <a href="store.html?collection=Night+Ride" class="store-collection-opt"><span class="dot">○</span> Night Ride</a>
-        <a href="store.html?collection=Urban+Echo" class="store-collection-opt"><span class="dot">○</span> Urban Echo</a>
-        <a href="store.html?collection=Midnight+Society" class="store-collection-opt"><span class="dot">○</span> Midnight Society</a>
-        <a href="store.html?collection=Wander" class="store-collection-opt"><span class="dot">○</span> Wander</a>
+    <div class="ord-content">
+      <div class="ord-tabs" id="ord-tabs">
+        <button class="ord-tab active" data-state="all">All</button>
+        <button class="ord-tab" data-state="pending">Pending</button>
+        <button class="ord-tab" data-state="confirmed">Confirmed</button>
+        <button class="ord-tab" data-state="shipped">Shipped</button>
+        <button class="ord-tab" data-state="delivered">Delivered</button>
+      </div>
+      <div id="ord-list">
+        <div class="ord-empty"><div class="empty-icon">◇</div><p>Loading...</p></div>
       </div>
     </div>
+
   </div>
+</div>
 
-  <div id="toast-container"></div>
+<div class="page-transition" id="page-transition"></div>
 
-  <div class="cursor-dot" id="cursor-dot"></div>
-  <div class="cursor-ring" id="cursor-ring"></div>
-  <canvas id="cursor-canvas"></canvas>
+<div class="mobile-menu-overlay" id="mobile-menu">
+  <div class="mobile-menu-drawer">
+    <button class="mobile-menu-close" id="mobile-menu-close">&#10005;</button>
+    <div class="mobile-menu-user">Welcome, <strong id="mobile-user-name">Guest</strong></div>
+    <nav class="mobile-menu-nav">
+      <a href="index.html">Home</a>
+      <a href="store.html" class="store-nav-trigger">Store</a>
+      <a href="about.html">About</a>
+      <a href="contact.html">Contact</a>
+      <a href="profile.html">Profile</a>
+      <a href="orders.html" class="active">Orders</a>
+      <a href="admin.html" id="mobile-admin-link" style="display:none">Admin</a>
+      <a href="cart.html" class="cart-link">Cart</a>
+    </nav>
+  </div>
+</div>
 
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/gsap.min.js"></script>
-  <script src="js/api.js"></script>
-  <script>
-    // ─── PAGE REVEAL ───
-    window.addEventListener('pageshow', function() {
-      var o = document.getElementById('page-transition');
-      if (o) o.classList.remove('active');
+<div class="store-modal-overlay" id="store-modal">
+  <div class="store-modal">
+    <button class="store-modal-close" id="store-modal-close" title="Close">✕</button>
+    <h3 class="store-modal-title">Our Store</h3>
+    <p class="store-modal-subtitle">Choose a Collection</p>
+    <div class="store-collections-list">
+      <a href="store.html" class="store-collection-opt"><span class="dot">◎</span> General</a>
+      <a href="store.html?collection=Night+Ride" class="store-collection-opt"><span class="dot">○</span> Night Ride</a>
+      <a href="store.html?collection=Urban+Echo" class="store-collection-opt"><span class="dot">○</span> Urban Echo</a>
+      <a href="store.html?collection=Midnight+Society" class="store-collection-opt"><span class="dot">○</span> Midnight Society</a>
+      <a href="store.html?collection=Wander" class="store-collection-opt"><span class="dot">○</span> Wander</a>
+    </div>
+  </div>
+</div>
+
+<div id="toast-container"></div>
+
+<div class="cursor-dot" id="cursor-dot"></div>
+<div class="cursor-ring" id="cursor-ring"></div>
+<canvas id="cursor-canvas"></canvas>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/gsap.min.js"></script>
+<script src="js/api.js"></script>
+<script>
+window.addEventListener('pageshow', function() { var o = document.getElementById('page-transition'); if (o) o.classList.remove('active'); });
+
+document.querySelectorAll('.site-header .sh-nav a, .site-footer .sf-links a').forEach(function(link) {
+  link.addEventListener('click', function(e) {
+    var href = this.getAttribute('href');
+    if (!href || href === '#' || href.startsWith('http') || href.startsWith('file:')) return;
+    e.preventDefault();
+    var overlay = document.getElementById('page-transition');
+    var frame = document.querySelector('.glass-frame');
+    if (overlay) {
+      if (frame) gsap.to(frame, { scale: 0.96, opacity: 0, duration: 0.18, ease: 'power2.in', overwrite: 'auto' });
+      overlay.classList.add('active');
+      setTimeout(function() { window.location.href = href; }, 280);
+    } else { window.location.href = href; }
+  });
+});
+
+(function() {
+  const storeModal = document.getElementById('store-modal');
+  const storeClose = document.getElementById('store-modal-close');
+  document.querySelectorAll('.store-nav-trigger').forEach(function(trigger) {
+    trigger.addEventListener('click', function(e) {
+      if (trigger.tagName === 'A') return;
+      e.preventDefault(); e.stopPropagation();
+      if (storeModal) { storeModal.classList.add('open'); document.body.style.overflow = 'hidden'; }
     });
-
-    // ─── INTERCEPT LINK TRANSITIONS ───
-    document.querySelectorAll('.site-header .sh-nav a, .site-footer .sf-links a').forEach(function(link) {
-      link.addEventListener('click', function(e) {
-        var href = this.getAttribute('href');
-        if (!href || href === '#' || href.startsWith('http') || href.startsWith('file:')) return;
-        e.preventDefault();
-        var overlay = document.getElementById('page-transition');
-        var frame = document.querySelector('.glass-frame');
-        if (overlay) {
-          if (frame) { gsap.to(frame, { scale: 0.96, opacity: 0, duration: 0.18, ease: 'power2.in', overwrite: 'auto' }); }
-          overlay.classList.add('active');
-          setTimeout(function() { window.location.href = href; }, 280);
-        } else { window.location.href = href; }
-      });
+  });
+  if (storeClose && storeModal) {
+    const closeStoreModal = function() { storeModal.classList.remove('open'); document.body.style.overflow = ''; };
+    storeClose.addEventListener('click', closeStoreModal);
+    storeModal.addEventListener('click', function(e) { if (e.target === storeModal) closeStoreModal(); });
+    document.addEventListener('keydown', function(e) { if (e.key === 'Escape' && storeModal.classList.contains('open')) closeStoreModal(); });
+  }
+  document.querySelectorAll('.store-collection-opt').forEach(function(link) {
+    link.addEventListener('click', function(e) {
+      e.preventDefault();
+      var href = this.getAttribute('href');
+      if (storeModal) storeModal.classList.remove('open');
+      document.body.style.overflow = '';
+      var overlay = document.getElementById('page-transition');
+      var frame = document.querySelector('.glass-frame');
+      if (overlay && frame) { gsap.to(frame, { scale: 0.96, opacity: 0, duration: 0.18, ease: 'power2.in', overwrite: 'auto' }); overlay.classList.add('active'); setTimeout(function() { window.location.href = href; }, 280); }
+      else { window.location.href = href; }
     });
+  });
+})();
 
-    // ─── STORE POPUP MODAL ───
-    (function() {
-      const storeModal = document.getElementById('store-modal');
-      const storeClose = document.getElementById('store-modal-close');
-      document.querySelectorAll('.store-nav-trigger').forEach(function(trigger) {
-        trigger.addEventListener('click', function(e) {
-          if (trigger.tagName === 'A') return;
-          e.preventDefault(); e.stopPropagation();
-          if (storeModal) { storeModal.classList.add('open'); document.body.style.overflow = 'hidden'; }
-        });
-      });
-      if (storeClose && storeModal) {
-        const closeStoreModal = function() { storeModal.classList.remove('open'); document.body.style.overflow = ''; };
-        storeClose.addEventListener('click', closeStoreModal);
-        storeModal.addEventListener('click', function(e) { if (e.target === storeModal) closeStoreModal(); });
-        document.addEventListener('keydown', function(e) { if (e.key === 'Escape' && storeModal.classList.contains('open')) closeStoreModal(); });
-      }
-      document.querySelectorAll('.store-collection-opt').forEach(function(link) {
-        link.addEventListener('click', function(e) {
-          e.preventDefault();
-          var href = this.getAttribute('href');
-          if (storeModal) storeModal.classList.remove('open');
-          document.body.style.overflow = '';
-          var overlay = document.getElementById('page-transition');
-          var frame = document.querySelector('.glass-frame');
-          if (overlay && frame) { gsap.to(frame, { scale: 0.96, opacity: 0, duration: 0.18, ease: 'power2.in', overwrite: 'auto' }); overlay.classList.add('active'); setTimeout(function() { window.location.href = href; }, 280); }
-          else { window.location.href = href; }
-        });
-      });
-    })();
+(function() {
+  var btn = document.getElementById('sh-menu-btn');
+  var panel = document.getElementById('mobile-menu');
+  var close = document.getElementById('mobile-menu-close');
+  var nameEl = document.getElementById('mobile-user-name');
+  if (nameEl) { try { var stored = localStorage.getItem('yaro_user'); if (stored) nameEl.textContent = stored; } catch(e) {} }
+  function openMenu() { if (panel) { panel.classList.add('open'); if (btn) btn.classList.add('open'); } }
+  function closeMenu() { if (panel) { panel.classList.remove('open'); if (btn) btn.classList.remove('open'); } }
+  if (btn) btn.addEventListener('click', openMenu);
+  if (close) close.addEventListener('click', closeMenu);
+  if (panel) panel.addEventListener('click', function(e) { if (e.target === panel) closeMenu(); });
+})();
 
+var allOrders = [];
+var currentState = 'all';
 
+function showToast(msg, type) {
+  type = type || 'success';
+  var container = document.getElementById('toast-container');
+  var icons = { success: '✓', error: '✕' };
+  var t = document.createElement('div');
+  t.className = 'toast';
+  t.innerHTML = '<span style="font-size:16px;flex-shrink:0;' + (type==='success'?'color:#22c55e':'color:#ef4444') + '">' + (icons[type]||'') + '</span><span style="flex:1">' + msg + '</span>';
+  container.appendChild(t);
+  requestAnimationFrame(function() { t.classList.add('show'); });
+  setTimeout(function() { t.classList.remove('show'); setTimeout(function() { t.remove(); }, 400); }, 3500);
+}
 
-    // Search handled by js/header.js
-
-    // ─── MOBILE MENU ───
-    (function() {
-      var btn = document.getElementById('sh-menu-btn');
-      var panel = document.getElementById('mobile-menu');
-      var close = document.getElementById('mobile-menu-close');
-      var nameEl = document.getElementById('mobile-user-name');
-      if (nameEl) {
-        try { var stored = localStorage.getItem('yaro_user'); if (stored) nameEl.textContent = stored; } catch(e) {}
-      }
-      function openMenu() { if (panel) { panel.classList.add('open'); if (btn) btn.classList.add('open'); } }
-      function closeMenu() { if (panel) { panel.classList.remove('open'); if (btn) btn.classList.remove('open'); } }
-      if (btn) btn.addEventListener('click', openMenu);
-      if (close) close.addEventListener('click', closeMenu);
-      if (panel) panel.addEventListener('click', function(e) { if (e.target === panel) closeMenu(); });
-    })();
-
-    // ─── ORDERS ───
-    var allOrders = [];
-    var currentState = 'all';
-
-    function showToast(msg, type) {
-      type = type || 'success';
-      var container = document.getElementById('toast-container');
-      var icons = { success: '✓', error: '✕' };
-      var t = document.createElement('div');
-      t.className = 'toast';
-      t.innerHTML = '<span style="font-size:16px;flex-shrink:0;' + (type==='success'?'color:#22c55e':'color:#ef4444') + '">' + (icons[type]||'') + '</span><span style="flex:1">' + msg + '</span>';
-      container.appendChild(t);
-      requestAnimationFrame(function() { t.classList.add('show'); });
-      setTimeout(function() { t.classList.remove('show'); setTimeout(function() { t.remove(); }, 400); }, 3500);
+async function loadOrders() {
+  try {
+    var token = YARO_API.getToken();
+    if (!token) { document.body.className = 'logged-out'; return; }
+    var data = await YARO_API.getOrders();
+    if (data && Array.isArray(data)) {
+      var user = await YARO_API.me();
+      var userId = user ? user.id : null;
+      if (userId) allOrders = data.filter(function(o) { return o.user_id === userId; });
+      else allOrders = data;
+      document.body.className = 'logged-in';
+      renderOrders();
     }
+  } catch(e) { document.body.className = 'logged-out'; }
+  if (!YARO_API.getToken()) document.body.className = 'logged-out';
+}
 
-    async function loadOrders() {
-      try {
-        var data = await YARO_API.getOrders();
-        if (data && Array.isArray(data)) {
-          allOrders = data;
-          document.body.className = 'logged-in';
-          renderOrders();
-        }
-      } catch(e) { document.body.className = 'logged-out'; }
-      if (!YARO_API.getToken()) { document.body.className = 'logged-out'; }
-    }
+function renderOrders() {
+  var list = document.getElementById('ord-list');
+  var filtered = currentState === 'all' ? allOrders : allOrders.filter(function(o) { return (o.fulfillment_status || 'pending') === currentState; });
+  if (!filtered.length) {
+    list.innerHTML = '<div class="ord-empty"><div class="empty-icon">◇</div><p>No ' + (currentState === 'all' ? '' : currentState + ' ') + 'orders yet</p><a href="store.html">Start Shopping</a></div>';
+    return;
+  }
+  var html = '';
+  filtered.forEach(function(o, idx) {
+    var total = o.total ? '₹' + (o.total / 100).toFixed(0) : '—';
+    var date = o.created_at ? new Date(o.created_at).toLocaleDateString('en-IN', { year: 'numeric', month: 'short', day: 'numeric' }) : '';
+    var status = o.fulfillment_status || 'pending';
+    var items = o.order_items || [];
+    var itemCount = items.reduce(function(s, i) { return s + (i.quantity || 1); }, 0);
+    var orderNum = o.order_number || ('#' + (o.id ? o.id.substring(0,6).toUpperCase() : '000000'));
+    html += '<div class="ord-card" style="opacity:0;transform:translateY(10px)">';
+    html += '<div class="ord-card-row">';
+    html += '<div class="ord-card-left"><div class="ord-id">' + orderNum + '</div><div class="ord-date">' + date + '</div><div class="ord-meta">' + itemCount + ' item' + (itemCount > 1 ? 's' : '') + '</div></div>';
+    html += '<div class="ord-card-right"><div class="ord-total">' + total + '</div><span class="ord-badge ' + status + '">' + status + '</span></div>';
+    html += '</div></div>';
+  });
+  list.innerHTML = html;
+  gsap.to('.ord-card', { opacity: 1, y: 0, duration: 0.4, stagger: 0.05, ease: 'power2.out', overwrite: 'auto' });
+}
 
-    function renderOrders() {
-      var list = document.getElementById('ord-list');
-      var filtered = currentState === 'all' ? allOrders : allOrders.filter(function(o) { return (o.fulfillment_status || 'pending') === currentState; });
-      if (!filtered.length) {
-        list.innerHTML = '<div class="ord-empty"><p>No ' + (currentState === 'all' ? '' : currentState + ' ') + 'orders found</p><a href="store.html">Start Shopping</a></div>';
-        return;
-      }
-      var html = '';
-      filtered.forEach(function(o) {
-        var total = o.total ? '<span class="rupee">₹</span>' + (o.total / 100).toFixed(2) : '-';
-        var date = o.created_at ? new Date(o.created_at).toLocaleDateString('en-IN', { year: 'numeric', month: 'short', day: 'numeric' }) : '';
-        var status = o.fulfillment_status || 'pending';
-        var payStatus = o.payment_status || 'pending';
-        var items = o.order_items || [];
-        html += '<div class="ord-card">';
-        html += '<div class="ord-card-header"><div><span class="ord-card-num">' + (o.order_number || 'Order') + '</span></div><span class="ord-card-date">' + date + '</span></div>';
-        html += '<div class="ord-card-body">';
-        items.forEach(function(item) {
-          var pname = item.product_name || 'Product';
-          var qty = item.quantity || 1;
-          var iprice = item.price ? '<span class="rupee">₹</span>' + item.price : '';
-          html += '<div class="ord-item"><div class="ord-item-left"><div style="width:36px;height:36px;border-radius:6px;background:#1a1a1a;display:flex;align-items:center;justify-content:center;font-size:10px;color:#555;">Y</div><div><div class="ord-item-name">' + pname + (item.size ? ' (' + item.size + ')' : '') + '</div><div class="ord-item-qty">Qty: ' + qty + '</div></div></div><span class="ord-item-price">' + iprice + '</span></div>';
-        });
-        html += '</div>';
-        html += '<div class="ord-card-footer"><div><span class="ord-total">' + total + '</span><br><span class="ord-pay-status ' + (payStatus === 'confirmed' ? 'paid' : '') + '">' + payStatus + '</span></div><span class="ord-status ' + status + '">' + status + '</span></div></div>';
-      });
-      list.innerHTML = html;
-    }
+document.querySelectorAll('.ord-tab').forEach(function(btn) {
+  btn.addEventListener('click', function() {
+    document.querySelectorAll('.ord-tab').forEach(function(b) { b.classList.remove('active'); });
+    this.classList.add('active');
+    currentState = this.dataset.state;
+    renderOrders();
+  });
+});
 
-    document.querySelectorAll('.ord-state-btn').forEach(function(btn) {
-      btn.addEventListener('click', function() {
-        document.querySelectorAll('.ord-state-btn').forEach(function(b) { b.classList.remove('active'); });
-        this.classList.add('active');
-        currentState = this.dataset.state;
-        renderOrders();
-      });
-    });
-
-    loadOrders();
-  </script>
+loadOrders();
+</script>
 
 <script>
-  (function() {
-    var dot = document.getElementById('cursor-dot');
-    var ring = document.getElementById('cursor-ring');
-    var canvas = document.getElementById('cursor-canvas');
-    if (!dot || !ring || !canvas) return;
-    var ctx = canvas.getContext('2d');
-    function resizeCanvas() { canvas.width = window.innerWidth; canvas.height = window.innerHeight; }
-    window.addEventListener('resize', resizeCanvas);
-    resizeCanvas();
-    var mouseX = window.innerWidth / 2, mouseY = window.innerHeight / 2;
-    var dotX = mouseX, dotY = mouseY;
-    var ringX = mouseX, ringY = mouseY;
-    var trail = [];
-    var TRAIL_LENGTH = 18;
-    document.addEventListener('mousemove', function(e) {
-      mouseX = e.clientX; mouseY = e.clientY;
-      trail.push({ x: mouseX, y: mouseY, life: 1 });
-      if (trail.length > TRAIL_LENGTH) trail.shift();
-    });
-    function animateCursor() {
-      dotX += (mouseX - dotX) * 0.25;
-      dotY += (mouseY - dotY) * 0.25;
-      ringX += (mouseX - ringX) * 0.1;
-      ringY += (mouseY - ringY) * 0.1;
-      dot.style.transform = 'translate3d(' + dotX + 'px, ' + dotY + 'px, 0) translate(-50%, -50%)';
-      ring.style.transform = 'translate3d(' + ringX + 'px, ' + ringY + 'px, 0) translate(-50%, -50%)';
-      ctx.clearRect(0, 0, canvas.width, canvas.height);
-      if (trail.length > 2) {
-        for (var i = trail.length - 1; i >= 0; i--) trail[i].life -= 0.045;
-        ctx.lineCap = 'round';
-        for (var i = 1; i < trail.length; i++) {
-          var p = trail[i], pp = trail[i - 1];
-          if (p.life <= 0 || pp.life <= 0) continue;
-          ctx.beginPath();
-          ctx.moveTo(pp.x, pp.y);
-          ctx.lineTo(p.x, p.y);
-          ctx.strokeStyle = 'rgba(167, 139, 250, ' + (p.life * 0.25) + ')';
-          ctx.lineWidth = p.life * 1.2;
-          ctx.stroke();
-        }
-        while (trail.length > 0 && trail[0].life <= 0) trail.shift();
+(function() {
+  var dot = document.getElementById('cursor-dot');
+  var ring = document.getElementById('cursor-ring');
+  var canvas = document.getElementById('cursor-canvas');
+  if (!dot || !ring || !canvas) return;
+  var ctx = canvas.getContext('2d');
+  function resizeCanvas() { canvas.width = window.innerWidth; canvas.height = window.innerHeight; }
+  window.addEventListener('resize', resizeCanvas);
+  resizeCanvas();
+  var mouseX = window.innerWidth / 2, mouseY = window.innerHeight / 2;
+  var dotX = mouseX, dotY = mouseY;
+  var ringX = mouseX, ringY = mouseY;
+  var trail = [];
+  var TRAIL_LENGTH = 18;
+  document.addEventListener('mousemove', function(e) {
+    mouseX = e.clientX; mouseY = e.clientY;
+    trail.push({ x: mouseX, y: mouseY, life: 1 });
+    if (trail.length > TRAIL_LENGTH) trail.shift();
+  });
+  function animateCursor() {
+    dotX += (mouseX - dotX) * 0.25;
+    dotY += (mouseY - dotY) * 0.25;
+    ringX += (mouseX - ringX) * 0.1;
+    ringY += (mouseY - ringY) * 0.1;
+    dot.style.transform = 'translate3d(' + dotX + 'px, ' + dotY + 'px, 0) translate(-50%, -50%)';
+    ring.style.transform = 'translate3d(' + ringX + 'px, ' + ringY + 'px, 0) translate(-50%, -50%)';
+    ctx.clearRect(0, 0, canvas.width, canvas.height);
+    if (trail.length > 2) {
+      for (var i = trail.length - 1; i >= 0; i--) trail[i].life -= 0.045;
+      ctx.lineCap = 'round';
+      for (var i = 1; i < trail.length; i++) {
+        var p = trail[i], pp = trail[i - 1];
+        if (p.life <= 0 || pp.life <= 0) continue;
+        ctx.beginPath();
+        ctx.moveTo(pp.x, pp.y);
+        ctx.lineTo(p.x, p.y);
+        ctx.strokeStyle = 'rgba(167, 139, 250, ' + (p.life * 0.25) + ')';
+        ctx.lineWidth = p.life * 1.2;
+        ctx.stroke();
       }
-      requestAnimationFrame(animateCursor);
+      while (trail.length > 0 && trail[0].life <= 0) trail.shift();
     }
-    animateCursor();
-  })();
-  </script>
+    requestAnimationFrame(animateCursor);
+  }
+  animateCursor();
+})();
+</script>
 <script src="js/footer.js"></script>
 </body>
 </html>
