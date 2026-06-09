@@ -118,6 +118,7 @@ const YARO_API = (function() {
         authUser = data.user;
         localStorage.setItem('sb_token', data.access_token);
         localStorage.setItem('sb_refresh', data.refresh_token);
+        localStorage.setItem('sb_user', JSON.stringify(data.user));
         return { user: data.user, session: data };
       } catch(e) { console.error('signIn error:', e); return { error: e.message || 'Network error — check your connection' }; }
     },
@@ -143,6 +144,7 @@ const YARO_API = (function() {
         authUser = null;
         localStorage.removeItem('sb_token');
         localStorage.removeItem('sb_refresh');
+        localStorage.removeItem('sb_user');
         localStorage.removeItem('admin_token');
         return { success: true };
       } catch(e) { return { error: e.message }; }
@@ -151,7 +153,11 @@ const YARO_API = (function() {
     getSession() {
       if (authUser) return { user: authUser, token: authToken };
       var t = localStorage.getItem('sb_token');
-      if (t) return { token: t };
+      if (t) {
+        var u = localStorage.getItem('sb_user');
+        if (u) { try { return { user: JSON.parse(u), token: t }; } catch(e) {} }
+        return { user: { id: t }, token: t };
+      }
       return null;
     },
 
@@ -175,7 +181,7 @@ const YARO_API = (function() {
 
     setToken: function(t) {},
     getToken: function() { return getStoredToken(); },
-    clearToken: function() { authToken = null; authUser = null; localStorage.removeItem('sb_token'); localStorage.removeItem('sb_refresh'); },
+    clearToken: function() { authToken = null; authUser = null; localStorage.removeItem('sb_token'); localStorage.removeItem('sb_refresh'); localStorage.removeItem('sb_user'); },
 
     // ── Products ──
     async getProducts() {
