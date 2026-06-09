@@ -1290,9 +1290,10 @@ async function openProdModal(id) {
   h += '<div class="fg"><label>Original Price</label><input type="number" id="f-oprice"></div>';
   h += '<div class="fg"><label>Stock</label><input type="number" id="f-stock"></div>';
   h += '<div class="fg"><label>SKU</label><input type="text" id="f-sku"></div>';
-  h += '<div class="fg full"><label>Images (max 10)</label><div class="img-grid" id="f-images-grid"></div><div class="img-drop-zone" id="f-drop-zone"><span>+ Click or drag images here</span><small>Supports JPG, PNG, WebP</small></div><input type="file" id="f-image-file" accept="image/*" style="display:none"><p id="f-images-err" style="font-size:10px;color:#f87171;margin-top:4px;display:none"></p></div>';
+  h += '<div class="fg full"><label>Default Images (fallback)</label><div class="img-grid" id="f-images-grid"></div><div class="img-drop-zone" id="f-drop-zone"><span>+ Click or drag images here</span><small>Supports JPG, PNG, WebP</small></div><input type="file" id="f-image-file" accept="image/*" style="display:none"><p id="f-images-err" style="font-size:10px;color:#f87171;margin-top:4px;display:none"></p></div>';
   h += '<div class="fg full"><label>Sizes</label><div class="size-chips" id="f-sizes">' + ['S','M','L','XL','2XL','3XL'].map(function(s){return '<span class="size-chip" data-size="'+s+'">'+s+'</span>'}).join('') + '</div></div>';
   h += '<div class="fg full"><label>Colours</label><div class="size-chips" id="f-colours">' + ['Black','White','Grey','Navy','Olive','Beige','Green','Blue','Red','Pink','Purple','Brown','Charcoal','Cream','Burgundy','Teal','Sage','Coral','Khaki','Tan'].map(function(c){var bg=COLOUR_MAP[c.toLowerCase()]||c;var wc=c.toLowerCase()==='white'?' white-dot':'';return '<span class="size-chip colour-chip" data-colour="'+c+'"><span class="colour-dot'+wc+'" style="background:'+bg+'"></span>'+c+'</span>'}).join('') + '</div></div>';
+  h += '<div class="fg full" id="f-colour-section-wrap" style="display:none"><label>Colour Images</label><div id="f-colour-sections"></div></div>';
   h += '<div class="fg"><label>Badge</label><input type="text" id="f-badge"></div>';
   h += '<div class="fg"><label>Offer Name</label><input type="text" id="f-offer"></div>';
   h += '<div class="fg full"><label>Story Text</label><textarea id="f-story-text"></textarea></div>';
@@ -1306,8 +1307,9 @@ async function openProdModal(id) {
   document.getElementById('f-colours').addEventListener('click', function(e) {
     var chip = e.target.closest('.colour-chip');
     if (chip) chip.classList.toggle('selected');
+    renderColourSections();
   });
-  if (id) loadProd(id); else { window._editImages = []; renderImageGrid(); }
+  if (id) loadProd(id); else { window._editImages = []; window._colourData = {}; renderImageGrid(); renderColourSections(); }
   document.getElementById('mf').addEventListener('submit', function(e) { e.preventDefault(); saveProd(id); });
 }
 
@@ -1333,6 +1335,8 @@ async function loadProd(id) {
   document.querySelectorAll('#f-colours .colour-chip').forEach(function(chip) {
     if (colours.indexOf(chip.getAttribute('data-colour')) >= 0) chip.classList.add('selected');
   });
+  window._colourData = d.colour_data || {};
+  renderColourSections();
   document.getElementById('f-gender').value = d.gender || 'Any';
   document.getElementById('f-badge').value = d.badge || '';
   document.getElementById('f-offer').value = d.offer_name || '';
@@ -1357,6 +1361,7 @@ async function saveProd(id) {
     badge: document.getElementById('f-badge').value,
     offer_name: document.getElementById('f-offer').value,
     story_text: document.getElementById('f-story-text').value,
+    colour_data: window._colourData,
     status: document.getElementById('f-status').value
   };
   var r = id ? await YARO_API.updateProduct(id, body) : await YARO_API.createProduct(body);
@@ -1470,6 +1475,86 @@ document.addEventListener('drop', async function(e) {
   var files = e.dataTransfer.files;
   if (files && files.length) await uploadSelectedFile(files[0]);
 });
+
+// ─── COLOUR-SPECIFIC IMAGES ───
+function renderColourSections() {
+  var wrap = document.getElementById('f-colour-section-wrap');
+  var container = document.getElementById('f-colour-sections');
+  if (!wrap || !container) return;
+  var selected = Array.from(document.querySelectorAll('#f-colours .colour-chip.selected')).map(function(c){return c.getAttribute('data-colour')});
+  if (!selected.length) { wrap.style.display = 'none'; return; }
+  wrap.style.display = 'block';
+  if (!window._colourData) window._colourData = {};
+  var html = '';
+  selected.forEach(function(colour) {
+    if (!window._colourData[colour]) window._colourData[colour] = [];
+    var imgs = window._colourData[colour];
+    var safe = colour.replace(/\s+/g,'-').toLowerCase();
+    html += '<div class="colour-section" data-colour="' + colour + '" style="margin-top:12px;padding:12px;border-radius:10px;background:var(--surface);border:1px solid var(--border-light)">';
+    html += '<div style="display:flex;align-items:center;gap:10px;margin-bottom:10px"><span class="colour-dot" style="display:inline-block;width:14px;height:14px;border-radius:50%;background:' + (COLOUR_MAP[colour.toLowerCase()]||'#888') + ';border:1px solid rgba(255,255,255,0.15)"></span><strong style="font-size:13px;color:var(--text)">' + colour + '</strong><span style="font-size:10px;color:var(--muted)">(' + imgs.length + ' images)</span></div>';
+    html += '<div class="img-grid" id="cg-' + safe + '-grid" data-colour="' + colour + '">';
+    imgs.forEach(function(url,i) {
+      html += '<div class="img-item"><span class="img-idx">' + (i+1) + '</span><img src="' + url + '"><div class="img-ovr">' +
+        (i > 0 ? '<button type="button" class="img-mv" onclick="moveColourImage(\'' + colour + '\',' + i + ',' + (i-1) + ')">▲</button>' : '') +
+        (i < imgs.length - 1 ? '<button type="button" class="img-mv" onclick="moveColourImage(\'' + colour + '\',' + i + ',' + (i+1) + ')">▼</button>' : '') +
+        '<button type="button" class="img-rm" onclick="removeColourImage(\'' + colour + '\',' + i + ')">✕</button></div></div>';
+    });
+    html += '</div>';
+    html += '<div class="img-drop-zone colour-upload" data-colour="' + colour + '" style="margin-top:8px"><span>+ Upload ' + colour + ' images</span><small>Supports JPG, PNG, WebP</small></div>';
+    html += '</div>';
+  });
+  container.innerHTML = html;
+  // Wire up per-colour drop zones
+  container.querySelectorAll('.colour-upload').forEach(function(dz) {
+    dz.addEventListener('click', function() {
+      window._uploadTarget = dz.getAttribute('data-colour');
+      var inp = document.getElementById('f-colour-file');
+      if (!inp) {
+        inp = document.createElement('input');
+        inp.type = 'file'; inp.id = 'f-colour-file'; inp.accept = 'image/*';
+        inp.style.display = 'none'; document.body.appendChild(inp);
+        inp.addEventListener('change', function() {
+          var file = inp.files && inp.files[0]; inp.value = '';
+          if (file && window._uploadTarget) uploadColourImage(window._uploadTarget, file);
+        });
+      }
+      inp.click();
+    });
+    dz.addEventListener('dragenter', function(e) { e.preventDefault(); dz.classList.add('drag-over'); });
+    dz.addEventListener('dragover', function(e) { e.preventDefault(); });
+    dz.addEventListener('dragleave', function(e) { if (!dz.contains(e.relatedTarget)) dz.classList.remove('drag-over'); });
+    dz.addEventListener('drop', function(e) {
+      e.preventDefault(); dz.classList.remove('drag-over');
+      var files = e.dataTransfer.files;
+      if (files && files.length) uploadColourImage(dz.getAttribute('data-colour'), files[0]);
+    });
+  });
+}
+
+async function uploadColourImage(colour, file) {
+  if (!file || !colour) return;
+  if (!window._colourData) window._colourData = {};
+  if (!window._colourData[colour]) window._colourData[colour] = [];
+  if (window._colourData[colour].length >= 10) { showToast('Max 10 images per colour', 'error'); return; }
+  var dz = document.querySelector('.colour-upload[data-colour="' + colour + '"]');
+  if (dz) { dz.innerHTML = '<span>Uploading…</span>'; dz.style.pointerEvents = 'none'; }
+  var result = await YARO_API.uploadImage(file);
+  if (dz) { dz.innerHTML = '<span>+ Upload ' + colour + ' images</span><small>Supports JPG, PNG, WebP</small>'; dz.style.pointerEvents = ''; }
+  if (result.error) { showToast('Upload failed: ' + (result.error.message || result.error), 'error'); return; }
+  window._colourData[colour].push(result.url);
+  renderColourSections();
+}
+
+function moveColourImage(colour, from, to) {
+  var arr = window._colourData[colour];
+  var tmp = arr[from]; arr[from] = arr[to]; arr[to] = tmp;
+  renderColourSections();
+}
+
+function removeColourImage(colour, idx) {
+  if (window._colourData[colour]) window._colourData[colour].splice(idx, 1);
+  renderColourSections();
+}
 
 // ─── PASSWORD CONFIRM MODAL ───
 function requirePassword(action) {

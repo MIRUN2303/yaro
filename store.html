@@ -1405,6 +1405,19 @@ background: url("data:image/svg+xml,%3Csvg viewBox='0 0 400 400' xmlns='http://w
       color: rgba(196,181,253,0.25);
     }
 
+    .product-card .prod-swatches {
+      display: flex; gap: 4px; margin: 4px 0 6px; flex-wrap: wrap; align-items: center;
+    }
+    .product-card .prod-swatch {
+      width: 11px; height: 11px; border-radius: 50%; border: 1px solid rgba(255,255,255,0.12); flex-shrink: 0; transition: opacity 0.3s ease;
+    }
+    .product-card:hover .prod-swatch {
+      opacity: 0.85;
+    }
+    .product-card .prod-swatch.more {
+      width: auto; border: none; background: transparent !important; font-size: 8px; color: rgba(255,255,255,0.3); padding: 0 2px; line-height: 11px;
+    }
+
     .product-card .prod-gender {
       position: absolute;
       top: 12px;
@@ -2206,6 +2219,7 @@ background: url("data:image/svg+xml,%3Csvg viewBox='0 0 400 400' xmlns='http://w
 
     // ─── DYNAMIC PRODUCT LOADER FROM API ───
     (function() {
+      var COLOUR_MAP = { 'black':'#000000','white':'#ffffff','grey':'#6b7280','gray':'#6b7280','navy':'#1a2744','olive':'#808000','burgundy':'#800020','green':'#166534','blue':'#1d4ed8','red':'#dc2626','brown':'#78350f','beige':'#d6d3c1','cream':'#f5f0e1','pink':'#db2777','purple':'#7c3aed','maroon':'#7f1d1d','tan':'#b8966e','khaki':'#b5a88a','charcoal':'#374151','coral':'#e87968','sage':'#84a98c','mustard':'#eab308','teal':'#0d9488' };
       var grid = document.getElementById('product-grid');
       if (!grid) return;
       YARO_API.getProducts().then(function(products) {
@@ -2247,6 +2261,7 @@ background: url("data:image/svg+xml,%3Csvg viewBox='0 0 400 400' xmlns='http://w
           html += '<div class="prod-info">';
           html += '<span class="prod-name">' + name + '</span>';
           html += '<span class="prod-category">' + cat + '</span>';
+          html += '<div class="prod-swatches">' + (p.colours && Array.isArray(p.colours) ? p.colours.map(function(c){var bg=COLOUR_MAP[c.toLowerCase()]||c;return '<span class="prod-swatch" style="background:'+bg+'" title="'+c+'"></span>'}).join('') : '') + '</div>';
           html += '<div class="prod-bottom">';
           html += '<span class="prod-stars">' + stars + '</span>';
           html += '<div class="prod-price-wrap">';

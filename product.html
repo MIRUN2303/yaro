@@ -2290,6 +2290,7 @@
             additionalImages: Array.isArray(p.images) ? p.images.slice(1) : [],
             sizes: p.sizes || ['S','M','L','XL','XXL'],
             colours: p.colours || [],
+            colourData: p.colour_data || {},
             stock: p.stock || 0,
             gender: p.gender || 'Any'
           };
@@ -2391,13 +2392,27 @@
           container.querySelectorAll('.colour-chip').forEach(function(x) { x.classList.remove('selected'); });
           chip.classList.add('selected');
           selectedColour = chip.getAttribute('data-colour');
+          switchColourImages(selectedColour);
         });
       });
       // Auto-select first
       var first = container.querySelector('.colour-chip');
-      if (first) { first.classList.add('selected'); selectedColour = first.getAttribute('data-colour'); }
+      if (first) { first.classList.add('selected'); selectedColour = first.getAttribute('data-colour'); switchColourImages(selectedColour); }
     }
     renderColours();
+
+    // ─── COLOUR-SPECIFIC IMAGES ───
+    function switchColourImages(colour) {
+      if (!colour || !activeProduct.colourData) return;
+      var colourImgs = activeProduct.colourData[colour];
+      if (colourImgs && Array.isArray(colourImgs) && colourImgs.length) {
+        productImages = colourImgs;
+      } else {
+        productImages = [activeProduct.image, ...activeProduct.additionalImages];
+      }
+      activeImageIndex = 0;
+      renderGallery();
+    }
 
     // ─── RENDER GALLERY THUMBNAILS ───
     function renderGallery() {
