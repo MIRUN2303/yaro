@@ -1364,8 +1364,17 @@ async function saveProd(id) {
     colour_data: window._colourData,
     status: document.getElementById('f-status').value
   };
+  if (body.status === 'active') {
+    if (!body.colours.length) { showToast('Select at least one colour before publishing', 'error'); return; }
+    var missing = [];
+    body.colours.forEach(function(c) {
+      var imgs = window._colourData && window._colourData[c];
+      if (!imgs || !imgs.length) missing.push(c);
+    });
+    if (missing.length) { showToast('Upload at least 1 image for: ' + missing.join(', '), 'error'); return; }
+  }
   var r = id ? await YARO_API.updateProduct(id, body) : await YARO_API.createProduct(body);
-  if (r.error) { alert('Error: ' + JSON.stringify(r.error)); return; }
+  if (r.error) { showToast('Error: ' + (r.error.message || typeof r.error === 'string' ? r.error : JSON.stringify(r.error)), 'error'); return; }
   closeModal(); loadPage('products');
 }
 
