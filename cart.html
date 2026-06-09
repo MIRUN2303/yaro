@@ -1250,7 +1250,7 @@
               '<div class="cart-item-img-wrap"><img src="' + prod.image + '" alt="' + prod.name + '"></div>' +
               '<div class="cart-item-info">' +
                 '<div class="cart-item-name">' + prod.name + '</div>' +
-                '<div class="cart-item-meta">' + (item.size || 'One Size') + '</div>' +
+                '<div class="cart-item-meta">' + (item.size || 'One Size') + (item.colour ? ' &middot; ' + item.colour : '') + '</div>' +
                 '<div class="cart-item-price">' + prod.price.replace('₹', '<span class="rupee">₹</span>') + '</div>' +
                 '<div class="cart-item-subtotal">Subtotal: <span class="rupee">₹</span>' + itemTotal + '</div>' +
                 stockMsg +
@@ -1428,7 +1428,7 @@
           '<div class="buynow-img-wrap"><img src="' + item.image + '" alt="' + item.name + '"></div>' +
           '<div class="buynow-info">' +
             '<div class="buynow-name">' + item.name + '</div>' +
-            '<div class="buynow-meta">' + (item.size || 'One Size') + '</div>' +
+            '<div class="buynow-meta">' + (item.size || 'One Size') + (item.colour ? ' &middot; ' + item.colour : '') + '</div>' +
             '<div class="buynow-price"><span class="rupee">₹</span>' + price + '</div>' +
           '</div>' +
           '<div class="buynow-qty">' +
@@ -1610,53 +1610,39 @@
       document.querySelector('#remove-modal .modal-desc').textContent = 'Are you sure you want to remove this item from your cart? This action cannot be undone.';
     }
 
+    // ─── HELPERS ───
+    function parsePrice(priceStr) {
+      return parseInt(String(priceStr).replace(/[^0-9]/g, '')) || 0;
+    }
+
+    function getProd(id) {
+      return productsDB.find(function(p) { return p.id === id; });
+    }
+
+    function buildOrderItems(cartItems) {
+      var items = [];
+      cartItems.forEach(function(item) {
+        var prod = getProd(item.id);
+        if (!prod) return;
+        var price = parsePrice(prod.price);
+        items.push({
+          product_id: prod.slug || prod.id,
+          product_name: prod.name,
+          product_image: prod.image,
+          price: price,
+          quantity: item.qty,
+          size: item.size || null,
+          colour: item.colour || null
+        });
+      });
+      return items;
+    }
+
     // ─── CHECKOUT ───
     document.getElementById('checkout-btn').addEventListener('click', function() {
       var btn = this;
 
-      // ─── BUY NOW CHECKOUT ───
-      if (isBuyNow && buyNowItem) {
-        var name = document.getElementById('loc-name').value.trim();
-        var phone = document.getElementById('loc-phone').value.trim();
-        var door = document.getElementById('loc-door').value.trim();
-        var address = document.getElementById('loc-address').value.trim();
-        var city = document.getElementById('loc-city').value.trim();
-        var pincode = document.getElementById('loc-pincode').value.trim();
-        var landmark = document.getElementById('loc-landmark').value.trim();
-
-        if (!name || !phone || !door || !address || !city || !pincode || !landmark) {
-          showToast('Please fill in your delivery address', 'error');
-          document.querySelector('.location-section').scrollIntoView({ behavior: 'smooth', block: 'center' });
-          return;
-        }
-        if (phone.length < 10) { showToast('Please enter a valid phone number', 'error'); return; }
-        if (pincode.length < 6) { showToast('Please enter a valid pincode', 'error'); return; }
-
-        btn.classList.add('loading');
-        var orderId = 'YARO-' + new Date().toISOString().slice(0,8).replace(/-/g,'') + '-' + Math.random().toString(36).substr(2,4).toUpperCase();
-        var total = document.getElementById('summary-total').innerHTML;
-
-        setTimeout(function() {
-          btn.classList.remove('loading');
-          sessionStorage.removeItem('yaro_buy_now');
-          isBuyNow = false;
-          buyNowItem = null;
-          document.getElementById('success-order-id').textContent = orderId;
-          document.getElementById('success-total').innerHTML = total;
-          document.getElementById('success-modal').classList.add('open');
-          renderCart();
-          showToast('Order placed successfully! 🎉', 'success');
-          stopTimer();
-        }, 2000);
-        return;
-      }
-
-      // ─── NORMAL CART CHECKOUT ───
-      if (bucketTotalItems() === 0) { showToast('Your cart is empty', 'error'); return; }
-      if (!activeBucket || !buckets[activeBucket] || buckets[activeBucket].items.length === 0) {
-        showToast('Please select a basket to checkout', 'error'); return;
-      }
-
+      // ─── VALIDATE ADDRESS ───
       var name = document.getElementById('loc-name').value.trim();
       var phone = document.getElementById('loc-phone').value.trim();
       var door = document.getElementById('loc-door').value.trim();
@@ -1673,33 +1659,117 @@
       if (phone.length < 10) { showToast('Please enter a valid phone number', 'error'); return; }
       if (pincode.length < 6) { showToast('Please enter a valid pincode', 'error'); return; }
 
+      // ─── AUTH CHECK ───
+      var session = YARO_API.getSession();
+      if (!session || !session.user) {
+        showToast('Please login to place an order', 'error');
+        setTimeout(function() { window.location.href = 'login.html'; }, 1000);
+        return;
+      }
+      var userId = session.user.id;
+      var userEmail = session.user.email || '';
+
+      // ─── BUILD CART ITEMS ───
+      var cartItems;
+      if (isBuyNow && buyNowItem) {
+        cartItems = [buyNowItem];
+      } else {
+        if (bucketTotalItems() === 0) { showToast('Your cart is empty', 'error'); return; }
+        if (!activeBucket || !buckets[activeBucket] || buckets[activeBucket].items.length === 0) {
+          showToast('Please select a basket to checkout', 'error'); return;
+        }
+        cartItems = buckets[activeBucket].items;
+      }
+
+      // ─── CALCULATE TOTALS ───
+      var subtotal = 0;
+      cartItems.forEach(function(item) {
+        var prod = getProd(item.id);
+        if (prod) subtotal += parsePrice(prod.price) * item.qty;
+      });
+      var shipping = subtotal >= 699 ? 0 : 99;
+      var tax = Math.round(subtotal * 0.05);
+      var discount = promoApplied ? Math.round(subtotal * promoDiscount) : 0;
+      var total = subtotal + shipping + tax - discount;
+
+      // Store in paise for admin compatibility (o.total/100)
+      var subtotalPaise = subtotal * 100;
+      var shippingPaise = shipping * 100;
+      var taxPaise = tax * 100;
+      var totalPaise = total * 100;
+
+      // ─── BUILD ORDER ───
+      var orderId = 'YARO-' + Date.now();
+      var orderNumber = 'YARO-' + new Date().toISOString().slice(0,8).replace(/-/g,'') + '-' + Math.random().toString(36).substr(2,4).toUpperCase();
+      var deliveryAddr = JSON.stringify({ door: door, address: address, city: city, pincode: pincode, landmark: landmark });
+
+      var orderData = {
+        id: orderId,
+        order_number: orderNumber,
+        user_id: userId,
+        status: 'placed',
+        payment_status: 'pending',
+        fulfillment_status: 'pending',
+        subtotal: subtotalPaise,
+        shipping: shippingPaise,
+        tax: taxPaise,
+        total: totalPaise,
+        delivery_address: deliveryAddr,
+        customer_email: userEmail,
+        customer_phone: phone,
+        customer_name: name
+      };
+
+      var orderItems = buildOrderItems(cartItems);
+      orderItems.forEach(function(item) { item.order_id = orderId; });
+
+      // ─── PERSIST ───
       btn.classList.add('loading');
 
-      var orderId = 'YARO-' + new Date().toISOString().slice(0,8).replace(/-/g,'') + '-' + Math.random().toString(36).substr(2,4).toUpperCase();
-      var total = document.getElementById('summary-total').innerHTML;
+      YARO_API.createOrder(orderData).then(function(orderResult) {
+        if (!orderResult || orderResult.error) {
+          btn.classList.remove('loading');
+          showToast('Failed to place order. Please try again.', 'error');
+          return;
+        }
+        YARO_API.createOrderItems(orderItems).then(function(itemsResult) {
+          btn.classList.remove('loading');
+          if (itemsResult && itemsResult.error) {
+            console.error('Order created but items failed:', itemsResult.error);
+          }
 
-      setTimeout(function() {
+          // ─── SUCCESS ───
+          document.getElementById('success-order-id').textContent = orderNumber;
+          document.getElementById('success-total').innerHTML = '<span class="rupee">₹</span>' + total;
+          document.getElementById('success-modal').classList.add('open');
+
+          // Clear state
+          if (isBuyNow && buyNowItem) {
+            sessionStorage.removeItem('yaro_buy_now');
+            isBuyNow = false;
+            buyNowItem = null;
+          } else {
+            var placedName = activeBucket;
+            delete buckets[placedName];
+            if (Object.keys(buckets).length === 0) buckets = { 'My Cart': { items: [] } };
+            activeBucket = null;
+            expandedBucket = null;
+            promoApplied = false;
+            promoDiscount = 0;
+            document.getElementById('promo-input').disabled = false;
+            document.getElementById('promo-input').value = '';
+            document.getElementById('promo-msg').className = 'promo-msg';
+            saveBuckets();
+          }
+          renderCart();
+          showToast('Order placed successfully! 🎉', 'success');
+          stopTimer();
+        });
+      }).catch(function(err) {
         btn.classList.remove('loading');
-        document.getElementById('success-order-id').textContent = orderId;
-        document.getElementById('success-total').innerHTML = total;
-        document.getElementById('success-modal').classList.add('open');
-
-        // Only clear the placed (active) basket, keep others
-        var placedName = activeBucket;
-        delete buckets[placedName];
-        if (Object.keys(buckets).length === 0) buckets = { 'My Cart': { items: [] } };
-        activeBucket = null;
-        expandedBucket = null;
-        promoApplied = false;
-        promoDiscount = 0;
-        document.getElementById('promo-input').disabled = false;
-        document.getElementById('promo-input').value = '';
-        document.getElementById('promo-msg').className = 'promo-msg';
-        saveBuckets();
-        renderCart();
-        showToast('"' + placedName + '" ordered successfully! 🎉', 'success');
-        stopTimer();
-      }, 2000);
+        showToast('Network error. Please try again.', 'error');
+        console.error('Checkout error:', err);
+      });
     });
 
     document.getElementById('success-modal-close').addEventListener('click', function() { document.getElementById('success-modal').classList.remove('open'); });

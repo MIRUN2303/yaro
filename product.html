@@ -572,6 +572,56 @@
       background: rgba(139,92,246,0.04);
     }
 
+    /* Colour Selection */
+    .colour-row {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 8px;
+      margin: -16px 0 20px;
+    }
+    .colour-chips {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+      justify-content: center;
+    }
+    .colour-chip {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      padding: 6px 14px 6px 10px;
+      background: rgba(255,255,255,0.025);
+      border: 1px solid rgba(255,255,255,0.06);
+      border-radius: 20px;
+      color: var(--text-dim);
+      font-size: 10px;
+      font-weight: 500;
+      cursor: pointer;
+      user-select: none;
+      transition: all 0.25s ease;
+    }
+    .colour-chip:hover {
+      border-color: rgba(196,181,253,0.3);
+      color: var(--text);
+    }
+    .colour-chip.selected {
+      background: rgba(196,181,253,0.12);
+      border-color: var(--accent);
+      color: var(--accent);
+      box-shadow: 0 0 12px rgba(196,181,253,0.08);
+    }
+    .colour-dot {
+      width: 14px;
+      height: 14px;
+      border-radius: 50%;
+      flex-shrink: 0;
+      border: 1px solid rgba(255,255,255,0.1);
+    }
+    .colour-chip.selected .colour-dot {
+      border-color: var(--accent);
+    }
+
     /* Checkout / Call to Actions */
     .actions-container {
       background: rgba(255,255,255,0.03);
@@ -1882,6 +1932,12 @@
                 </div>
               </div>
             </div>
+
+            <!-- Colour Selection -->
+            <div class="colour-row" id="colour-row" style="display:none">
+              <div class="sq-label">Colour</div>
+              <div class="colour-chips" id="colour-chips"></div>
+            </div>
             
             <!-- Checkout Action Buttons -->
             <div class="actions-container">
@@ -2075,6 +2131,9 @@
   <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/gsap.min.js"></script>
   
   <script>
+    // ─── COLOUR MAP ───
+    var COLOUR_MAP = { 'black':'#000000','white':'#ffffff','grey':'#6b7280','gray':'#6b7280','navy':'#1a2744','olive':'#808000','burgundy':'#800020','green':'#166534','blue':'#1d4ed8','red':'#dc2626','brown':'#78350f','beige':'#d6d3c1','cream':'#f5f0e1','pink':'#db2777','purple':'#7c3aed','maroon':'#7f1d1d','tan':'#b8966e','khaki':'#b5a88a','charcoal':'#374151','coral':'#e87968','sage':'#84a98c','mustard':'#eab308','teal':'#0d9488' };
+
     // ─── PRODUCT METADATA DATABASE ───
     // Static fallback data (identical to original). API data overrides when available.
     let productsDB = [
@@ -2094,6 +2153,7 @@
           'images/detail_pics/left_back.png',
           'images/detail_pics/right_front.png'
         ],
+        colours: ['Black', 'White', 'Navy'],
         gender: 'Any'
       },
       {
@@ -2109,6 +2169,7 @@
         story: 'Lost in the neon glow, chasing shadows of a life we used to know.',
         desc: 'Heavyweight combed ringspun cotton with drop-shoulder silhouette, massive structured hood, and relaxed cuffs.',
         additionalImages: [],
+        colours: ['Black', 'Grey', 'Olive'],
         gender: 'Any'
       },
       {
@@ -2124,6 +2185,7 @@
         story: 'No destination, just the cold wind and the open path ahead.',
         desc: 'Technical shadow cargo pant engineered with heavy nylon cotton canvas, deep modular pockets, dual side utility straps, and matte steel adjustment hardware.',
         additionalImages: [],
+        colours: ['Black', 'Olive'],
         gender: 'His'
       },
       {
@@ -2139,6 +2201,7 @@
         story: 'Born of the pavement, thriving in the noise of the crowded street.',
         desc: 'Minimalist off-white crop tee crafted with organic soft rib cotton, structured box fit drape, and double stitch hem details.',
         additionalImages: [],
+        colours: ['White', 'Black'],
         gender: 'Hers'
       },
       {
@@ -2154,6 +2217,7 @@
         story: 'A frequency cut short, a voice fading into static.',
         desc: 'Cozy oversized charcoal crewneck sweatshirt with organic cotton fleece backing, drop-shoulder seams, and rib finish mockneck collar.',
         additionalImages: [],
+        colours: ['Charcoal', 'Black', 'Navy'],
         gender: 'Any'
       },
       {
@@ -2169,6 +2233,7 @@
         story: 'Surrounded by thousands, yet walking in absolute silence.',
         desc: 'Heavyweight sand beige drop-shoulder t-shirt with premium mock neck rib collar and structured boxy aesthetic outline.',
         additionalImages: [],
+        colours: ['Beige', 'Black'],
         gender: 'Any'
       },
       {
@@ -2184,6 +2249,7 @@
         story: 'Sneaking out into the cool night, leaving the city behind.',
         desc: 'Classic kids white graphic t-shirt in extremely soft organic ring-spun combed cotton, featuring the YARO micro logo on the chest.',
         additionalImages: [],
+        colours: ['White', 'Black', 'Grey'],
         gender: 'Mini-Gent'
       },
       {
@@ -2199,6 +2265,7 @@
         story: 'Not all who wander are looking for a way home.',
         desc: 'Ultra soft double fleece organic light beige kid hoodie. Minimalist clean style with micro branding and perfect warmth for children.',
         additionalImages: [],
+        colours: ['Beige', 'Pink', 'White'],
         gender: 'Mini-Lady'
       }
     ];
@@ -2222,6 +2289,7 @@
             desc: p.description || '',
             additionalImages: p.images ? p.images.slice(1) : [],
             sizes: p.sizes || ['S','M','L','XL','XXL'],
+            colours: p.colours || [],
             stock: p.stock || 0,
             gender: p.gender || 'Any'
           };
@@ -2274,8 +2342,9 @@
     }
 
     // ─── SIZE STEPPER ───
-    var sizes = ['S', 'M', 'L', 'XL', 'XXL'];
-    var currentSizeIndex = 1;
+    var sizes = activeProduct.sizes && activeProduct.sizes.length ? activeProduct.sizes : ['S','M','L','XL','XXL'];
+    var currentSizeIndex = Math.min(1, sizes.length - 1);
+    if (currentSizeIndex < 0) currentSizeIndex = 0;
     function updateSizeDisplay() { document.getElementById('pd-size-current').textContent = sizes[currentSizeIndex]; }
     document.getElementById('pd-size-inc').addEventListener('click', function() {
       if (currentSizeIndex < sizes.length - 1) currentSizeIndex++;
@@ -2285,6 +2354,31 @@
       if (currentSizeIndex > 0) currentSizeIndex--;
       updateSizeDisplay();
     });
+
+    // ─── COLOUR CHIPS ───
+    var selectedColour = null;
+    function renderColours() {
+      var cols = activeProduct.colours;
+      var row = document.getElementById('colour-row');
+      var container = document.getElementById('colour-chips');
+      if (!cols || !cols.length) { row.style.display = 'none'; return; }
+      row.style.display = 'flex';
+      container.innerHTML = cols.map(function(c) {
+        var dotBg = COLOUR_MAP[c.toLowerCase()] || c;
+        return '<span class="colour-chip" data-colour="' + c + '"><span class="colour-dot" style="background:' + dotBg + '"></span>' + c + '</span>';
+      }).join('');
+      container.querySelectorAll('.colour-chip').forEach(function(chip) {
+        chip.addEventListener('click', function() {
+          container.querySelectorAll('.colour-chip').forEach(function(x) { x.classList.remove('selected'); });
+          chip.classList.add('selected');
+          selectedColour = chip.getAttribute('data-colour');
+        });
+      });
+      // Auto-select first
+      var first = container.querySelector('.colour-chip');
+      if (first) { first.classList.add('selected'); selectedColour = first.getAttribute('data-colour'); }
+    }
+    renderColours();
 
     // ─── RENDER GALLERY THUMBNAILS ───
     function renderGallery() {
@@ -2422,7 +2516,8 @@
         price: activeProduct.price,
         image: activeProduct.image,
         qty: pageQty,
-        size: getSelectedSize()
+        size: getSelectedSize(),
+        colour: selectedColour || ''
       };
       sessionStorage.setItem('yaro_buy_now', JSON.stringify(buyItem));
       window.location.href = 'cart.html?buynow=1';
@@ -2511,6 +2606,7 @@
         id: activeProduct.id,
         qty: addCartQty,
         size: getSelectedSize(),
+        colour: selectedColour || '',
         stock: 5
       });
       document.getElementById('add-cart-modal').classList.remove('open');

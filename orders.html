@@ -27,11 +27,6 @@
   .ord-head h1 { font-size: 20px; font-weight: 500; letter-spacing: 3px; margin-bottom: 6px; }
   .ord-head p { font-size: 12px; color: #666; letter-spacing: 0.5px; }
 
-  .ord-tabs { display: flex; gap: 4px; justify-content: center; margin-bottom: 28px; background: rgba(255,255,255,0.02); border: 1px solid var(--border); border-radius: 100px; padding: 3px; max-width: 420px; margin-left: auto; margin-right: auto; }
-  .ord-tab { flex: 1; padding: 7px 0; border: none; border-radius: 100px; background: transparent; color: #666; font-family: 'Clash Display', sans-serif; font-size: 11px; letter-spacing: 0.5px; cursor: pointer; transition: all 0.3s; }
-  .ord-tab:hover { color: var(--accent); }
-  .ord-tab.active { background: rgba(196,181,253,0.1); color: var(--accent); font-weight: 600; }
-
   .ord-card {
     background: rgba(255,255,255,0.015);
     border: 1px solid var(--border);
@@ -95,7 +90,7 @@
   .toast { position: fixed; top: 80px; right: 20px; z-index: 6000; padding: 14px 20px; border-radius: 10px; background: rgba(15,10,25,0.95); border: 1px solid rgba(196,181,253,0.15); backdrop-filter: blur(12px); display: flex; align-items: center; gap: 10px; font-size: 12px; color: #fff; min-width: 280px; transform: translateX(120%); opacity: 0; transition: all 0.4s cubic-bezier(0.22,1,0.36,1); }
   .toast.show { transform: translateX(0); opacity: 1; }
 
-  @media (max-width: 600px) { .ord-container { padding: 0; } .ord-card { padding: 16px 18px; } .ord-tabs { border-radius: 50px; padding: 2px; } .ord-tab { font-size: 10px; padding: 6px 0; } }
+  @media (max-width: 600px) { .ord-container { padding: 0; } .ord-card { padding: 16px 18px; } }
 
   * { cursor: none !important; }
   @media (max-width: 820px), (hover: none) and (pointer: coarse) {
@@ -138,18 +133,11 @@
       <a href="login.html">Sign In</a>
     </div>
 
-    <div class="ord-content">
-      <div class="ord-tabs" id="ord-tabs">
-        <button class="ord-tab active" data-state="all">All</button>
-        <button class="ord-tab" data-state="pending">Pending</button>
-        <button class="ord-tab" data-state="confirmed">Confirmed</button>
-        <button class="ord-tab" data-state="shipped">Shipped</button>
-        <button class="ord-tab" data-state="delivered">Delivered</button>
+      <div class="ord-content">
+        <div id="ord-list">
+          <div class="ord-empty"><div class="empty-icon">◇</div><p>Loading...</p></div>
+        </div>
       </div>
-      <div id="ord-list">
-        <div class="ord-empty"><div class="empty-icon">◇</div><p>Loading...</p></div>
-      </div>
-    </div>
 
   </div>
 </div>
@@ -258,7 +246,6 @@ document.querySelectorAll('.site-header .sh-nav a, .site-footer .sf-links a').fo
 })();
 
 var allOrders = [];
-var currentState = 'all';
 
 function showToast(msg, type) {
   type = type || 'success';
@@ -291,37 +278,28 @@ async function loadOrders() {
 
 function renderOrders() {
   var list = document.getElementById('ord-list');
-  var filtered = currentState === 'all' ? allOrders : allOrders.filter(function(o) { return (o.fulfillment_status || 'pending') === currentState; });
-  if (!filtered.length) {
-    list.innerHTML = '<div class="ord-empty"><div class="empty-icon">◇</div><p>No ' + (currentState === 'all' ? '' : currentState + ' ') + 'orders yet</p><a href="store.html">Start Shopping</a></div>';
+  if (!allOrders.length) {
+    list.innerHTML = '<div class="ord-empty"><div class="empty-icon">◇</div><p>No orders yet</p><a href="store.html">Start Shopping</a></div>';
     return;
   }
   var html = '';
-  filtered.forEach(function(o, idx) {
+  allOrders.forEach(function(o, idx) {
     var total = o.total ? '₹' + (o.total / 100).toFixed(0) : '—';
     var date = o.created_at ? new Date(o.created_at).toLocaleDateString('en-IN', { year: 'numeric', month: 'short', day: 'numeric' }) : '';
     var status = o.fulfillment_status || 'pending';
     var items = o.order_items || [];
     var itemCount = items.reduce(function(s, i) { return s + (i.quantity || 1); }, 0);
+    var itemsSummary = items.map(function(i) { return i.product_name + (i.size ? ' (' + i.size : '') + (i.colour ? ', ' + i.colour : '') + (i.size || i.colour ? ')' : ''); }).join(', ');
     var orderNum = o.order_number || ('#' + (o.id ? o.id.substring(0,6).toUpperCase() : '000000'));
     html += '<div class="ord-card" style="opacity:0;transform:translateY(10px)">';
     html += '<div class="ord-card-row">';
-    html += '<div class="ord-card-left"><div class="ord-id">' + orderNum + '</div><div class="ord-date">' + date + '</div><div class="ord-meta">' + itemCount + ' item' + (itemCount > 1 ? 's' : '') + '</div></div>';
+    html += '<div class="ord-card-left"><div class="ord-id">' + orderNum + '</div><div class="ord-date">' + date + '</div><div class="ord-meta">' + itemCount + ' item' + (itemCount > 1 ? 's' : '') + (itemsSummary ? '<br><span style="font-size:10px;color:#555">' + itemsSummary + '</span>' : '') + '</div></div>';
     html += '<div class="ord-card-right"><div class="ord-total">' + total + '</div><span class="ord-badge ' + status + '">' + status + '</span></div>';
     html += '</div></div>';
   });
   list.innerHTML = html;
   gsap.to('.ord-card', { opacity: 1, y: 0, duration: 0.4, stagger: 0.05, ease: 'power2.out', overwrite: 'auto' });
 }
-
-document.querySelectorAll('.ord-tab').forEach(function(btn) {
-  btn.addEventListener('click', function() {
-    document.querySelectorAll('.ord-tab').forEach(function(b) { b.classList.remove('active'); });
-    this.classList.add('active');
-    currentState = this.dataset.state;
-    renderOrders();
-  });
-});
 
 loadOrders();
 </script>

@@ -676,7 +676,8 @@ tbody td {
 tbody tr:last-child td { border-bottom: none; }
 tbody tr { transition: background var(--transition-fast); }
 tbody tr:hover td { background: rgba(196,181,253,0.025); }
-.acts { display: flex; gap: 6px; align-items: center; }
+.acts { white-space: nowrap; }
+.acts-inner { display: inline-flex; gap: 6px; align-items: center; }
 
 /* ─── BADGE ─── */
 .badge {
@@ -817,25 +818,61 @@ img.thumb {
   font-family: 'Clash Display', sans-serif;
   transition: var(--transition);
 }
-.fg input:focus, .fg textarea:focus, .fg select:focus {
+.fg input:focus, .fg textarea:focus {
   outline: none;
   border-color: var(--accent);
-  background: rgba(196,181,253,0.05);
   box-shadow: 0 0 20px rgba(196,181,253,0.06);
 }
 .fg textarea { min-height: 80px; resize: vertical; }
 .fg select {
   cursor: pointer;
+  -webkit-appearance: none;
+  -moz-appearance: none;
   appearance: none;
+  background-color: rgba(255,255,255,0.025) !important;
   background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='10' height='6' fill='none'%3E%3Cpath d='M1 1l4 4 4-4' stroke='%23666' stroke-width='1.2' stroke-linecap='round'/%3E%3C/svg%3E");
   background-repeat: no-repeat;
   background-position: right 12px center;
+  background-size: 10px 6px;
   padding-right: 30px;
 }
 .fg select option { background: #0f0a19; color: var(--text); }
-.fg select:focus { background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='10' height='6' fill='none'%3E%3Cpath d='M1 1l4 4 4-4' stroke='%23c4b5fd' stroke-width='1.2' stroke-linecap='round'/%3E%3C/svg%3E"); }
+.fg select:focus {
+  background-color: rgba(196,181,253,0.05) !important;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='10' height='6' fill='none'%3E%3Cpath d='M1 1l4 4 4-4' stroke='%23c4b5fd' stroke-width='1.2' stroke-linecap='round'/%3E%3C/svg%3E");
+  border-color: var(--accent);
+  box-shadow: 0 0 20px rgba(196,181,253,0.06);
+}
 .fr { display: flex; gap: 12px; }
 .fr .fg { flex: 1; }
+
+/* ─── SIZE CHIPS ─── */
+.size-chips { display: flex; flex-wrap: wrap; gap: 8px; }
+.size-chip {
+  display: inline-flex; align-items: center; justify-content: center;
+  min-width: 40px; height: 36px; padding: 0 12px;
+  background: rgba(255,255,255,0.025);
+  border: 1px solid rgba(255,255,255,0.06);
+  border-radius: var(--radius-sm);
+  color: var(--text-dim);
+  font-size: 11px; font-weight: 500;
+  cursor: pointer; user-select: none;
+  transition: var(--transition-fast);
+}
+.size-chip:hover { border-color: rgba(196,181,253,0.3); color: var(--text); }
+.size-chip.selected {
+  background: rgba(196,181,253,0.12);
+  border-color: var(--accent);
+  color: var(--accent);
+  box-shadow: 0 0 12px rgba(196,181,253,0.08);
+}
+.colour-chip .colour-dot { display:inline-block; width:12px; height:12px; border-radius:50%; margin-right:5px; vertical-align:middle; border:1px solid rgba(255,255,255,0.1); }
+.colour-chip .colour-dot.white-dot { border-color:rgba(255,255,255,0.2); }
+
+/* ─── FORM GRID ─── */
+.form-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; }
+.form-grid .fg { margin-bottom: 0; }
+.form-grid .fg.full { grid-column: 1 / -1; }
 .no-data {
   text-align: center;
   color: var(--muted2);
@@ -940,6 +977,7 @@ img.thumb {
 
 <script src="js/api.js"></script>
 <script>
+var COLOUR_MAP = { 'black':'#000000','white':'#ffffff','grey':'#6b7280','gray':'#6b7280','navy':'#1a2744','olive':'#808000','burgundy':'#800020','green':'#166534','blue':'#1d4ed8','red':'#dc2626','brown':'#78350f','beige':'#d6d3c1','cream':'#f5f0e1','pink':'#db2777','purple':'#7c3aed','maroon':'#7f1d1d','tan':'#b8966e','khaki':'#b5a88a','charcoal':'#374151','coral':'#e87968','sage':'#84a98c','mustard':'#eab308','teal':'#0d9488' };
 var adminToken = localStorage.getItem('admin_token');
 
 function esc(s) { var d = document.createElement('div'); d.appendChild(document.createTextNode(s || '')); return d.innerHTML; }
@@ -1063,16 +1101,14 @@ async function renderCollections(c) {
     (!items.length ? '<div class="tbl-wrap"><div class="no-data"><span>◈</span>No collections yet</div></div>' :
     '<div class="tbl-wrap"><table><thead><tr><th>Name</th><th>Slug</th><th>Description</th><th>Actions</th></tr></thead><tbody>' +
     items.map(function(x) {
-      return '<tr><td><strong style="color:rgba(255,255,255,0.85)">' + esc(x.name) + '</strong></td><td style="color:rgba(255,255,255,0.3)">' + esc(x.slug) + '</td><td style="color:rgba(255,255,255,0.45)">' + esc((x.description||'').slice(0,60)) + '</td><td class="acts"><button class="btn btn-sm btn-pri" onclick="openColModal(\'' + x.id + '\')">Edit</button><button class="btn btn-sm btn-del" onclick="delItem(\'collections\',\'' + x.id + '\')">Delete</button></td></tr>';
+      return '<tr><td><strong style="color:rgba(255,255,255,0.85)">' + esc(x.name) + '</strong></td><td style="color:rgba(255,255,255,0.3)">' + esc(x.slug) + '</td><td style="color:rgba(255,255,255,0.45)">' + esc((x.description||'').slice(0,60)) + '</td><td class="acts"><div class="acts-inner"><button class="btn btn-sm btn-pri" onclick="openColModal(\'' + x.id + '\')">Edit</button><button class="btn btn-sm btn-del" onclick="delItem(\'collections\',\'' + x.id + '\')">Delete</button></div></td></tr>';
     }).join('') + '</tbody></table></div>');
 }
 
 function openColModal(id) {
   var h = '<h3>' + (id?'Edit':'Add') + ' Collection</h3><form id="mf">';
   h += '<div class="fg"><label>Name</label><input type="text" id="f-name" required></div>';
-  h += '<div class="fg"><label>Slug</label><input type="text" id="f-slug" required></div>';
   h += '<div class="fg"><label>Description</label><textarea id="f-desc"></textarea></div>';
-  h += '<button type="submit" class="btn btn-pri">Save</button></form>';
   openModal(h);
   if (id) loadCol(id);
   document.getElementById('mf').addEventListener('submit', function(e) { e.preventDefault(); saveCol(id); });
@@ -1084,14 +1120,13 @@ async function loadCol(id) {
   for (var i = 0; i < cols.length; i++) { if (cols[i].id === id) { d = cols[i]; break; } }
   if (!d) return;
   document.getElementById('f-name').value = d.name || '';
-  document.getElementById('f-slug').value = d.slug || '';
   document.getElementById('f-desc').value = d.description || '';
 }
 
 async function saveCol(id) {
   var body = {
     name: document.getElementById('f-name').value,
-    slug: document.getElementById('f-slug').value,
+    slug: document.getElementById('f-name').value.toLowerCase().replace(/[^a-z0-9]+/g,'-').replace(/^-|-$/g,''),
     description: document.getElementById('f-desc').value
   };
   var r = id ? await YARO_API.updateCollection(id, body) : await YARO_API.createCollection(body);
@@ -1108,7 +1143,7 @@ async function renderStories(c) {
     (!items.length ? '<div class="tbl-wrap"><div class="no-data"><span>◇</span>No stories yet</div></div>' :
     '<div class="tbl-wrap"><table><thead><tr><th>Title</th><th>Slug</th><th>Collection</th><th>Actions</th></tr></thead><tbody>' +
     items.map(function(s) {
-      return '<tr><td><strong style="color:rgba(255,255,255,0.85)">' + esc(s.title) + '</strong></td><td style="color:rgba(255,255,255,0.3)">' + esc(s.slug) + '</td><td style="color:rgba(255,255,255,0.45)">' + esc(cm[s.collection_id]||'-') + '</td><td class="acts"><button class="btn btn-sm btn-pri" onclick="openStoryModal(\'' + s.id + '\')">Edit</button><button class="btn btn-sm btn-del" onclick="delItem(\'stories\',\'' + s.id + '\')">Delete</button></td></tr>';
+      return '<tr><td><strong style="color:rgba(255,255,255,0.85)">' + esc(s.title) + '</strong></td><td style="color:rgba(255,255,255,0.3)">' + esc(s.slug) + '</td><td style="color:rgba(255,255,255,0.45)">' + esc(cm[s.collection_id]||'-') + '</td><td class="acts"><div class="acts-inner"><button class="btn btn-sm btn-pri" onclick="openStoryModal(\'' + s.id + '\')">Edit</button><button class="btn btn-sm btn-del" onclick="delItem(\'stories\',\'' + s.id + '\')">Delete</button></div></td></tr>';
     }).join('') + '</tbody></table></div>');
 }
 
@@ -1119,7 +1154,6 @@ async function openStoryModal(id) {
   (Array.isArray(cols)?cols:[]).forEach(function(c) { h += '<option value="' + c.id + '">' + esc(c.name) + '</option>'; });
   h += '</select></div>';
   h += '<div class="fg"><label>Title</label><input type="text" id="f-title" required></div>';
-  h += '<div class="fg"><label>Slug</label><input type="text" id="f-slug" required></div>';
   h += '<div class="fg"><label>Description</label><input type="text" id="f-desc"></div>';
   h += '<div class="fg"><label>Story Content</label><textarea id="f-content"></textarea></div>';
   h += '<button type="submit" class="btn btn-pri">Save</button></form>';
@@ -1135,7 +1169,6 @@ async function loadStory(id) {
   if (!d) return;
   document.getElementById('f-collection').value = d.collection_id || '';
   document.getElementById('f-title').value = d.title || '';
-  document.getElementById('f-slug').value = d.slug || '';
   document.getElementById('f-desc').value = d.description || '';
   document.getElementById('f-content').value = d.story_content || '';
 }
@@ -1144,7 +1177,7 @@ async function saveStory(id) {
   var body = {
     collection_id: document.getElementById('f-collection').value || null,
     title: document.getElementById('f-title').value,
-    slug: document.getElementById('f-slug').value,
+    slug: document.getElementById('f-title').value.toLowerCase().replace(/[^a-z0-9]+/g,'-').replace(/^-|-$/g,''),
     description: document.getElementById('f-desc').value,
     story_content: document.getElementById('f-content').value
   };
@@ -1162,30 +1195,40 @@ async function renderProducts(c) {
     (!items.length ? '<div class="tbl-wrap"><div class="no-data"><span>◉</span>No products yet</div></div>' :
     '<div class="tbl-wrap"><table><thead><tr><th>Image</th><th>Name</th><th>Price</th><th>Stock</th><th>Collection</th><th>Gender</th><th>Status</th><th>Actions</th></tr></thead><tbody>' +
     items.map(function(p) {
-      return '<tr><td>' + (p.images&&p.images[0]?'<img class="thumb" src="'+fixImg(p.images[0])+'">':'-') + '</td><td><strong style="color:rgba(255,255,255,0.85)">' + esc(p.name) + '</strong></td><td>₹' + (p.price||0) + '</td><td>' + (p.stock||0) + '</td><td style="color:rgba(255,255,255,0.45)">' + esc(cm[p.collection_id]||'-') + '</td><td style="color:rgba(255,255,255,0.45)">' + esc(p.gender||'Any') + '</td><td><span class="badge ' + (p.status==='active'?'badge-suc':'badge-warn') + '">' + esc(p.status) + '</span></td><td class="acts"><button class="btn btn-sm btn-pri" onclick="openProdModal(\'' + p.id + '\')">Edit</button><button class="btn btn-sm btn-del" onclick="delItem(\'products\',\'' + p.id + '\')">Delete</button></td></tr>';
+      return '<tr><td>' + (p.images&&p.images[0]?'<img class="thumb" src="'+fixImg(p.images[0])+'">':'-') + '</td><td><strong style="color:rgba(255,255,255,0.85)">' + esc(p.name) + '</strong></td><td>₹' + (p.price||0) + '</td><td>' + (p.stock||0) + '</td><td style="color:rgba(255,255,255,0.45)">' + esc(cm[p.collection_id]||'-') + '</td><td style="color:rgba(255,255,255,0.45)">' + esc(p.gender||'Any') + '</td><td><span class="badge ' + (p.status==='active'?'badge-suc':'badge-warn') + '">' + esc(p.status) + '</span></td><td class="acts"><div class="acts-inner"><button class="btn btn-sm btn-pri" onclick="openProdModal(\'' + p.id + '\')">Edit</button><button class="btn btn-sm btn-del" onclick="delItem(\'products\',\'' + p.id + '\')">Delete</button></div></td></tr>';
     }).join('') + '</tbody></table></div>');
 }
 
 async function openProdModal(id) {
   var cols = await YARO_API.getCollections();
-  var h = '<h3>' + (id?'Edit':'Add') + ' Product</h3><form id="mf">';
-  h += '<div class="fg"><label>Name</label><input type="text" id="f-name" required></div>';
-  h += '<div class="fr"><div class="fg"><label>Collection</label><select id="f-collection"><option value="">None</option>';
+  var h = '<h3>' + (id?'Edit':'Add') + ' Product</h3><form id="mf"><div class="form-grid">';
+  h += '<div class="fg full"><label>Product Name</label><input type="text" id="f-name" required></div>';
+  h += '<div class="fg"><label>Collection</label><select id="f-collection"><option value="">None</option>';
   (Array.isArray(cols)?cols:[]).forEach(function(c) { h += '<option value="' + c.id + '">' + esc(c.name) + '</option>'; });
-  h += '</select></div><div class="fg"><label>Gender</label><select id="f-gender"><option value="Any">Any</option><option value="His">His</option><option value="Hers">Hers</option><option value="Mini">Mini</option><option value="Mini-Gent">Mini-Gent</option><option value="Mini-Lady">Mini-Lady</option></select></div></div>';
-  h += '<div class="fg"><label>Description</label><textarea id="f-desc"></textarea></div>';
-  h += '<div class="fr"><div class="fg"><label>Price (₹)</label><input type="number" id="f-price"></div>';
-  h += '<div class="fg"><label>Original Price</label><input type="number" id="f-oprice"></div></div>';
-  h += '<div class="fr"><div class="fg"><label>Stock</label><input type="number" id="f-stock"></div>';
-  h += '<div class="fg"><label>SKU</label><input type="text" id="f-sku"></div></div>';
-  h += '<div class="fr"><div class="fg"><label>Images</label><input type="text" id="f-images" placeholder="Comma-separated URLs"></div>';
-  h += '<div class="fg"><label>Sizes</label><input type="text" id="f-sizes" placeholder="Comma-separated"></div></div>';
-  h += '<div class="fr"><div class="fg"><label>Badge</label><input type="text" id="f-badge"></div>';
-  h += '<div class="fg"><label>Offer Name</label><input type="text" id="f-offer"></div></div>';
-  h += '<div class="fg"><label>Story Text</label><textarea id="f-story-text"></textarea></div>';
+  h += '</select></div>';
+  h += '<div class="fg"><label>Gender</label><select id="f-gender"><option value="Any">Any</option><option value="His">His</option><option value="Hers">Hers</option><option value="Mini">Mini</option><option value="Mini-Gent">Mini-Gent</option><option value="Mini-Lady">Mini-Lady</option></select></div>';
+  h += '<div class="fg full"><label>Description</label><textarea id="f-desc"></textarea></div>';
+  h += '<div class="fg"><label>Price (₹)</label><input type="number" id="f-price"></div>';
+  h += '<div class="fg"><label>Original Price</label><input type="number" id="f-oprice"></div>';
+  h += '<div class="fg"><label>Stock</label><input type="number" id="f-stock"></div>';
+  h += '<div class="fg"><label>SKU</label><input type="text" id="f-sku"></div>';
+  h += '<div class="fg full"><label>Images</label><input type="text" id="f-images" placeholder="Comma-separated URLs"></div>';
+  h += '<div class="fg full"><label>Sizes</label><div class="size-chips" id="f-sizes">' + ['S','M','L','XL','2XL','3XL'].map(function(s){return '<span class="size-chip" data-size="'+s+'">'+s+'</span>'}).join('') + '</div></div>';
+  h += '<div class="fg full"><label>Colours</label><div class="size-chips" id="f-colours">' + ['Black','White','Grey','Navy','Olive','Beige','Green','Blue','Red','Pink','Purple','Brown','Charcoal','Cream','Burgundy','Teal','Sage','Coral','Khaki','Tan'].map(function(c){var bg=COLOUR_MAP[c.toLowerCase()]||c;var wc=c.toLowerCase()==='white'?' white-dot':'';return '<span class="size-chip colour-chip" data-colour="'+c+'"><span class="colour-dot'+wc+'" style="background:'+bg+'"></span>'+c+'</span>'}).join('') + '</div></div>';
+  h += '<div class="fg"><label>Badge</label><input type="text" id="f-badge"></div>';
+  h += '<div class="fg"><label>Offer Name</label><input type="text" id="f-offer"></div>';
+  h += '<div class="fg full"><label>Story Text</label><textarea id="f-story-text"></textarea></div>';
   h += '<div class="fg"><label>Status</label><select id="f-status"><option value="active">Active</option><option value="draft">Draft</option></select></div>';
-  h += '<button type="submit" class="btn btn-pri">Save</button></form>';
+  h += '<div class="fg" style="display:flex;align-items:flex-end"><button type="submit" class="btn btn-pri" style="width:100%">Save</button></div>';
+  h += '</div></form>';
   openModal(h);
+  document.getElementById('f-sizes').addEventListener('click', function(e) {
+    if (e.target.classList.contains('size-chip')) e.target.classList.toggle('selected');
+  });
+  document.getElementById('f-colours').addEventListener('click', function(e) {
+    var chip = e.target.closest('.colour-chip');
+    if (chip) chip.classList.toggle('selected');
+  });
   if (id) loadProd(id);
   document.getElementById('mf').addEventListener('submit', function(e) { e.preventDefault(); saveProd(id); });
 }
@@ -1203,7 +1246,14 @@ async function loadProd(id) {
   document.getElementById('f-stock').value = d.stock || '';
   document.getElementById('f-sku').value = d.sku || '';
   document.getElementById('f-images').value = (d.images||[]).join(', ');
-  document.getElementById('f-sizes').value = (d.sizes||[]).join(', ');
+  var sizes = d.sizes || [];
+  document.querySelectorAll('#f-sizes .size-chip').forEach(function(chip) {
+    if (sizes.indexOf(chip.getAttribute('data-size')) >= 0) chip.classList.add('selected');
+  });
+  var colours = d.colours || [];
+  document.querySelectorAll('#f-colours .colour-chip').forEach(function(chip) {
+    if (colours.indexOf(chip.getAttribute('data-colour')) >= 0) chip.classList.add('selected');
+  });
   document.getElementById('f-gender').value = d.gender || 'Any';
   document.getElementById('f-badge').value = d.badge || '';
   document.getElementById('f-offer').value = d.offer_name || '';
@@ -1222,7 +1272,8 @@ async function saveProd(id) {
     stock: parseInt(document.getElementById('f-stock').value) || 0,
     sku: document.getElementById('f-sku').value,
     images: document.getElementById('f-images').value.split(',').map(function(s){return s.trim()}).filter(Boolean),
-    sizes: document.getElementById('f-sizes').value.split(',').map(function(s){return s.trim()}).filter(Boolean),
+    sizes: Array.from(document.querySelectorAll('#f-sizes .size-chip.selected')).map(function(c){return c.getAttribute('data-size')}),
+    colours: Array.from(document.querySelectorAll('#f-colours .colour-chip.selected')).map(function(c){return c.getAttribute('data-colour')}),
     gender: document.getElementById('f-gender').value,
     badge: document.getElementById('f-badge').value,
     offer_name: document.getElementById('f-offer').value,
@@ -1242,7 +1293,7 @@ async function renderOrders(c) {
     (!items.length ? '<div class="tbl-wrap"><div class="no-data"><span>◻</span>No orders yet</div></div>' :
     '<div class="tbl-wrap"><table><thead><tr><th>Order</th><th>Customer</th><th>Total</th><th>Payment</th><th>Fulfillment</th><th>Date</th><th>Actions</th></tr></thead><tbody>' +
     items.map(function(o) {
-      return '<tr><td><strong style="color:rgba(255,255,255,0.85)">' + esc(o.order_number) + '</strong></td><td style="color:rgba(255,255,255,0.45)">' + esc(o.user_id||'-') + '</td><td>₹' + ((o.total||0)/100).toFixed(2) + '</td><td><span class="badge ' + (o.payment_status==='confirmed'?'badge-suc':o.payment_status==='failed'?'badge-dng':'badge-warn') + '">' + esc(o.payment_status) + '</span></td><td><span class="badge ' + (o.fulfillment_status==='shipped'||o.fulfillment_status==='delivered'?'badge-suc':'badge-warn') + '">' + esc(o.fulfillment_status) + '</span></td><td style="color:rgba(255,255,255,0.3)">' + (o.created_at?new Date(o.created_at).toLocaleDateString():'-') + '</td><td class="acts"><button class="btn btn-sm btn-pri" onclick="updateOrder(\'' + o.id + '\')">Update</button></td></tr>';
+      return '<tr><td><strong style="color:rgba(255,255,255,0.85)">' + esc(o.order_number) + '</strong></td><td style="color:rgba(255,255,255,0.45)">' + esc(o.user_id||'-') + '</td><td>₹' + ((o.total||0)/100).toFixed(2) + '</td><td><span class="badge ' + (o.payment_status==='confirmed'?'badge-suc':o.payment_status==='failed'?'badge-dng':'badge-warn') + '">' + esc(o.payment_status) + '</span></td><td><span class="badge ' + (o.fulfillment_status==='shipped'||o.fulfillment_status==='delivered'?'badge-suc':'badge-warn') + '">' + esc(o.fulfillment_status) + '</span></td><td style="color:rgba(255,255,255,0.3)">' + (o.created_at?new Date(o.created_at).toLocaleDateString():'-') + '</td><td class="acts"><div class="acts-inner"><button class="btn btn-sm btn-pri" onclick="updateOrder(\'' + o.id + '\')">Update</button></div></td></tr>';
     }).join('') + '</tbody></table></div>');
 }
 

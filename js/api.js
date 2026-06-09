@@ -273,6 +273,10 @@ const YARO_API = (function() {
       return sbInsert('orders', data);
     },
 
+    async createOrderItems(items) {
+      return sbInsert('order_items', items);
+    },
+
     // ── Cart (localStorage) ──
     async getCart() {
       return getCartFromStorage();
