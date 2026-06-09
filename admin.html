@@ -1062,7 +1062,17 @@ function closeSidebar() {
 }
 
 // ─── AUTH ───
-if (adminToken) { showApp(); loadPage('dashboard'); }
+(async function() {
+  if (adminToken) {
+    var valid = await YARO_API.verifyToken();
+    if (valid) { showApp(); loadPage('dashboard'); return; }
+    localStorage.removeItem('admin_token');
+    localStorage.removeItem('sb_token');
+    localStorage.removeItem('sb_refresh');
+    localStorage.removeItem('sb_user');
+    adminToken = null;
+  }
+})();
 
 document.getElementById('adm-login-btn').addEventListener('click', async function() {
   var email = document.getElementById('adm-email').value.trim();

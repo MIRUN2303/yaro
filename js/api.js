@@ -194,6 +194,16 @@ const YARO_API = (function() {
     setToken: function(t) {},
     getToken: function() { return getStoredToken(); },
     clearToken: function() { authToken = null; authUser = null; localStorage.removeItem('sb_token'); localStorage.removeItem('sb_refresh'); localStorage.removeItem('sb_user'); },
+    verifyToken: async function() {
+      try {
+        var t = getStoredToken();
+        if (!t) return false;
+        var res = await fetch(SUPABASE_URL + '/auth/v1/user', {
+          headers: { 'apikey': SUPABASE_ANON_KEY, 'Authorization': 'Bearer ' + t }
+        });
+        return res.ok;
+      } catch(e) { return false; }
+    },
 
     // ── Products ──
     async getProducts() {
