@@ -1290,10 +1290,9 @@ async function openProdModal(id) {
   h += '<div class="fg"><label>Original Price</label><input type="number" id="f-oprice"></div>';
   h += '<div class="fg"><label>Stock</label><input type="number" id="f-stock"></div>';
   h += '<div class="fg"><label>SKU</label><input type="text" id="f-sku"></div>';
-  h += '<div class="fg full"><label>Default Images (fallback)</label><div class="img-grid" id="f-images-grid"></div><div class="img-drop-zone" id="f-drop-zone"><span>+ Click or drag images here</span><small>Supports JPG, PNG, WebP</small></div><input type="file" id="f-image-file" accept="image/*" style="display:none"><p id="f-images-err" style="font-size:10px;color:#f87171;margin-top:4px;display:none"></p></div>';
   h += '<div class="fg full"><label>Sizes</label><div class="size-chips" id="f-sizes">' + ['S','M','L','XL','2XL','3XL'].map(function(s){return '<span class="size-chip" data-size="'+s+'">'+s+'</span>'}).join('') + '</div></div>';
   h += '<div class="fg full"><label>Colours</label><div class="size-chips" id="f-colours">' + ['Black','White','Grey','Navy','Olive','Beige','Green','Blue','Red','Pink','Purple','Brown','Charcoal','Cream','Burgundy','Teal','Sage','Coral','Khaki','Tan'].map(function(c){var bg=COLOUR_MAP[c.toLowerCase()]||c;var wc=c.toLowerCase()==='white'?' white-dot':'';return '<span class="size-chip colour-chip" data-colour="'+c+'"><span class="colour-dot'+wc+'" style="background:'+bg+'"></span>'+c+'</span>'}).join('') + '</div></div>';
-  h += '<div class="fg full" id="f-colour-section-wrap" style="display:none"><label>Colour Images</label><div id="f-colour-sections"></div></div>';
+  h += '<div class="fg full" id="f-colour-section-wrap" style="display:none"><label>Colour Images (required)</label><div id="f-colour-sections"></div></div>';
   h += '<div class="fg"><label>Badge</label><input type="text" id="f-badge"></div>';
   h += '<div class="fg"><label>Offer Name</label><input type="text" id="f-offer"></div>';
   h += '<div class="fg full"><label>Story Text</label><textarea id="f-story-text"></textarea></div>';
@@ -1309,7 +1308,7 @@ async function openProdModal(id) {
     if (chip) chip.classList.toggle('selected');
     renderColourSections();
   });
-  if (id) loadProd(id); else { window._editImages = []; window._colourData = {}; renderImageGrid(); renderColourSections(); }
+  if (id) loadProd(id); else { window._colourData = {}; renderColourSections(); }
   document.getElementById('mf').addEventListener('submit', function(e) { e.preventDefault(); saveProd(id); });
 }
 
@@ -1325,8 +1324,6 @@ async function loadProd(id) {
   document.getElementById('f-oprice').value = d.original_price || '';
   document.getElementById('f-stock').value = d.stock || '';
   document.getElementById('f-sku').value = d.sku || '';
-  window._editImages = (d.images || []).slice(0,10);
-  renderImageGrid();
   var sizes = d.sizes || [];
   document.querySelectorAll('#f-sizes .size-chip').forEach(function(chip) {
     if (sizes.indexOf(chip.getAttribute('data-size')) >= 0) chip.classList.add('selected');
@@ -1354,7 +1351,7 @@ async function saveProd(id) {
     original_price: parseInt(document.getElementById('f-oprice').value) || null,
     stock: parseInt(document.getElementById('f-stock').value) || 0,
     sku: document.getElementById('f-sku').value,
-    images: window._editImages || [],
+    images: [],
     sizes: Array.from(document.querySelectorAll('#f-sizes .size-chip.selected')).map(function(c){return c.getAttribute('data-size')}),
     colours: Array.from(document.querySelectorAll('#f-colours .colour-chip.selected')).map(function(c){return c.getAttribute('data-colour')}),
     gender: document.getElementById('f-gender').value,
@@ -1377,113 +1374,6 @@ async function saveProd(id) {
   if (r.error) { showToast('Error: ' + (r.error.message || typeof r.error === 'string' ? r.error : JSON.stringify(r.error)), 'error'); return; }
   closeModal(); loadPage('products');
 }
-
-// ─── IMAGE UPLOAD (with drag & drop) ───
-var _dragIdx = null;
-function renderImageGrid() {
-  var grid = document.getElementById('f-images-grid');
-  if (!grid) return;
-  var imgs = window._editImages || [];
-  grid.innerHTML = imgs.map(function(url, i) {
-    return '<div class="img-item" draggable="true" data-idx="' + i + '"><span class="img-idx">' + (i+1) + '</span><img src="' + url + '"><div class="img-ovr">' +
-      (i > 0 ? '<button type="button" class="img-mv" onclick="moveImage(' + i + ',' + (i-1) + ')">▲</button>' : '') +
-      (i < imgs.length - 1 ? '<button type="button" class="img-mv" onclick="moveImage(' + i + ',' + (i+1) + ')">▼</button>' : '') +
-      '<button type="button" class="img-rm" onclick="removeImage(' + i + ')">✕</button></div></div>';
-  }).join('');
-  // Attach drag & drop listeners
-  Array.from(grid.children).forEach(function(el) {
-    el.addEventListener('dragstart', function(e) {
-      _dragIdx = parseInt(el.dataset.idx);
-      el.classList.add('dragging');
-      e.dataTransfer.effectAllowed = 'move';
-    });
-    el.addEventListener('dragend', function() {
-      el.classList.remove('dragging');
-      grid.querySelectorAll('.drag-over').forEach(function(d) { d.classList.remove('drag-over'); });
-      _dragIdx = null;
-    });
-    el.addEventListener('dragover', function(e) { e.preventDefault(); e.dataTransfer.dropEffect = 'move'; });
-    el.addEventListener('dragenter', function() { el.classList.add('drag-over'); });
-    el.addEventListener('dragleave', function() { el.classList.remove('drag-over'); });
-    el.addEventListener('drop', function(e) {
-      e.preventDefault();
-      el.classList.remove('drag-over');
-      var toIdx = parseInt(el.dataset.idx);
-      if (_dragIdx !== null && _dragIdx !== toIdx) moveImage(_dragIdx, toIdx);
-    });
-  });
-}
-
-function moveImage(from, to) {
-  var imgs = window._editImages;
-  var tmp = imgs[from];
-  imgs[from] = imgs[to];
-  imgs[to] = tmp;
-  renderImageGrid();
-}
-
-function removeImage(idx) {
-  window._editImages.splice(idx, 1);
-  renderImageGrid();
-}
-
-async function uploadSelectedFile(file) {
-  if (!file) return;
-  var errEl = document.getElementById('f-images-err');
-  if ((window._editImages || []).length >= 10) {
-    if (errEl) { errEl.textContent = 'Maximum 10 images allowed'; errEl.style.display = 'block'; }
-    return;
-  }
-  if (errEl) errEl.style.display = 'none';
-  var dz = document.getElementById('f-drop-zone');
-  if (dz) { dz.innerHTML = '<span>Uploading…</span>'; dz.style.pointerEvents = 'none'; }
-  var result = await YARO_API.uploadImage(file);
-  if (dz) { dz.innerHTML = '<span>+ Click or drag images here</span><small>Supports JPG, PNG, WebP</small>'; dz.style.pointerEvents = ''; }
-  if (result.error) {
-    if (errEl) { errEl.textContent = 'Upload failed: ' + (result.error.message || result.error); errEl.style.display = 'block'; }
-    return;
-  }
-  window._editImages.push(result.url);
-  renderImageGrid();
-}
-
-document.addEventListener('click', function(e) {
-  var dz = e.target.closest('#f-drop-zone');
-  if (dz) {
-    var fileInput = document.getElementById('f-image-file');
-    if (fileInput) fileInput.click();
-  }
-});
-
-document.addEventListener('change', async function(e) {
-  if (e.target && e.target.id === 'f-image-file') {
-    var file = e.target.files && e.target.files[0];
-    e.target.value = '';
-    await uploadSelectedFile(file);
-  }
-});
-
-// Drag-and-drop on the drop zone
-document.addEventListener('dragenter', function(e) {
-  var dz = e.target.closest('#f-drop-zone');
-  if (dz) { e.preventDefault(); dz.classList.add('drag-over'); }
-});
-document.addEventListener('dragover', function(e) {
-  var dz = e.target.closest('#f-drop-zone');
-  if (dz) { e.preventDefault(); }
-});
-document.addEventListener('dragleave', function(e) {
-  var dz = e.target.closest('#f-drop-zone');
-  if (dz && !dz.contains(e.relatedTarget)) dz.classList.remove('drag-over');
-});
-document.addEventListener('drop', async function(e) {
-  var dz = e.target.closest('#f-drop-zone');
-  if (!dz) return;
-  e.preventDefault();
-  dz.classList.remove('drag-over');
-  var files = e.dataTransfer.files;
-  if (files && files.length) await uploadSelectedFile(files[0]);
-});
 
 // ─── COLOUR-SPECIFIC IMAGES ───
 function renderColourSections() {

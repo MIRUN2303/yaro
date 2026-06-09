@@ -2299,7 +2299,17 @@
         activeProduct = productsDB.find(function(p) { return p.id === productId; });
         if (!activeProduct) activeProduct = productsDB[0];
         // Re-render the page with updated data
-        productImages = [activeProduct.image, ...activeProduct.additionalImages];
+        var firstColourImgs = null;
+        if (activeProduct.colourData) {
+          var ckeys = Object.keys(activeProduct.colourData);
+          for (var ci = 0; ci < ckeys.length; ci++) {
+            if (activeProduct.colourData[ckeys[ci]] && activeProduct.colourData[ckeys[ci]].length) {
+              firstColourImgs = activeProduct.colourData[ckeys[ci]];
+              break;
+            }
+          }
+        }
+        productImages = firstColourImgs || [activeProduct.image, ...activeProduct.additionalImages];
         activeImageIndex = 0;
         renderGallery();
         categoryLabel.textContent = activeProduct.category;
@@ -2408,7 +2418,16 @@
       if (colourImgs && Array.isArray(colourImgs) && colourImgs.length) {
         productImages = colourImgs;
       } else {
-        productImages = [activeProduct.image, ...activeProduct.additionalImages];
+        // fallback: try any other colour's images
+        var fallbackImgs = null;
+        var ckeys = Object.keys(activeProduct.colourData);
+        for (var ci = 0; ci < ckeys.length; ci++) {
+          if (ckeys[ci] !== colour && activeProduct.colourData[ckeys[ci]] && activeProduct.colourData[ckeys[ci]].length) {
+            fallbackImgs = activeProduct.colourData[ckeys[ci]];
+            break;
+          }
+        }
+        productImages = fallbackImgs || [activeProduct.image, ...activeProduct.additionalImages];
       }
       activeImageIndex = 0;
       renderGallery();
