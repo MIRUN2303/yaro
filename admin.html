@@ -750,6 +750,8 @@ img.thumb {
 }
 .img-grid .img-item .img-mv { background: rgba(255,255,255,0.15); color: #fff; }
 .img-grid .img-item .img-rm { background: rgba(239,68,68,0.85); color: #fff; }
+.img-grid .img-item.dragging { opacity: 0.3; }
+.img-grid .img-item.drag-over { border-color: var(--accent); box-shadow: 0 0 0 2px var(--accent-dim); }
 
 /* ─── MODAL ─── */
 .modal-overlay {
@@ -1338,17 +1340,40 @@ async function saveProd(id) {
   closeModal(); loadPage('products');
 }
 
-// ─── IMAGE UPLOAD ───
+// ─── IMAGE UPLOAD (with drag & drop) ───
+var _dragIdx = null;
 function renderImageGrid() {
   var grid = document.getElementById('f-images-grid');
   if (!grid) return;
   var imgs = window._editImages || [];
   grid.innerHTML = imgs.map(function(url, i) {
-    return '<div class="img-item"><span class="img-idx">' + (i+1) + '</span><img src="' + url + '"><div class="img-ovr">' +
+    return '<div class="img-item" draggable="true" data-idx="' + i + '"><span class="img-idx">' + (i+1) + '</span><img src="' + url + '"><div class="img-ovr">' +
       (i > 0 ? '<button type="button" class="img-mv" onclick="moveImage(' + i + ',' + (i-1) + ')">▲</button>' : '') +
       (i < imgs.length - 1 ? '<button type="button" class="img-mv" onclick="moveImage(' + i + ',' + (i+1) + ')">▼</button>' : '') +
       '<button type="button" class="img-rm" onclick="removeImage(' + i + ')">✕</button></div></div>';
   }).join('');
+  // Attach drag & drop listeners
+  Array.from(grid.children).forEach(function(el) {
+    el.addEventListener('dragstart', function(e) {
+      _dragIdx = parseInt(el.dataset.idx);
+      el.classList.add('dragging');
+      e.dataTransfer.effectAllowed = 'move';
+    });
+    el.addEventListener('dragend', function() {
+      el.classList.remove('dragging');
+      grid.querySelectorAll('.drag-over').forEach(function(d) { d.classList.remove('drag-over'); });
+      _dragIdx = null;
+    });
+    el.addEventListener('dragover', function(e) { e.preventDefault(); e.dataTransfer.dropEffect = 'move'; });
+    el.addEventListener('dragenter', function() { el.classList.add('drag-over'); });
+    el.addEventListener('dragleave', function() { el.classList.remove('drag-over'); });
+    el.addEventListener('drop', function(e) {
+      e.preventDefault();
+      el.classList.remove('drag-over');
+      var toIdx = parseInt(el.dataset.idx);
+      if (_dragIdx !== null && _dragIdx !== toIdx) moveImage(_dragIdx, toIdx);
+    });
+  });
 }
 
 function moveImage(from, to) {
