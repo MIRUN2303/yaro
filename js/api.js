@@ -172,13 +172,23 @@ const YARO_API = (function() {
         await this.signOut();
         return { error: 'Not authorized as admin' };
       }
-      if (result.user) localStorage.setItem('admin_token', result.session.access_token);
+      if (result.user) {
+        localStorage.setItem('admin_token', result.session.access_token);
+        try { sessionStorage.setItem('admin_pass', password); } catch(e) {}
+      }
       return result;
     },
 
     async adminLogout() {
       localStorage.removeItem('admin_token');
+      try { sessionStorage.removeItem('admin_pass'); } catch(e) {}
       return this.signOut();
+    },
+
+    checkAdminPassword(pwd) {
+      var stored = null;
+      try { stored = sessionStorage.getItem('admin_pass'); } catch(e) {}
+      return stored && stored === pwd;
     },
 
     setToken: function(t) {},
