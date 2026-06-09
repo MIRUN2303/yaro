@@ -232,7 +232,7 @@
       btn.classList.add('loading');
       btn.disabled = true;
       try {
-        var data = await YARO_API.login(email, password);
+        var data = await YARO_API.signIn(email, password);
         if (data && data.user) {
           if (data.user.email && data.user.email === 'yarodrops@gmail.com') {
             try { localStorage.setItem('admin_token', data.session.access_token); } catch(e) {}
