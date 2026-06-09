@@ -752,6 +752,20 @@ img.thumb {
 .img-grid .img-item .img-rm { background: rgba(239,68,68,0.85); color: #fff; }
 .img-grid .img-item.dragging { opacity: 0.3; }
 .img-grid .img-item.drag-over { border-color: var(--accent); box-shadow: 0 0 0 2px var(--accent-dim); }
+.img-drop-zone {
+  border: 1.5px dashed rgba(255,255,255,0.12);
+  border-radius: 10px;
+  padding: 24px 16px;
+  text-align: center;
+  cursor: pointer;
+  transition: var(--transition-fast);
+  margin-top: 10px;
+  background: var(--surface);
+}
+.img-drop-zone:hover { border-color: var(--accent); background: var(--surface-hover); }
+.img-drop-zone.drag-over { border-color: var(--accent); background: var(--accent-dim); }
+.img-drop-zone span { font-size: 12px; color: var(--text-dim); }
+.img-drop-zone small { display: block; font-size: 10px; color: var(--muted); margin-top: 4px; }
 
 /* ─── MODAL ─── */
 .modal-overlay {
@@ -1276,7 +1290,7 @@ async function openProdModal(id) {
   h += '<div class="fg"><label>Original Price</label><input type="number" id="f-oprice"></div>';
   h += '<div class="fg"><label>Stock</label><input type="number" id="f-stock"></div>';
   h += '<div class="fg"><label>SKU</label><input type="text" id="f-sku"></div>';
-  h += '<div class="fg full"><label>Images (max 10)</label><div class="img-grid" id="f-images-grid"></div><div style="display:flex;gap:8px;margin-top:8px"><button type="button" class="btn btn-sm btn-pri" id="f-add-image-btn">+ Upload Image</button><input type="file" id="f-image-file" accept="image/*" style="display:none"></div><p id="f-images-err" style="font-size:10px;color:#f87171;margin-top:4px;display:none"></p></div>';
+  h += '<div class="fg full"><label>Images (max 10)</label><div class="img-grid" id="f-images-grid"></div><div class="img-drop-zone" id="f-drop-zone"><span>+ Click or drag images here</span><small>Supports JPG, PNG, WebP</small></div><input type="file" id="f-image-file" accept="image/*" style="display:none"><p id="f-images-err" style="font-size:10px;color:#f87171;margin-top:4px;display:none"></p></div>';
   h += '<div class="fg full"><label>Sizes</label><div class="size-chips" id="f-sizes">' + ['S','M','L','XL','2XL','3XL'].map(function(s){return '<span class="size-chip" data-size="'+s+'">'+s+'</span>'}).join('') + '</div></div>';
   h += '<div class="fg full"><label>Colours</label><div class="size-chips" id="f-colours">' + ['Black','White','Grey','Navy','Olive','Beige','Green','Blue','Red','Pink','Purple','Brown','Charcoal','Cream','Burgundy','Teal','Sage','Coral','Khaki','Tan'].map(function(c){var bg=COLOUR_MAP[c.toLowerCase()]||c;var wc=c.toLowerCase()==='white'?' white-dot':'';return '<span class="size-chip colour-chip" data-colour="'+c+'"><span class="colour-dot'+wc+'" style="background:'+bg+'"></span>'+c+'</span>'}).join('') + '</div></div>';
   h += '<div class="fg"><label>Badge</label><input type="text" id="f-badge"></div>';
@@ -1399,8 +1413,29 @@ function removeImage(idx) {
   renderImageGrid();
 }
 
+async function uploadSelectedFile(file) {
+  if (!file) return;
+  var errEl = document.getElementById('f-images-err');
+  if ((window._editImages || []).length >= 10) {
+    if (errEl) { errEl.textContent = 'Maximum 10 images allowed'; errEl.style.display = 'block'; }
+    return;
+  }
+  if (errEl) errEl.style.display = 'none';
+  var dz = document.getElementById('f-drop-zone');
+  if (dz) { dz.innerHTML = '<span>Uploading…</span>'; dz.style.pointerEvents = 'none'; }
+  var result = await YARO_API.uploadImage(file);
+  if (dz) { dz.innerHTML = '<span>+ Click or drag images here</span><small>Supports JPG, PNG, WebP</small>'; dz.style.pointerEvents = ''; }
+  if (result.error) {
+    if (errEl) { errEl.textContent = 'Upload failed: ' + (result.error.message || result.error); errEl.style.display = 'block'; }
+    return;
+  }
+  window._editImages.push(result.url);
+  renderImageGrid();
+}
+
 document.addEventListener('click', function(e) {
-  if (e.target && e.target.id === 'f-add-image-btn') {
+  var dz = e.target.closest('#f-drop-zone');
+  if (dz) {
     var fileInput = document.getElementById('f-image-file');
     if (fileInput) fileInput.click();
   }
@@ -1409,26 +1444,31 @@ document.addEventListener('click', function(e) {
 document.addEventListener('change', async function(e) {
   if (e.target && e.target.id === 'f-image-file') {
     var file = e.target.files && e.target.files[0];
-    if (!file) return;
-    var errEl = document.getElementById('f-images-err');
-    if ((window._editImages || []).length >= 10) {
-      if (errEl) { errEl.textContent = 'Maximum 10 images allowed'; errEl.style.display = 'block'; }
-      e.target.value = '';
-      return;
-    }
-    if (errEl) errEl.style.display = 'none';
-    var btn = document.getElementById('f-add-image-btn');
-    btn.textContent = 'Uploading...'; btn.disabled = true;
-    var result = await YARO_API.uploadImage(file);
-    btn.textContent = '+ Upload Image'; btn.disabled = false;
     e.target.value = '';
-    if (result.error) {
-      if (errEl) { errEl.textContent = 'Upload failed: ' + (result.error.message || result.error); errEl.style.display = 'block'; }
-      return;
-    }
-    window._editImages.push(result.url);
-    renderImageGrid();
+    await uploadSelectedFile(file);
   }
+});
+
+// Drag-and-drop on the drop zone
+document.addEventListener('dragenter', function(e) {
+  var dz = e.target.closest('#f-drop-zone');
+  if (dz) { e.preventDefault(); dz.classList.add('drag-over'); }
+});
+document.addEventListener('dragover', function(e) {
+  var dz = e.target.closest('#f-drop-zone');
+  if (dz) { e.preventDefault(); }
+});
+document.addEventListener('dragleave', function(e) {
+  var dz = e.target.closest('#f-drop-zone');
+  if (dz && !dz.contains(e.relatedTarget)) dz.classList.remove('drag-over');
+});
+document.addEventListener('drop', async function(e) {
+  var dz = e.target.closest('#f-drop-zone');
+  if (!dz) return;
+  e.preventDefault();
+  dz.classList.remove('drag-over');
+  var files = e.dataTransfer.files;
+  if (files && files.length) await uploadSelectedFile(files[0]);
 });
 
 // ─── PASSWORD CONFIRM MODAL ───
