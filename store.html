@@ -2236,7 +2236,7 @@ background: url("data:image/svg+xml,%3Csvg viewBox='0 0 400 400' xmlns='http://w
           }
           html += '<a href="product.html?id=' + slug + '" class="product-card" data-collection="' + cat + '">';
           html += '<div class="prod-image"><div class="prod-image-inner">';
-          html += '<img src="' + img + '" alt="' + name + '" class="prod-img-element" loading="lazy" onerror="this.parentElement.innerHTML=\'<span class=\\\\\'no-img\\\\\' style=\\\\\'display:flex;align-items:center;justify-content:center;height:100%;color:rgba(255,255,255,0.15);font-size:28px;font-weight:300\\\\\'\\\\\'>✕</span>\'">';
+          html += '<img src="' + img + '" alt="' + name + '" class="prod-img-element" loading="lazy" onerror="this.style.display=\'none\'">';
           html += '</div>';
           if (badge) html += '<span class="prod-badge ' + badgeClass + '">' + badge + '</span>';
           if (p.gender) {
