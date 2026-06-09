@@ -27,10 +27,11 @@ const YARO_API = (function() {
   ];
 
   // ─── SUPABASE HELPERS ───
-  function headers(token) {
+  function headers(token, prefer) {
     var h = { 'apikey': SUPABASE_ANON_KEY, 'Content-Type': 'application/json' };
     var t = token || authToken || localStorage.getItem('sb_token');
     if (t) h['Authorization'] = 'Bearer ' + t;
+    if (prefer) h['Prefer'] = prefer;
     return h;
   }
 
@@ -65,9 +66,10 @@ const YARO_API = (function() {
       var url = SUPABASE_URL + '/rest/v1/' + table;
       if (filter) url += '?' + filter;
       var t = getStoredToken();
+      var pref = (method === 'POST' || method === 'PATCH') ? 'return=representation' : null;
       var res = await fetch(url, {
         method: method,
-        headers: headers(t),
+        headers: headers(t, pref),
         body: body ? JSON.stringify(body) : undefined
       });
       if (!res.ok) {
@@ -75,7 +77,8 @@ const YARO_API = (function() {
         return { error: err };
       }
       if (method === 'DELETE') return { success: true };
-      return res.json();
+      var text = await res.text();
+      return text ? JSON.parse(text) : { success: true };
     } catch(e) { return { error: e.message }; }
   }
 
