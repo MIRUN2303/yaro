@@ -1878,7 +1878,7 @@
           <!-- Left Side: Interactive Gallery & Mockup Uploader -->
           <div class="prod-gallery-wrap">
             <div class="main-showcase" id="main-showcase">
-              <img src="" alt="" id="showcase-img">
+              <img src="" alt="" id="showcase-img" onerror="this.alt='Image unavailable'">
               <div class="showcase-rating" id="showcase-rating"></div>
               <button class="img-arrow -prev" id="img-prev" title="Previous">❮</button>
               <button class="img-arrow -next" id="img-next" title="Next">❯</button>
@@ -2284,10 +2284,10 @@
             offerName: p.offer_name || '',
             badge: p.badge || '',
             badgeClass: p.badge_class || '',
-            image: (p.images && p.images[0]) || p.image || '',
+            image: (Array.isArray(p.images) && p.images[0]) || (typeof p.images === 'string' ? p.images : '') || p.image || '',
             story: p.story_text || '',
             desc: p.description || '',
-            additionalImages: p.images ? p.images.slice(1) : [],
+            additionalImages: Array.isArray(p.images) ? p.images.slice(1) : [],
             sizes: p.sizes || ['S','M','L','XL','XXL'],
             colours: p.colours || [],
             stock: p.stock || 0,
@@ -2410,7 +2410,7 @@
         const card = document.createElement('div');
         card.className = `thumb-card ${index === activeImageIndex ? 'active' : ''}`;
 
-        card.innerHTML = `<img src="${imgSrc}" alt="${activeProduct.name} Thumbnail">`;
+        card.innerHTML = `<img src="${imgSrc}" alt="${activeProduct.name} Thumbnail" onerror="this.style.display='none'">`;
 
         // Click handler to select image
         card.addEventListener('click', () => selectImage(index));
@@ -2421,6 +2421,7 @@
       // Update Showcase
       showcaseImg.src = productImages[activeImageIndex];
       showcaseImg.alt = activeProduct.name;
+      showcaseImg.onerror = function() { this.style.opacity = '0.15'; this.src = ''; };
     }
 
     function selectImage(index) {

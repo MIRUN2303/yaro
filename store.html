@@ -2220,7 +2220,14 @@ background: url("data:image/svg+xml,%3Csvg viewBox='0 0 400 400' xmlns='http://w
           var origPrice = p.original_price ? '₹' + p.original_price : (p.originalPrice || '');
           var badge = p.badge || '';
           var badgeClass = p.badge_class || '';
-          var img = (p.images && p.images[0]) || p.image || '';
+          var img = '';
+          if (p.images && Array.isArray(p.images) && p.images.length) {
+            img = p.images[0];
+          } else if (typeof p.images === 'string') {
+            img = p.images;
+          } else if (p.image) {
+            img = p.image;
+          }
           var stars = '★★★★★';
           var offTag = '';
           if (p.original_price && p.price) {
@@ -2229,7 +2236,7 @@ background: url("data:image/svg+xml,%3Csvg viewBox='0 0 400 400' xmlns='http://w
           }
           html += '<a href="product.html?id=' + slug + '" class="product-card" data-collection="' + cat + '">';
           html += '<div class="prod-image"><div class="prod-image-inner">';
-          html += '<img src="' + img + '" alt="' + name + '" class="prod-img-element" loading="lazy">';
+          html += '<img src="' + img + '" alt="' + name + '" class="prod-img-element" loading="lazy" onerror="this.parentElement.innerHTML=\'<span class=\\\\\'no-img\\\\\' style=\\\\\'display:flex;align-items:center;justify-content:center;height:100%;color:rgba(255,255,255,0.15);font-size:28px;font-weight:300\\\\\'\\\\\'>✕</span>\'">';
           html += '</div>';
           if (badge) html += '<span class="prod-badge ' + badgeClass + '">' + badge + '</span>';
           if (p.gender) {
