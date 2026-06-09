@@ -209,19 +209,19 @@ const YARO_API = (function() {
     async getProducts() {
       var data = await sbGet('products', { select: '*', filter: 'status=eq.active', order: 'created_at.desc' });
       if (data && Array.isArray(data) && data.length) return data;
-      return FALLBACK_PRODUCTS;
+      return [];
     },
 
     async getAllProducts() {
       var data = await sbGet('products', { select: '*', order: 'created_at.desc' });
       if (data && Array.isArray(data) && data.length) return data;
-      return FALLBACK_PRODUCTS;
+      return [];
     },
 
     async getProduct(slug) {
       var p = await sbSingle('products', 'slug', slug);
       if (p && !p.error) return p;
-      return FALLBACK_PRODUCTS.find(function(p) { return p.slug === slug || p.id === slug; }) || FALLBACK_PRODUCTS[0];
+      return null;
     },
 
     async createProduct(data) {
@@ -240,13 +240,13 @@ const YARO_API = (function() {
     async getCollections() {
       var data = await sbGet('collections', { select: '*', order: 'created_at.asc' });
       if (data && Array.isArray(data) && data.length) return data;
-      return FALLBACK_COLLECTIONS;
+      return [];
     },
 
     async getCollection(slug) {
       var c = await sbSingle('collections', 'slug', slug);
       if (c) return c;
-      return FALLBACK_COLLECTIONS.find(function(c) { return c.slug === slug; }) || null;
+      return null;
     },
 
     async createCollection(data) {

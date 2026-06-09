@@ -2298,6 +2298,7 @@
         // Re-resolve active product with API data
         activeProduct = productsDB.find(function(p) { return p.id === productId; });
         if (!activeProduct) activeProduct = productsDB[0];
+        if (!activeProduct) return;
         // Re-render the page with updated data
         var firstColourImgs = null;
         if (activeProduct.colourData) {
@@ -2334,12 +2335,16 @@
 
     // ─── GET ACTIVE PRODUCT FROM QUERY ───
     const urlParams = new URLSearchParams(window.location.search);
-    const productId = urlParams.get('id') || 'obsidian-lava-tee';
+    const productId = urlParams.get('id') || '';
     
     // Find active product
     let activeProduct = productsDB.find(p => p.id === productId);
     if (!activeProduct) {
       activeProduct = productsDB[0]; // fallback
+    }
+    if (!activeProduct) {
+      document.getElementById('page-main-content').innerHTML = '<div style="text-align:center;padding:80px 20px;color:rgba(255,255,255,0.3)"><h2>No products available</h2><p style="margin-top:12px">Check back soon.</p></div>';
+      return;
     }
 
     // Set page title dynamically
