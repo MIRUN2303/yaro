@@ -52,24 +52,35 @@ DROP POLICY IF EXISTS "Admin delete products" ON products;
 CREATE POLICY "Admin delete products" ON products
   FOR DELETE USING (auth.email() = 'yarodrops@gmail.com');
 
--- 4. ORDERS (admin read + admin update)
+ALTER TABLE orders ENABLE ROW LEVEL SECURITY;
+ALTER TABLE order_items ENABLE ROW LEVEL SECURITY;
+
+-- 4. ORDERS
 DROP POLICY IF EXISTS "Admin read orders" ON orders;
 CREATE POLICY "Admin read orders" ON orders
   FOR SELECT USING (auth.email() = 'yarodrops@gmail.com');
-
-DROP POLICY IF EXISTS "Admin update orders" ON orders;
-CREATE POLICY "Admin update orders" ON orders
-  FOR UPDATE USING (auth.email() = 'yarodrops@gmail.com');
 
 DROP POLICY IF EXISTS "Admin insert orders" ON orders;
 CREATE POLICY "Admin insert orders" ON orders
   FOR INSERT WITH CHECK (auth.email() = 'yarodrops@gmail.com');
 
+DROP POLICY IF EXISTS "Admin update orders" ON orders;
+CREATE POLICY "Admin update orders" ON orders
+  FOR UPDATE USING (auth.email() = 'yarodrops@gmail.com');
+
 DROP POLICY IF EXISTS "Admin delete orders" ON orders;
 CREATE POLICY "Admin delete orders" ON orders
   FOR DELETE USING (auth.email() = 'yarodrops@gmail.com');
 
--- 5. ORDER ITEMS (admin read + admin write)
+DROP POLICY IF EXISTS "Users insert own orders" ON orders;
+CREATE POLICY "Users insert own orders" ON orders
+  FOR INSERT WITH CHECK (auth.uid() = user_id);
+
+DROP POLICY IF EXISTS "Users view own orders" ON orders;
+CREATE POLICY "Users view own orders" ON orders
+  FOR SELECT USING (auth.uid() = user_id);
+
+-- 5. ORDER ITEMS
 DROP POLICY IF EXISTS "Admin read order_items" ON order_items;
 CREATE POLICY "Admin read order_items" ON order_items
   FOR SELECT USING (auth.email() = 'yarodrops@gmail.com');
@@ -82,15 +93,14 @@ DROP POLICY IF EXISTS "Admin delete order_items" ON order_items;
 CREATE POLICY "Admin delete order_items" ON order_items
   FOR DELETE USING (auth.email() = 'yarodrops@gmail.com');
 
--- 6. CART ITEMS (admin read + admin write)
-DROP POLICY IF EXISTS "Admin read cart_items" ON cart_items;
-CREATE POLICY "Admin read cart_items" ON cart_items
-  FOR SELECT USING (auth.email() = 'yarodrops@gmail.com');
+DROP POLICY IF EXISTS "Users insert order_items" ON order_items;
+CREATE POLICY "Users insert order_items" ON order_items
+  FOR INSERT WITH CHECK (
+    EXISTS (SELECT 1 FROM orders WHERE orders.id = order_items.order_id AND orders.user_id = auth.uid())
+  );
 
-DROP POLICY IF EXISTS "Admin insert cart_items" ON cart_items;
-CREATE POLICY "Admin insert cart_items" ON cart_items
-  FOR INSERT WITH CHECK (auth.email() = 'yarodrops@gmail.com');
-
-DROP POLICY IF EXISTS "Admin delete cart_items" ON cart_items;
-CREATE POLICY "Admin delete cart_items" ON cart_items
-  FOR DELETE USING (auth.email() = 'yarodrops@gmail.com');
+DROP POLICY IF EXISTS "Users view own order_items" ON order_items;
+CREATE POLICY "Users view own order_items" ON order_items
+  FOR SELECT USING (
+    EXISTS (SELECT 1 FROM orders WHERE orders.id = order_items.order_id AND orders.user_id = auth.uid())
+  );
