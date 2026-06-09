@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+﻿<!DOCTYPE html>
 <html lang="en">
 <head>
   <!-- YARO Product — Gender system: activeProduct.gender mapped via genderMap (His→For the Gents, Hers→For the Ladies, Any→For the Soul, Mini→For the Little, Mini-Gent→For the Little Gents, Mini-Lady→For the Little Ladies) shown in .prod-action-gender below action buttons. Static productsDB and API map both include gender field. -->
@@ -2135,144 +2135,10 @@
     var COLOUR_MAP = { 'black':'#000000','white':'#ffffff','grey':'#6b7280','gray':'#6b7280','navy':'#1a2744','olive':'#808000','burgundy':'#800020','green':'#166534','blue':'#1d4ed8','red':'#dc2626','brown':'#78350f','beige':'#d6d3c1','cream':'#f5f0e1','pink':'#db2777','purple':'#7c3aed','maroon':'#7f1d1d','tan':'#b8966e','khaki':'#b5a88a','charcoal':'#374151','coral':'#e87968','sage':'#84a98c','mustard':'#eab308','teal':'#0d9488' };
 
     // ─── PRODUCT METADATA DATABASE ───
-    // Static fallback data (identical to original). API data overrides when available.
-    let productsDB = [
-      {
-        id: 'obsidian-lava-tee',
-        name: 'Midnight Drift',
-        category: 'Night Ride',
-        price: '₹899',
-        originalPrice: '₹1499',
-        offerName: 'Flash Sale',
-        badge: 'Chapter',
-        badgeClass: 'bestseller',
-        image: 'images/detail_pics/center_model.png',
-        story: 'The quiet roads know every dream that never reached daylight.',
-        desc: 'A signature heavyweight black t-shirt with structured chest layout, boxy drop-shoulder fit, and high-density print detail.',
-        additionalImages: [
-          'images/detail_pics/left_back.png',
-          'images/detail_pics/right_front.png'
-        ],
-        colours: ['Black', 'White', 'Navy'],
-        gender: 'Any'
-      },
-      {
-        id: 'violet-haze-hoodie',
-        name: 'City Lights',
-        category: 'Night Ride',
-        price: '₹899',
-        originalPrice: '₹1499',
-        offerName: 'Flash Sale',
-        badge: 'Chapter',
-        badgeClass: 'bestseller',
-        image: 'images/violet_haze_hoodie.png',
-        story: 'Lost in the neon glow, chasing shadows of a life we used to know.',
-        desc: 'Heavyweight combed ringspun cotton with drop-shoulder silhouette, massive structured hood, and relaxed cuffs.',
-        additionalImages: [],
-        colours: ['Black', 'Grey', 'Olive'],
-        gender: 'Any'
-      },
-      {
-        id: 'shadow-cargo-pant',
-        name: 'Empty Roads',
-        category: 'Night Ride',
-        price: '₹899',
-        originalPrice: '₹1499',
-        offerName: 'Season Sale',
-        badge: 'New',
-        badgeClass: 'new',
-        image: 'images/shadow_cargo_pant.png',
-        story: 'No destination, just the cold wind and the open path ahead.',
-        desc: 'Technical shadow cargo pant engineered with heavy nylon cotton canvas, deep modular pockets, dual side utility straps, and matte steel adjustment hardware.',
-        additionalImages: [],
-        colours: ['Black', 'Olive'],
-        gender: 'His'
-      },
-      {
-        id: 'crop-lacroix-tee',
-        name: 'Concrete Soul',
-        category: 'Urban Echo',
-        price: '₹899',
-        originalPrice: '₹1399',
-        offerName: 'Flash Sale',
-        badge: 'Chapter',
-        badgeClass: 'bestseller',
-        image: 'images/crop_lacroix_tee.png',
-        story: 'Born of the pavement, thriving in the noise of the crowded street.',
-        desc: 'Minimalist off-white crop tee crafted with organic soft rib cotton, structured box fit drape, and double stitch hem details.',
-        additionalImages: [],
-        colours: ['White', 'Black'],
-        gender: 'Hers'
-      },
-      {
-        id: 'relaxed-fit-sweatshirt',
-        name: 'Lost Signal',
-        category: 'Urban Echo',
-        price: '₹899',
-        originalPrice: '₹1499',
-        offerName: 'Flash Sale',
-        badge: 'Chapter',
-        badgeClass: 'bestseller',
-        image: 'images/relaxed_fit_sweatshirt.png',
-        story: 'A frequency cut short, a voice fading into static.',
-        desc: 'Cozy oversized charcoal crewneck sweatshirt with organic cotton fleece backing, drop-shoulder seams, and rib finish mockneck collar.',
-        additionalImages: [],
-        colours: ['Charcoal', 'Black', 'Navy'],
-        gender: 'Any'
-      },
-      {
-        id: 'oversized-drop-shoulder',
-        name: 'Silent Crowd',
-        category: 'Urban Echo',
-        price: '₹899',
-        originalPrice: '₹1499',
-        offerName: 'Season Sale',
-        badge: 'New',
-        badgeClass: 'new',
-        image: 'images/oversized_drop_shoulder.png',
-        story: 'Surrounded by thousands, yet walking in absolute silence.',
-        desc: 'Heavyweight sand beige drop-shoulder t-shirt with premium mock neck rib collar and structured boxy aesthetic outline.',
-        additionalImages: [],
-        colours: ['Beige', 'Black'],
-        gender: 'Any'
-      },
-      {
-        id: 'mini-logo-tee',
-        name: 'Late Escape',
-        category: 'Midnight Society',
-        price: '₹899',
-        originalPrice: '₹1299',
-        offerName: 'Clearance',
-        badge: 'New',
-        badgeClass: 'new',
-        image: 'images/mini_logo_tee.png',
-        story: 'Sneaking out into the cool night, leaving the city behind.',
-        desc: 'Classic kids white graphic t-shirt in extremely soft organic ring-spun combed cotton, featuring the YARO micro logo on the chest.',
-        additionalImages: [],
-        colours: ['White', 'Black', 'Grey'],
-        gender: 'Mini-Gent'
-      },
-      {
-        id: 'mini-hoodie',
-        name: 'Lost Path',
-        category: 'Wander',
-        price: '₹899',
-        originalPrice: '₹1399',
-        offerName: 'Clearance',
-        badge: 'New',
-        badgeClass: 'new',
-        image: 'images/mini_hoodie.png',
-        story: 'Not all who wander are looking for a way home.',
-        desc: 'Ultra soft double fleece organic light beige kid hoodie. Minimalist clean style with micro branding and perfect warmth for children.',
-        additionalImages: [],
-        colours: ['Beige', 'Pink', 'White'],
-        gender: 'Mini-Lady'
-      }
-    ];
+    let productsDB = [];
 
-    // ─── TRY LOADING FROM API (falls back to static data) ───
     YARO_API.getProducts().then(function(apiProducts) {
-      if (apiProducts && apiProducts.length && apiProducts !== YARO_API.getFallbackProducts()) {
+      if (apiProducts && apiProducts.length) {
         // Map API data to match frontend's expected format
         productsDB = apiProducts.map(function(p) {
           return {
@@ -3242,3 +3108,4 @@
 
 </body>
 </html>
+

@@ -2223,8 +2223,14 @@ background: url("data:image/svg+xml,%3Csvg viewBox='0 0 400 400' xmlns='http://w
       var grid = document.getElementById('product-grid');
       if (!grid) return;
       YARO_API.getProducts().then(function(products) {
-        if (!products || !products.length || products === YARO_API.getFallbackProducts()) return;
-        // Generate identical HTML from API data, keeping static grid as fallback
+        if (!products) return;
+        // Clear static fallback grid
+        grid.innerHTML = '';
+        if (!products.length) {
+          grid.innerHTML = '<div style="grid-column:1/-1;text-align:center;padding:60px 20px;color:rgba(255,255,255,0.25)"><p>No products available yet.</p></div>';
+          return;
+        }
+        // Generate identical HTML from API data
         var html = '';
         products.forEach(function(p) {
           var slug = p.slug || p.id;

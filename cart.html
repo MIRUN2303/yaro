@@ -1071,12 +1071,10 @@
   <script src="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.min.js"></script>
   <script>
     // ─── PRODUCTS DATABASE ───
-    var productsDB = YARO_API.getFallbackProducts().map(function(p) {
-      return { id: p.slug || p.id, name: p.name, price: p.price, originalPrice: p.originalPrice, category: p.category, image: p.image };
-    });
+    var productsDB = [];
     // Try to load fresh data from API
     YARO_API.getProducts().then(function(apiProducts) {
-      if (apiProducts && apiProducts.length && apiProducts !== YARO_API.getFallbackProducts()) {
+      if (apiProducts && apiProducts.length) {
         productsDB = apiProducts.map(function(p) {
           return { id: p.slug || p.id, name: p.name, price: p.price ? '₹' + p.price : p.price, originalPrice: p.original_price ? '₹' + p.original_price : '', category: p.category, image: (p.images && p.images[0]) || p.image || '' };
         });

@@ -8,24 +8,6 @@ const YARO_API = (function() {
   var authUser = null;
 
   // ─── FALLBACK DATA ───
-  var FALLBACK_PRODUCTS = [
-    { id: 'obsidian-lava-tee', slug: 'obsidian-lava-tee', name: 'Midnight Drift', category: 'Night Ride', price: '₹899', originalPrice: '₹1499', original_price: 1499, offerName: 'Flash Sale', badge: 'Chapter', badgeClass: 'bestseller', image: 'images/detail_pics/center_model.png', images: ['images/detail_pics/center_model.png','images/detail_pics/left_back.png','images/detail_pics/right_front.png'], story: 'The quiet roads know every dream that never reached daylight.', desc: 'A signature heavyweight black t-shirt with structured chest layout, boxy drop-shoulder fit, and high-density print detail.', sizes: ['S','M','L','XL','XXL'], additionalImages: ['images/detail_pics/left_back.png','images/detail_pics/right_front.png'], gender: 'Any' },
-    { id: 'violet-haze-hoodie', slug: 'violet-haze-hoodie', name: 'City Lights', category: 'Night Ride', price: '₹899', originalPrice: '₹1499', original_price: 1499, offerName: 'Flash Sale', badge: 'Chapter', badgeClass: 'bestseller', image: 'images/violet_haze_hoodie.png', images: ['images/violet_haze_hoodie.png'], story: 'Lost in the neon glow, chasing shadows of a life we used to know.', desc: 'Heavyweight combed ringspun cotton with drop-shoulder silhouette, massive structured hood, and relaxed cuffs.', sizes: ['S','M','L','XL','XXL'], additionalImages: [], gender: 'Any' },
-    { id: 'shadow-cargo-pant', slug: 'shadow-cargo-pant', name: 'Empty Roads', category: 'Night Ride', price: '₹899', originalPrice: '₹1499', original_price: 1499, offerName: 'Season Sale', badge: 'New', badgeClass: 'new', image: 'images/shadow_cargo_pant.png', images: ['images/shadow_cargo_pant.png'], story: 'No destination, just the cold wind and the open path ahead.', desc: 'Technical shadow cargo pant engineered with heavy nylon cotton canvas, deep modular pockets, dual side utility straps, and matte steel adjustment hardware.', sizes: ['S','M','L','XL','XXL'], additionalImages: [], gender: 'His' },
-    { id: 'crop-lacroix-tee', slug: 'crop-lacroix-tee', name: 'Concrete Soul', category: 'Urban Echo', price: '₹899', originalPrice: '₹1399', original_price: 1399, offerName: 'Flash Sale', badge: 'Chapter', badgeClass: 'bestseller', image: 'images/crop_lacroix_tee.png', images: ['images/crop_lacroix_tee.png'], story: 'Born of the pavement, thriving in the noise of the crowded street.', desc: 'Minimalist off-white crop tee crafted with organic soft rib cotton, structured box fit drape, and double stitch hem details.', sizes: ['S','M','L','XL','XXL'], additionalImages: [], gender: 'Hers' },
-    { id: 'relaxed-fit-sweatshirt', slug: 'relaxed-fit-sweatshirt', name: 'Lost Signal', category: 'Urban Echo', price: '₹899', originalPrice: '₹1499', original_price: 1499, offerName: 'Flash Sale', badge: 'Chapter', badgeClass: 'bestseller', image: 'images/relaxed_fit_sweatshirt.png', images: ['images/relaxed_fit_sweatshirt.png'], story: 'A frequency cut short, a voice fading into static.', desc: 'Cozy oversized charcoal crewneck sweatshirt with organic cotton fleece backing, drop-shoulder seams, and rib finish mockneck collar.', sizes: ['S','M','L','XL','XXL'], additionalImages: [], gender: 'Any' },
-    { id: 'oversized-drop-shoulder', slug: 'oversized-drop-shoulder', name: 'Silent Crowd', category: 'Urban Echo', price: '₹899', originalPrice: '₹1499', original_price: 1499, offerName: 'Season Sale', badge: 'New', badgeClass: 'new', image: 'images/oversized_drop_shoulder.png', images: ['images/oversized_drop_shoulder.png'], story: 'Surrounded by thousands, yet walking in absolute silence.', desc: 'Heavyweight sand beige drop-shoulder t-shirt with premium mock neck rib collar and structured boxy aesthetic outline.', sizes: ['S','M','L','XL','XXL'], additionalImages: [], gender: 'Any' },
-    { id: 'mini-logo-tee', slug: 'mini-logo-tee', name: 'Late Escape', category: 'Midnight Society', price: '₹899', originalPrice: '₹1299', original_price: 1299, offerName: 'Clearance', badge: 'New', badgeClass: 'new', image: 'images/mini_logo_tee.png', images: ['images/mini_logo_tee.png'], story: 'Sneaking out into the cool night, leaving the city behind.', desc: 'Classic kids white graphic t-shirt in extremely soft organic ring-spun combed cotton, featuring the YARO micro logo on the chest.', sizes: ['XS','S','M','L'], additionalImages: [], gender: 'Mini-Gent' },
-    { id: 'mini-hoodie', slug: 'mini-hoodie', name: 'Lost Path', category: 'Wander', price: '₹899', originalPrice: '₹1399', original_price: 1399, offerName: 'Clearance', badge: 'New', badgeClass: 'new', image: 'images/mini_hoodie.png', images: ['images/mini_hoodie.png'], story: 'Not all who wander are looking for a way home.', desc: 'Ultra soft double fleece organic light beige kid hoodie. Minimalist clean style with micro branding and perfect warmth for children.', sizes: ['XS','S','M','L'], additionalImages: [], gender: 'Mini-Lady' }
-  ];
-
-  var FALLBACK_COLLECTIONS = [
-    { name: 'Night Ride', slug: 'night-ride', description: 'The quiet roads know every dream that never reached daylight.' },
-    { name: 'Urban Echo', slug: 'urban-echo', description: 'Born of the pavement, thriving in the noise of the crowded street.' },
-    { name: 'Midnight Society', slug: 'midnight-society', description: 'Sneaking out into the cool night, leaving the city behind.' },
-    { name: 'Wander', slug: 'wander', description: 'Not all who wander are looking for a way home.' }
-  ];
-
   // ─── SUPABASE HELPERS ───
   function headers(token, prefer) {
     var h = { 'apikey': SUPABASE_ANON_KEY, 'Content-Type': 'application/json' };
@@ -419,8 +401,6 @@ const YARO_API = (function() {
 
     // ── Utility ──
     getBaseUrl: function() { return SUPABASE_URL; },
-    getFallbackProducts: function() { return FALLBACK_PRODUCTS; },
-    getFallbackCollections: function() { return FALLBACK_COLLECTIONS; },
 
     // ── Image Upload ──
     async uploadImage(file) {
