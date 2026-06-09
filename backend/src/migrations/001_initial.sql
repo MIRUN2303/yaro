@@ -92,6 +92,7 @@ CREATE TABLE IF NOT EXISTS orders (
   razorpay_order_id VARCHAR(255),
   razorpay_payment_id VARCHAR(255),
   shipping_address JSONB,
+  cancellation JSONB DEFAULT NULL,
   customer_name VARCHAR(255),
   customer_email VARCHAR(255),
   customer_phone VARCHAR(20),
