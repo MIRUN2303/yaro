@@ -1289,7 +1289,6 @@ async function openProdModal(id) {
   h += '<div class="fg"><label>Price (₹)</label><input type="number" id="f-price"></div>';
   h += '<div class="fg"><label>Original Price</label><input type="number" id="f-oprice"></div>';
   h += '<div class="fg"><label>Stock</label><input type="number" id="f-stock"></div>';
-  h += '<div class="fg"><label>SKU</label><input type="text" id="f-sku"></div>';
   h += '<div class="fg full"><label>Sizes</label><div class="size-chips" id="f-sizes">' + ['S','M','L','XL','2XL','3XL'].map(function(s){return '<span class="size-chip" data-size="'+s+'">'+s+'</span>'}).join('') + '</div></div>';
   h += '<div class="fg full"><label>Colours</label><div class="size-chips" id="f-colours">' + ['Black','White','Grey','Navy','Olive','Beige','Green','Blue','Red','Pink','Purple','Brown','Charcoal','Cream','Burgundy','Teal','Sage','Coral','Khaki','Tan'].map(function(c){var bg=COLOUR_MAP[c.toLowerCase()]||c;var wc=c.toLowerCase()==='white'?' white-dot':'';return '<span class="size-chip colour-chip" data-colour="'+c+'"><span class="colour-dot'+wc+'" style="background:'+bg+'"></span>'+c+'</span>'}).join('') + '</div></div>';
   h += '<div class="fg full" id="f-colour-section-wrap" style="display:none"><label>Colour Images (required)</label><div id="f-colour-sections"></div></div>';
@@ -1323,7 +1322,6 @@ async function loadProd(id) {
   document.getElementById('f-price').value = d.price || '';
   document.getElementById('f-oprice').value = d.original_price || '';
   document.getElementById('f-stock').value = d.stock || '';
-  document.getElementById('f-sku').value = d.sku || '';
   var sizes = d.sizes || [];
   document.querySelectorAll('#f-sizes .size-chip').forEach(function(chip) {
     if (sizes.indexOf(chip.getAttribute('data-size')) >= 0) chip.classList.add('selected');
@@ -1345,12 +1343,11 @@ async function saveProd(id) {
   var body = {
     collection_id: document.getElementById('f-collection').value || null,
     name: document.getElementById('f-name').value,
-    slug: document.getElementById('f-name').value.toLowerCase().replace(/[^a-z0-9]+/g,'-').replace(/^-|-$/g,''),
+    slug: document.getElementById('f-name').value.toLowerCase().replace(/[^a-z0-9]+/g,'-').replace(/^-|-$/g,'') + (id ? '' : '-' + Date.now().toString(36)),
     description: document.getElementById('f-desc').value,
     price: parseInt(document.getElementById('f-price').value) || 0,
     original_price: parseInt(document.getElementById('f-oprice').value) || null,
     stock: parseInt(document.getElementById('f-stock').value) || 0,
-    sku: document.getElementById('f-sku').value,
     images: [],
     sizes: Array.from(document.querySelectorAll('#f-sizes .size-chip.selected')).map(function(c){return c.getAttribute('data-size')}),
     colours: Array.from(document.querySelectorAll('#f-colours .colour-chip.selected')).map(function(c){return c.getAttribute('data-colour')}),
