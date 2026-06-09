@@ -722,6 +722,22 @@ img.thumb {
   border: 1px solid var(--border-light);
 }
 
+.img-grid { display: flex; flex-wrap: wrap; gap: 8px; }
+.img-grid .img-item {
+  width: 72px; height: 90px; border-radius: 8px; overflow: hidden;
+  position: relative; border: 1px solid var(--border-light);
+  background: var(--surface);
+}
+.img-grid .img-item img { width: 100%; height: 100%; object-fit: cover; }
+.img-grid .img-item .img-rm {
+  position: absolute; top: 2px; right: 2px; width: 20px; height: 20px;
+  border-radius: 50%; border: none; background: rgba(239,68,68,0.85);
+  color: #fff; font-size: 11px; cursor: pointer; display: flex;
+  align-items: center; justify-content: center; line-height: 1;
+  opacity: 0; transition: opacity 0.2s; font-family: inherit;
+}
+.img-grid .img-item:hover .img-rm { opacity: 1; }
+
 /* ─── MODAL ─── */
 .modal-overlay {
   display: none;
@@ -1235,7 +1251,7 @@ async function openProdModal(id) {
   h += '<div class="fg"><label>Original Price</label><input type="number" id="f-oprice"></div>';
   h += '<div class="fg"><label>Stock</label><input type="number" id="f-stock"></div>';
   h += '<div class="fg"><label>SKU</label><input type="text" id="f-sku"></div>';
-  h += '<div class="fg full"><label>Images</label><input type="text" id="f-images" placeholder="Comma-separated URLs"></div>';
+  h += '<div class="fg full"><label>Images (max 10)</label><div class="img-grid" id="f-images-grid"></div><div style="display:flex;gap:8px;margin-top:8px"><button type="button" class="btn btn-sm btn-pri" id="f-add-image-btn">+ Upload Image</button><input type="file" id="f-image-file" accept="image/*" style="display:none"></div><p id="f-images-err" style="font-size:10px;color:#f87171;margin-top:4px;display:none"></p></div>';
   h += '<div class="fg full"><label>Sizes</label><div class="size-chips" id="f-sizes">' + ['S','M','L','XL','2XL','3XL'].map(function(s){return '<span class="size-chip" data-size="'+s+'">'+s+'</span>'}).join('') + '</div></div>';
   h += '<div class="fg full"><label>Colours</label><div class="size-chips" id="f-colours">' + ['Black','White','Grey','Navy','Olive','Beige','Green','Blue','Red','Pink','Purple','Brown','Charcoal','Cream','Burgundy','Teal','Sage','Coral','Khaki','Tan'].map(function(c){var bg=COLOUR_MAP[c.toLowerCase()]||c;var wc=c.toLowerCase()==='white'?' white-dot':'';return '<span class="size-chip colour-chip" data-colour="'+c+'"><span class="colour-dot'+wc+'" style="background:'+bg+'"></span>'+c+'</span>'}).join('') + '</div></div>';
   h += '<div class="fg"><label>Badge</label><input type="text" id="f-badge"></div>';
@@ -1252,7 +1268,7 @@ async function openProdModal(id) {
     var chip = e.target.closest('.colour-chip');
     if (chip) chip.classList.toggle('selected');
   });
-  if (id) loadProd(id);
+  if (id) loadProd(id); else { window._editImages = []; renderImageGrid(); }
   document.getElementById('mf').addEventListener('submit', function(e) { e.preventDefault(); saveProd(id); });
 }
 
@@ -1268,7 +1284,8 @@ async function loadProd(id) {
   document.getElementById('f-oprice').value = d.original_price || '';
   document.getElementById('f-stock').value = d.stock || '';
   document.getElementById('f-sku').value = d.sku || '';
-  document.getElementById('f-images').value = (d.images||[]).join(', ');
+  window._editImages = (d.images || []).slice(0,10);
+  renderImageGrid();
   var sizes = d.sizes || [];
   document.querySelectorAll('#f-sizes .size-chip').forEach(function(chip) {
     if (sizes.indexOf(chip.getAttribute('data-size')) >= 0) chip.classList.add('selected');
@@ -1294,7 +1311,7 @@ async function saveProd(id) {
     original_price: parseInt(document.getElementById('f-oprice').value) || null,
     stock: parseInt(document.getElementById('f-stock').value) || 0,
     sku: document.getElementById('f-sku').value,
-    images: document.getElementById('f-images').value.split(',').map(function(s){return s.trim()}).filter(Boolean),
+    images: window._editImages || [],
     sizes: Array.from(document.querySelectorAll('#f-sizes .size-chip.selected')).map(function(c){return c.getAttribute('data-size')}),
     colours: Array.from(document.querySelectorAll('#f-colours .colour-chip.selected')).map(function(c){return c.getAttribute('data-colour')}),
     gender: document.getElementById('f-gender').value,
@@ -1307,6 +1324,53 @@ async function saveProd(id) {
   if (r.error) { alert('Error: ' + JSON.stringify(r.error)); return; }
   closeModal(); loadPage('products');
 }
+
+// ─── IMAGE UPLOAD ───
+function renderImageGrid() {
+  var grid = document.getElementById('f-images-grid');
+  if (!grid) return;
+  var imgs = window._editImages || [];
+  grid.innerHTML = imgs.map(function(url, i) {
+    return '<div class="img-item"><img src="' + url + '"><button type="button" class="img-rm" onclick="removeImage(' + i + ')">✕</button></div>';
+  }).join('');
+}
+
+function removeImage(idx) {
+  window._editImages.splice(idx, 1);
+  renderImageGrid();
+}
+
+document.addEventListener('click', function(e) {
+  if (e.target && e.target.id === 'f-add-image-btn') {
+    var fileInput = document.getElementById('f-image-file');
+    if (fileInput) fileInput.click();
+  }
+});
+
+document.addEventListener('change', async function(e) {
+  if (e.target && e.target.id === 'f-image-file') {
+    var file = e.target.files && e.target.files[0];
+    if (!file) return;
+    var errEl = document.getElementById('f-images-err');
+    if ((window._editImages || []).length >= 10) {
+      if (errEl) { errEl.textContent = 'Maximum 10 images allowed'; errEl.style.display = 'block'; }
+      e.target.value = '';
+      return;
+    }
+    if (errEl) errEl.style.display = 'none';
+    var btn = document.getElementById('f-add-image-btn');
+    btn.textContent = 'Uploading...'; btn.disabled = true;
+    var result = await YARO_API.uploadImage(file);
+    btn.textContent = '+ Upload Image'; btn.disabled = false;
+    e.target.value = '';
+    if (result.error) {
+      if (errEl) { errEl.textContent = 'Upload failed: ' + (result.error.message || result.error); errEl.style.display = 'block'; }
+      return;
+    }
+    window._editImages.push(result.url);
+    renderImageGrid();
+  }
+});
 
 // ─── PASSWORD CONFIRM MODAL ───
 function requirePassword(action) {

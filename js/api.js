@@ -410,6 +410,31 @@ const YARO_API = (function() {
     // ── Utility ──
     getBaseUrl: function() { return SUPABASE_URL; },
     getFallbackProducts: function() { return FALLBACK_PRODUCTS; },
-    getFallbackCollections: function() { return FALLBACK_COLLECTIONS; }
+    getFallbackCollections: function() { return FALLBACK_COLLECTIONS; },
+
+    // ── Image Upload ──
+    async uploadImage(file) {
+      try {
+        var ext = file.name.split('.').pop().toLowerCase();
+        var fileName = Date.now() + '-' + Math.random().toString(36).substr(2,6) + '.' + ext;
+        var t = getStoredToken();
+        var res = await fetch(SUPABASE_URL + '/storage/v1/object/yaro-images/' + fileName, {
+          method: 'POST',
+          headers: {
+            'apikey': SUPABASE_ANON_KEY,
+            'Authorization': 'Bearer ' + (t || ''),
+            'Content-Type': file.type,
+            'x-upsert': 'false'
+          },
+          body: file
+        });
+        if (!res.ok) {
+          var errText = await res.text().catch(function(){ return 'Upload failed' });
+          return { error: errText };
+        }
+        var publicUrl = SUPABASE_URL + '/storage/v1/object/public/yaro-images/' + fileName;
+        return { url: publicUrl };
+      } catch(e) { return { error: e.message }; }
+    }
   };
 })();
