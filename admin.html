@@ -1351,7 +1351,7 @@ async function renderOrders(c) {
       }
       var addressShort = '<span style="font-size:10px;color:rgba(255,255,255,0.35)" title="' + esc(addrStr) + '">' + esc(addr ? addr.city : '-') + '</span>';
       return '<tr>' +
-        '<td><strong style="color:rgba(255,255,255,0.85);font-size:13px">' + esc(o.order_number) + '</strong><br><span style="font-size:10px;color:rgba(255,255,255,0.25)">' + (o.id ? o.id.substring(0,8) : '') + '</span></td>' +
+        '<td><strong style="color:rgba(255,255,255,0.85);font-size:13px">' + esc(o.order_number) + '</strong></td>' +
         '<td><div style="font-size:12px;color:rgba(255,255,255,0.8)">' + esc(o.customer_name || '-') + '</div><div style="font-size:10px;color:rgba(255,255,255,0.35)">' + esc(o.customer_email || '') + (o.customer_phone ? '<br>' + esc(o.customer_phone) : '') + '</div>' + addressShort + '</td>' +
         '<td style="font-size:11px;color:rgba(255,255,255,0.5);max-width:200px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap" title="' + esc(itemsList) + '">' + esc(itemsList) + '</td>' +
         '<td style="font-weight:600">₹' + ((o.total||0)/100).toFixed(2) + '</td>' +
