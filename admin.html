@@ -991,6 +991,18 @@ function closeModal() { document.getElementById('modal-overlay').classList.remov
 document.getElementById('modal-close').addEventListener('click', closeModal);
 document.getElementById('modal-overlay').addEventListener('click', function(e) { if (e.target === this) closeModal(); });
 
+// ─── TOAST ───
+function showToast(msg, type) {
+  var c = document.getElementById('toast-container');
+  if (!c) { c = document.createElement('div'); c.id = 'toast-container'; Object.assign(c.style, {position:'fixed',top:'24px',right:'24px',zIndex:'9999',display:'flex',flexDirection:'column',gap:'10px'}); document.body.appendChild(c); }
+  var t = document.createElement('div');
+  t.textContent = msg;
+  Object.assign(t.style, {padding:'12px 24px',borderRadius:'8px',fontSize:'14px',fontWeight:'600',color:'#fff',background:type==='error'?'#ef4444':'#22c55e',boxShadow:'0 4px 20px rgba(0,0,0,0.4)',transform:'translateX(120%)',transition:'transform 0.35s cubic-bezier(0.22,1,0.36,1)',fontFamily:'"Clash Display",sans-serif'});
+  c.appendChild(t);
+  requestAnimationFrame(function() { t.style.transform = 'translateX(0)'; });
+  setTimeout(function() { t.style.transform = 'translateX(120%)'; t.style.opacity = '0'; setTimeout(function() { t.remove(); }, 400); }, 3500);
+}
+
 // ─── CUSTOM CONFIRM ───
 function admConfirm(msg) {
   return new Promise(function(resolve) {
@@ -1308,8 +1320,8 @@ function updateOrder(id) {
       fulfillment_status: document.getElementById('f-fstatus').value
     };
     var r = await YARO_API.updateOrder(id, body);
-    if (r.error) { alert('Error: ' + JSON.stringify(r.error)); return; }
-    closeModal(); loadPage('orders');
+    if (r.error) { closeModal(); showToast('Error updating order: ' + r.error.message || JSON.stringify(r.error), 'error'); return; }
+    closeModal(); showToast('Order status updated successfully', 'success'); loadPage('orders');
   });
 }
 
