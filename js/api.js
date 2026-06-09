@@ -156,7 +156,6 @@ const YARO_API = (function() {
       if (t) {
         var u = localStorage.getItem('sb_user');
         if (u) { try { return { user: JSON.parse(u), token: t }; } catch(e) {} }
-        return { user: { id: t }, token: t };
       }
       return null;
     },

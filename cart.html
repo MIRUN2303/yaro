@@ -1640,7 +1640,7 @@
     }
 
     // ─── CHECKOUT ───
-    document.getElementById('checkout-btn').addEventListener('click', function() {
+    document.getElementById('checkout-btn').addEventListener('click', async function() {
       var btn = this;
 
       // ─── VALIDATE ADDRESS ───
@@ -1661,14 +1661,17 @@
       if (pincode.length < 6) { showToast('Please enter a valid pincode', 'error'); return; }
 
       // ─── AUTH CHECK ───
-      var session = YARO_API.getSession();
-      if (!session || !session.user) {
+      var user = YARO_API.getSession() && YARO_API.getSession().user;
+      if (!user && YARO_API.getToken()) {
+        user = await YARO_API.me();
+      }
+      if (!user) {
         showToast('Please login to place an order', 'error');
         setTimeout(function() { window.location.href = 'login.html'; }, 1000);
         return;
       }
-      var userId = session.user.id;
-      var userEmail = session.user.email || '';
+      var userId = user.id;
+      var userEmail = user.email || '';
 
       // ─── BUILD CART ITEMS ───
       var cartItems;
