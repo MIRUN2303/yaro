@@ -960,6 +960,7 @@ img.thumb {
     </nav>
     <div class="sidebar-footer">
       <span class="admin-email" id="admin-email"></span>
+      <button class="back-store" id="admin-refresh" style="background:none;border:none;cursor:pointer;font-size:11px;color:rgba(255,255,255,0.25);text-align:left;padding:6px 0;font-family:inherit;transition:color 0.3s" onmouseover="this.style.color='rgba(255,255,255,0.5)'" onmouseout="this.style.color='rgba(255,255,255,0.25)'">↻ Refresh</button>
       <a href="store.html" class="back-store">← Back to Store</a>
       <button class="sign-out" id="adm-logout">← Sign Out</button>
     </div>
@@ -1067,14 +1068,20 @@ function showApp() {
   if (u) document.getElementById('admin-email').textContent = u;
 }
 
-// ─── NAV ───
+var currentPage = 'dashboard';
+
 document.querySelectorAll('.sidebar-nav a[data-page]').forEach(function(a) {
   a.addEventListener('click', function() {
     document.querySelectorAll('.sidebar-nav a[data-page]').forEach(function(x) { x.classList.remove('active'); });
     this.classList.add('active');
+    currentPage = this.dataset.page;
     closeSidebar();
     loadPage(this.dataset.page);
   });
+});
+
+document.getElementById('admin-refresh').addEventListener('click', function() {
+  loadPage(currentPage);
 });
 
 function loadPage(page) {
