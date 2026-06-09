@@ -729,14 +729,27 @@ img.thumb {
   background: var(--surface);
 }
 .img-grid .img-item img { width: 100%; height: 100%; object-fit: cover; }
-.img-grid .img-item .img-rm {
-  position: absolute; top: 2px; right: 2px; width: 20px; height: 20px;
-  border-radius: 50%; border: none; background: rgba(239,68,68,0.85);
-  color: #fff; font-size: 11px; cursor: pointer; display: flex;
-  align-items: center; justify-content: center; line-height: 1;
-  opacity: 0; transition: opacity 0.2s; font-family: inherit;
+.img-grid .img-item .img-idx {
+  position: absolute; top: 2px; left: 2px; z-index: 2;
+  width: 18px; height: 18px; border-radius: 50%;
+  background: rgba(0,0,0,0.6); color: #fff;
+  font-size: 9px; font-weight: 600; display: flex;
+  align-items: center; justify-content: center; font-family: inherit;
 }
-.img-grid .img-item:hover .img-rm { opacity: 1; }
+.img-grid .img-item .img-ovr {
+  position: absolute; bottom: 0; left: 0; right: 0;
+  display: flex; gap: 2px; padding: 3px;
+  background: linear-gradient(transparent, rgba(0,0,0,0.7));
+  justify-content: center;
+}
+.img-grid .img-item .img-mv, .img-grid .img-item .img-rm {
+  width: 20px; height: 20px; border-radius: 50%; border: none;
+  font-size: 10px; cursor: pointer; display: flex;
+  align-items: center; justify-content: center; line-height: 1;
+  font-family: inherit; transition: opacity 0.2s;
+}
+.img-grid .img-item .img-mv { background: rgba(255,255,255,0.15); color: #fff; }
+.img-grid .img-item .img-rm { background: rgba(239,68,68,0.85); color: #fff; }
 
 /* ─── MODAL ─── */
 .modal-overlay {
@@ -1331,8 +1344,19 @@ function renderImageGrid() {
   if (!grid) return;
   var imgs = window._editImages || [];
   grid.innerHTML = imgs.map(function(url, i) {
-    return '<div class="img-item"><img src="' + url + '"><button type="button" class="img-rm" onclick="removeImage(' + i + ')">✕</button></div>';
+    return '<div class="img-item"><span class="img-idx">' + (i+1) + '</span><img src="' + url + '"><div class="img-ovr">' +
+      (i > 0 ? '<button type="button" class="img-mv" onclick="moveImage(' + i + ',' + (i-1) + ')">▲</button>' : '') +
+      (i < imgs.length - 1 ? '<button type="button" class="img-mv" onclick="moveImage(' + i + ',' + (i+1) + ')">▼</button>' : '') +
+      '<button type="button" class="img-rm" onclick="removeImage(' + i + ')">✕</button></div></div>';
   }).join('');
+}
+
+function moveImage(from, to) {
+  var imgs = window._editImages;
+  var tmp = imgs[from];
+  imgs[from] = imgs[to];
+  imgs[to] = tmp;
+  renderImageGrid();
 }
 
 function removeImage(idx) {
