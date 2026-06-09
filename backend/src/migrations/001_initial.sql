@@ -37,6 +37,7 @@ CREATE TABLE IF NOT EXISTS products (
   sku VARCHAR(100),
   images TEXT[] DEFAULT '{}',
   sizes TEXT[] DEFAULT '{}',
+  colours TEXT[] DEFAULT '{}',
   status VARCHAR(50) DEFAULT 'active',
   category VARCHAR(255),
   gender VARCHAR(50) DEFAULT 'Any',
@@ -81,6 +82,7 @@ CREATE TABLE IF NOT EXISTS orders (
   id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
   user_id UUID REFERENCES users(id) ON DELETE SET NULL,
   order_number VARCHAR(50) UNIQUE NOT NULL,
+  status VARCHAR(50) DEFAULT 'placed',
   subtotal INTEGER NOT NULL,
   shipping INTEGER DEFAULT 0,
   tax INTEGER DEFAULT 0,
@@ -90,6 +92,9 @@ CREATE TABLE IF NOT EXISTS orders (
   razorpay_order_id VARCHAR(255),
   razorpay_payment_id VARCHAR(255),
   shipping_address JSONB,
+  customer_name VARCHAR(255),
+  customer_email VARCHAR(255),
+  customer_phone VARCHAR(20),
   created_at TIMESTAMPTZ DEFAULT NOW()
 );
 
@@ -99,7 +104,9 @@ CREATE TABLE IF NOT EXISTS order_items (
   order_id UUID REFERENCES orders(id) ON DELETE CASCADE,
   product_id UUID REFERENCES products(id) ON DELETE SET NULL,
   product_name VARCHAR(255),
+  product_image TEXT,
   size VARCHAR(20),
+  colour VARCHAR(50),
   quantity INTEGER DEFAULT 1,
   price INTEGER NOT NULL
 );

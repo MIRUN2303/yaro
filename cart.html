@@ -1629,9 +1629,11 @@
         items.push({
           product_id: prod.slug || prod.id,
           product_name: prod.name,
+          product_image: prod.image,
           price: price,
           quantity: item.qty,
-          size: item.size || null
+          size: item.size || null,
+          colour: item.colour || null
         });
       });
       return items;
@@ -1713,7 +1715,10 @@
         shipping: shippingPaise,
         tax: taxPaise,
         total: totalPaise,
-        shipping_address: shippingAddr
+        shipping_address: shippingAddr,
+        customer_name: name,
+        customer_email: userEmail,
+        customer_phone: phone
       };
 
       var orderItems = buildOrderItems(cartItems);
