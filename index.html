@@ -1747,6 +1747,7 @@
     </div>
   </div>
 
+  <script src="js/api.js"></script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/gsap.min.js"></script>
   <script>
     (() => {
@@ -2542,5 +2543,156 @@
     if (o) o.classList.remove('active');
   });
   </script>
+
+<script>
+// ─── DYNAMIC HOMEPAGE DATA LOADER ───
+(function() {
+  var subtitle = document.querySelector('.yaro-subtitle');
+  var storeModal = document.getElementById('store-modal');
+  var storeList = storeModal ? storeModal.querySelector('.store-collections-list') : null;
+
+  // Load homepage content
+  YARO_API.getHomepage().then(function(hp) {
+    if (!hp) return;
+    if (hp.hero_title && subtitle) subtitle.textContent = hp.hero_title.toUpperCase();
+  }).catch(function() {});
+
+  // Load collections into store modal
+  YARO_API.getCollections().then(function(cols) {
+    if (!cols || !cols.length || cols === YARO_API.getFallbackCollections()) return;
+    if (!storeList) return;
+    var html = '<a href="store.html" class="store-collection-opt"><span class="dot">\u25CE</span> General</a>';
+    cols.forEach(function(c) {
+      html += '<a href="store.html?collection=' + encodeURIComponent(c.name) + '" class="store-collection-opt"><span class="dot">\u25CB</span> ' + esc(c.name) + '</a>';
+    });
+    storeList.innerHTML = html;
+  }).catch(function() {});
+
+  // Load featured products into slide 2 gallery
+  YARO_API.getProducts().then(function(prods) {
+    if (!prods || !prods.length || prods === YARO_API.getFallbackProducts()) return;
+    var featured = prods.filter(function(p) { return p.badge_class === 'featured' || p.badge_class === 'bestseller'; });
+    if (!featured.length) featured = prods.slice(0, 3);
+    var slide2 = document.getElementById('slide-2');
+    if (!slide2 || !featured.length) return;
+    var gallery = slide2.querySelector('.product-gallery');
+    var mainDetail = slide2.querySelector('.main-detail');
+    if (!gallery) return;
+    // Update center card
+    var center = gallery.querySelector('.center-front');
+    var sideLeft = gallery.querySelector('.side-left');
+    var sideRight = gallery.querySelector('.side-right');
+    if (center && featured[0]) {
+      var img = center.querySelector('img');
+      var det = center.querySelector('.item-details');
+      if (img) { img.src = (featured[0].images && featured[0].images[0]) || featured[0].image || img.src; img.alt = featured[0].name; }
+      if (det) {
+        var h = det.querySelector('h3');
+        var p = det.querySelector('p');
+        if (h) h.textContent = featured[0].name;
+        if (p) p.textContent = (featured[0].category || '') + ' Collection';
+      }
+    }
+    if (sideLeft && featured[1]) {
+      var img = sideLeft.querySelector('img');
+      if (img) { img.src = (featured[1].images && featured[1].images[0]) || featured[1].image || img.src; img.alt = featured[1].name; }
+    }
+    if (sideRight && featured[2]) {
+      var img = sideRight.querySelector('img');
+      if (img) { img.src = (featured[2].images && featured[2].images[0]) || featured[2].image || img.src; img.alt = featured[2].name; }
+    }
+  }).catch(function() {});
+
+  // Load stories into slide 3 featured stories list
+  YARO_API.getStories().then(function(stories) {
+    if (!stories || !stories.length) return;
+    var slide3 = document.getElementById('slide-3');
+    if (!slide3) return;
+    var list = slide3.querySelector('.featured-stories-list');
+    if (!list) return;
+    var storyItems = list.querySelectorAll('.featured-story-item');
+    // Only replace if we have matching number of stories with product slugs
+    var prods = YARO_API.getFallbackProducts();
+    var html = '';
+    stories.forEach(function(s, idx) {
+      if (idx >= 3) return;
+      var productSlug = s.slug || '';
+      var colName = s.collection ? s.collection.name : (s.collection_id || '');
+      var imgSrc = s.cover_image || 'images/detail_pics/center_model.png';
+      var title = s.title || 'Story';
+      html += '<div class="featured-story-item interactive-elem" data-image="' + imgSrc + '" data-id="' + productSlug + '" style="padding:16px 20px;border-radius:12px;background:transparent;border:1px solid transparent;cursor:pointer;transition:all 0.3s ease;">';
+      html += '<div style="font-size:8px;font-weight:600;letter-spacing:0.15em;text-transform:uppercase;color:rgba(255,255,255,0.25);margin-bottom:4px;">Collection: ' + esc(colName) + '</div>';
+      html += '<div style="display:flex;align-items:center;justify-content:space-between;width:100%;">';
+      html += '<span style="font-family:\'Clash Display\',sans-serif;font-size:16px;font-weight:700;color:rgba(255,255,255,0.4);letter-spacing:0.05em;text-transform:uppercase;">' + esc(title) + '</span>';
+      html += '<span class="explore-btn-inline" style="font-size:10px;font-weight:600;color:rgba(255,255,255,0.2);letter-spacing:0.1em;text-transform:uppercase;">Explore \u2192</span>';
+      html += '</div></div>';
+    });
+    if (html) {
+      list.innerHTML = html;
+      // Re-bind click/mouseenter events
+      var newItems = list.querySelectorAll('.featured-story-item');
+      var fiA = document.querySelector('.fi-a');
+      var fiB = document.querySelector('.fi-b');
+      var featuredMobileTitle = document.querySelector('.mobile-image-title');
+      var featuredDesktopTitle = document.querySelector('.desktop-image-title');
+      var fiActive = fiA;
+      function crossfadeFeaturedImage(newSrc, newTitle) {
+        var hidden = (fiActive === fiA) ? fiB : fiA;
+        hidden.src = newSrc;
+        hidden.setAttribute('data-active', '0');
+        if (window.gsap) {
+          gsap.set(hidden, { opacity: 0, scale: 1.05, filter: 'blur(6px)', zIndex: 3 });
+          var tl = gsap.timeline({ onComplete: function() {
+            fiActive.setAttribute('data-active', '0'); fiActive.style.zIndex = 1;
+            hidden.setAttribute('data-active', '1'); hidden.style.zIndex = 2;
+            fiActive = hidden;
+          }});
+          tl.to(fiActive, { opacity: 0, scale: 0.95, filter: 'blur(5px)', duration: 0.35, ease: 'power2.in' }, 0);
+          tl.to(hidden, { opacity: 1, scale: 1, filter: 'blur(0px)', duration: 0.5, ease: 'power2.out' }, 0.12);
+        } else {
+          fiActive.style.opacity = '0'; hidden.style.opacity = '1';
+          fiActive.setAttribute('data-active', '0'); hidden.setAttribute('data-active', '1');
+          fiActive = hidden;
+        }
+      }
+      for (var i = 0; i < newItems.length; i++) {
+        newItems[i].addEventListener('mouseenter', function() {
+          for (var j = 0; j < newItems.length; j++) newItems[j].classList.remove('active');
+          this.classList.add('active');
+          var src = this.getAttribute('data-image');
+          var title = this.querySelector('span').textContent;
+          crossfadeFeaturedImage(src, title);
+          if (featuredMobileTitle) featuredMobileTitle.textContent = title;
+          if (featuredDesktopTitle) featuredDesktopTitle.textContent = title;
+        });
+        newItems[i].addEventListener('click', function(e) {
+          e.preventDefault();
+          var id = this.getAttribute('data-id');
+          if (!id) return;
+          var overlay = document.getElementById('page-transition');
+          var frame = document.querySelector('.glass-layer');
+          if (window.gsap && frame) {
+            gsap.to(frame, { scale: 0.96, opacity: 0, duration: 0.18, ease: 'power2.in', overwrite: 'auto' });
+            setTimeout(function() { overlay.classList.add('active'); setTimeout(function() { window.location.href = 'product.html?id=' + id; }, 250); }, 120);
+          } else {
+            window.location.href = 'product.html?id=' + id;
+          }
+        });
+      }
+      // Trigger first item
+      if (newItems.length && fiA) {
+        var firstSrc = newItems[0].getAttribute('data-image') || fiA.src;
+        var firstTitle = newItems[0].querySelector('span').textContent;
+        fiA.src = firstSrc; fiB.src = firstSrc;
+        if (featuredMobileTitle) featuredMobileTitle.textContent = firstTitle;
+        if (featuredDesktopTitle) featuredDesktopTitle.textContent = firstTitle;
+        newItems[0].classList.add('active');
+      }
+    }
+  }).catch(function() {});
+
+  function esc(str) { var d = document.createElement('div'); d.appendChild(document.createTextNode(str || '')); return d.innerHTML; }
+})();
+</script>
 </body>
 </html>

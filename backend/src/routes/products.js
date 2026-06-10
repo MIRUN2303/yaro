@@ -96,4 +96,31 @@ router.delete('/:id', adminAuth, async (req, res) => {
   }
 });
 
+// PATCH /api/products/:id/flags (admin)
+router.patch('/:id/flags', adminAuth, async (req, res) => {
+  try {
+    const { badge_class } = req.body;
+    const allowed = ['bestseller', 'new', 'featured', ''];
+    if (badge_class !== undefined && !allowed.includes(badge_class)) {
+      return res.status(400).json({ error: 'Invalid badge_class. Allowed: bestseller, new, featured' });
+    }
+    const updates = {};
+    if (badge_class !== undefined) updates.badge_class = badge_class;
+    if (Object.keys(updates).length === 0) {
+      return res.status(400).json({ error: 'No valid fields to update' });
+    }
+    const { data, error } = await supabase
+      .from('products')
+      .update(updates)
+      .eq('id', req.params.id)
+      .select()
+      .single();
+    if (error) throw error;
+    if (!data) return res.status(404).json({ error: 'Product not found' });
+    res.json(data);
+  } catch (err) {
+    res.status(500).json({ error: err.message });
+  }
+});
+
 module.exports = router;

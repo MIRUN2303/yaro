@@ -1,6 +1,8 @@
-
 node_modules/
+**/node_modules/
 .env
-backend/.env
-supabase/.temp/
-docs/SUPABASE*.txt
+.env.local
+backend/uploads/
+netlify/functions/node_modules/
+.DS_Store
+*.log

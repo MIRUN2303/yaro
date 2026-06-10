@@ -1,2 +1,23 @@
 [build]
   publish = "."
+  functions = "netlify/functions"
+
+[[redirects]]
+  from = "/api/*"
+  to = "/.netlify/functions/api/:splat"
+  status = 200
+
+[[redirects]]
+  from = "/api"
+  to = "/.netlify/functions/api"
+  status = 200
+
+[[redirects]]
+  from = "/admin-panel"
+  to = "/backend/admin/index.html"
+  status = 200
+
+[[redirects]]
+  from = "/admin-panel/*"
+  to = "/backend/admin/:splat"
+  status = 200
