@@ -1334,6 +1334,7 @@ async function saveProd(id) {
   }
   var r = id ? await YARO_API.updateProduct(id, body) : await YARO_API.createProduct(body);
   if (r.error) { showToast('Error: ' + (r.error.message || typeof r.error === 'string' ? r.error : JSON.stringify(r.error)), 'error'); return; }
+  showToast(id ? 'Product updated successfully ✓' : 'Product created successfully ✓', 'success');
   closeModal(); loadPage('products');
 }
 
