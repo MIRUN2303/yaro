@@ -19,10 +19,11 @@ router.post('/signup', async (req, res) => {
     if (authError) throw authError;
     if (!authData.user) throw new Error('Signup failed');
 
-    // Create local user mirror
+    // Cocopoy-style: store role in users table (default 'user')
+    const role = authData.user.user_metadata?.role || 'user';
     const { error: userError } = await supabase
       .from('users')
-      .insert({ id: authData.user.id, name, email, phone });
+      .insert({ id: authData.user.id, name, email, phone, role });
 
     if (userError) console.warn('User mirror insert warning:', userError.message);
 
@@ -70,8 +71,14 @@ router.post('/login', async (req, res) => {
       }
     };
 
-    // If email matches admin, silently attach admin JWT
-    if (email === process.env.ADMIN_EMAIL) {
+    // Cocopoy-style admin check: hardcoded email OR database role
+    const isAdmin = email === process.env.ADMIN_EMAIL ||
+      (existingUser && existingUser.role === 'admin');
+    if (isAdmin) {
+      // Ensure role is set in DB for future checks
+      if (existingUser && existingUser.role !== 'admin') {
+        await supabase.from('users').update({ role: 'admin' }).eq('id', existingUser.id);
+      }
       response.admin_token = jwt.sign(
         { email, role: 'admin' },
         process.env.JWT_SECRET,
@@ -135,7 +142,8 @@ router.get('/me', async (req, res) => {
       id: user.id,
       email: user.email,
       name: profile?.name || user.user_metadata?.name || user.email,
-      phone: profile?.phone || ''
+      phone: profile?.phone || '',
+      role: profile?.role || 'user'
     });
   } catch (err) {
     res.status(500).json({ error: err.message });
@@ -191,7 +199,31 @@ router.put('/profile', async (req, res) => {
 router.post('/admin/login', async (req, res) => {
   try {
     const { email, password } = req.body;
+    let authorized = false;
+
+    // Check 1: Hardcoded admin credentials from .env
     if (email === process.env.ADMIN_EMAIL && password === process.env.ADMIN_PASSWORD) {
+      authorized = true;
+    }
+
+    // Check 2: Cocopoy-style DB role check (role='admin' in users table)
+    if (!authorized) {
+      const { data: user } = await supabase
+        .from('users')
+        .select('role')
+        .eq('email', email)
+        .single();
+
+      if (user && user.role === 'admin') {
+        // For DB-role admins, verify password against Supabase Auth
+        const { data: authData, error: authError } = await supabase.auth.signInWithPassword({ email, password });
+        if (!authError && authData.user) {
+          authorized = true;
+        }
+      }
+    }
+
+    if (authorized) {
       const token = jwt.sign(
         { email, role: 'admin' },
         process.env.JWT_SECRET,
@@ -202,6 +234,21 @@ router.post('/admin/login', async (req, res) => {
     res.status(401).json({ error: 'Invalid admin credentials' });
   } catch (err) {
     res.status(500).json({ error: err.message });
+  }
+});
+
+// Verify admin token (used by frontend admin.html for server-side check)
+router.get('/admin/verify', async (req, res) => {
+  try {
+    const token = req.headers.authorization?.replace('Bearer ', '');
+    if (!token) return res.json({ valid: false });
+    const decoded = jwt.verify(token, process.env.JWT_SECRET);
+    if (decoded.role === 'admin') {
+      return res.json({ valid: true, email: decoded.email });
+    }
+    res.json({ valid: false });
+  } catch (err) {
+    res.json({ valid: false });
   }
 });
 

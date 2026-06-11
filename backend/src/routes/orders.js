@@ -195,4 +195,36 @@ router.put('/:id/status', adminAuth, async (req, res) => {
   }
 });
 
+// PUT /api/orders/:id/cancel-action (admin approve/reject cancellation)
+router.put('/:id/cancel-action', adminAuth, async (req, res) => {
+  try {
+    const { action, admin_note } = req.body;
+    if (!action || !['approved', 'rejected'].includes(action)) {
+      return res.status(400).json({ error: 'Invalid action. Use "approved" or "rejected"' });
+    }
+
+    const updates = {};
+    if (action === 'approved') {
+      updates.fulfillment_status = 'cancelled';
+      updates.cancellation = { status: 'approved', admin_note: admin_note || null };
+    } else {
+      updates.cancellation = { status: 'rejected', admin_note: admin_note || null };
+    }
+
+    const { data, error } = await supabase
+      .from('orders')
+      .update(updates)
+      .eq('id', req.params.id)
+      .select()
+      .single();
+
+    if (error) throw error;
+    if (!data) return res.status(404).json({ error: 'Order not found' });
+
+    res.json(data);
+  } catch (err) {
+    res.status(500).json({ error: err.message });
+  }
+});
+
 module.exports = router;

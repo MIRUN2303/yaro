@@ -1,9 +1,24 @@
 const BASE = '/api';
 const TOKEN = localStorage.getItem('admin_token');
 
-if (!TOKEN && !window.location.href.includes('login.html')) {
-  window.location.href = 'login.html';
-}
+// Verify token is valid (not just present), like Cocopoy's requireAdmin()
+(function() {
+  var t = TOKEN;
+  if (!t) {
+    if (!window.location.href.includes('login.html')) window.location.href = 'login.html';
+    return;
+  }
+  try {
+    var payload = JSON.parse(atob(t.split('.')[1]));
+    if (payload.role !== 'admin' || payload.exp * 1000 <= Date.now()) {
+      localStorage.removeItem('admin_token');
+      if (!window.location.href.includes('login.html')) window.location.href = 'login.html';
+    }
+  } catch(e) {
+    localStorage.removeItem('admin_token');
+    if (!window.location.href.includes('login.html')) window.location.href = 'login.html';
+  }
+})();
 
 async function api(path, opts) {
   opts = opts || {};

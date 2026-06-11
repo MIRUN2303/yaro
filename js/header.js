@@ -12,7 +12,7 @@
     '<a href="index.html" class="sh-logo">YARO</a>',
     '<div class="sh-search">',
     '<svg class="sh-search-icon" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/></svg>',
-    '<input type="text" placeholder="Search..." class="header-search-input">',
+    '<input type="text" class="header-search-input">',
     '<button class="sh-search-clear">&#10005;</button>',
     '</div>',
     '<button class="sh-menu-btn" id="sh-menu-btn" aria-label="Menu"><span></span><span></span><span></span></button>',
@@ -35,24 +35,31 @@
   ab.style.cssText = 'display:none;text-align:center;padding:8px 16px;background:rgba(196,181,253,0.06);border-bottom:1px solid rgba(196,181,253,0.08);font-size:11px;color:#c4b5fd;letter-spacing:0.08em;font-family:"Clash Display",sans-serif';
   h.parentNode.insertBefore(ab, h.nextSibling);
 
-  // Show admin link if admin is logged in
+  // Show admin link only if a valid admin token exists (like Cocopoy's isAdmin())
   (function() {
+    function showAdminLink() {
+      var link = document.getElementById('admin-header-link');
+      if (link) { link.style.display = ''; link.classList.add('visible'); }
+      var mLink = document.getElementById('mobile-admin-link');
+      if (mLink) { mLink.style.display = ''; mLink.classList.add('visible'); }
+      var s = document.createElement('style');
+      s.textContent = '.admin-nav-link.visible{display:inline-flex!important;align-items:center;gap:4px;padding:4px 12px!important;background:rgba(196,181,253,0.1);border:1px solid rgba(196,181,253,0.2);border-radius:6px;color:#c4b5fd!important;font-weight:600!important}.admin-nav-link.visible:hover{background:rgba(196,181,253,0.18)!important;border-color:rgba(196,181,253,0.35)!important;color:#d8ccff!important}.admin-nav-link.visible::after{display:none!important}';
+      document.head.appendChild(s);
+    }
     try {
-      var token = localStorage.getItem('sb_token');
-      if (!token) return;
-      fetch('https://hggaxgdiritrawbpyues.supabase.co/auth/v1/user', {
-        headers: { 'apikey': 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImhnZ2F4Z2Rpcml0cmF3YnB5dWVzIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODA4NTE1NjIsImV4cCI6MjA5NjQyNzU2Mn0.huBcWXCsLlTVW-_6VLOI4FRppb_72QJl-bhwsw2zynI', 'Authorization': 'Bearer ' + token }
-      }).then(function(r) { return r.json(); }).then(function(u) {
-        if (u && u.email === 'yarodrops@gmail.com') {
-          var link = document.getElementById('admin-header-link');
-          if (link) { link.style.display = ''; link.classList.add('visible'); }
-          var mLink = document.getElementById('mobile-admin-link');
-          if (mLink) { mLink.style.display = ''; mLink.classList.add('visible'); }
-          var s = document.createElement('style');
-          s.textContent = '.admin-nav-link.visible{display:inline-flex!important;align-items:center;gap:4px;padding:4px 12px!important;background:rgba(196,181,253,0.1);border:1px solid rgba(196,181,253,0.2);border-radius:6px;color:#c4b5fd!important;font-weight:600!important}.admin-nav-link.visible:hover{background:rgba(196,181,253,0.18)!important;border-color:rgba(196,181,253,0.35)!important;color:#d8ccff!important}.admin-nav-link.visible::after{display:none!important}';
-          document.head.appendChild(s);
+      var t = localStorage.getItem('admin_token');
+      if (t) {
+        try {
+          var payload = JSON.parse(atob(t.split('.')[1]));
+          if (payload.role === 'admin' && payload.exp * 1000 > Date.now()) {
+            showAdminLink();
+          } else {
+            localStorage.removeItem('admin_token');
+          }
+        } catch(e) {
+          localStorage.removeItem('admin_token');
         }
-      }).catch(function() {});
+      }
     } catch(e) {}
   })();
 

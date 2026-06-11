@@ -45,11 +45,11 @@ router.get('/:slug', async (req, res) => {
 // POST /api/products (admin)
 router.post('/', adminAuth, async (req, res) => {
   try {
-    const { name, slug, description, price, original_price, sale_price, stock, sku, images, sizes, status, category, gender, badge, badge_class, story_text, offer_name, collection_id, story_id } = req.body;
+    const { name, slug, description, price, original_price, sale_price, stock, sku, images, sizes, status, category, gender, badge, badge_class, story_text, offer_name, collection_id, story_id, colours, colour_data } = req.body;
     if (!name || !slug) return res.status(400).json({ error: 'Name and slug required' });
     const { data, error } = await supabase
       .from('products')
-      .insert({ name, slug, description, price, original_price, sale_price, stock, sku, images, sizes, status, category, gender, badge, badge_class, story_text, offer_name, collection_id, story_id })
+      .insert({ name, slug, description, price, original_price, sale_price, stock, sku, images, sizes, status, category, gender, badge, badge_class, story_text, offer_name, collection_id, story_id, colours, colour_data })
       .select()
       .single();
     if (error) throw error;

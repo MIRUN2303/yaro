@@ -1,8 +1,7 @@
 const express = require('express');
 const router = express.Router();
-const { razorpay } = require('../services/razorpay');
+const { getRazorpay, verifyPayment } = require('../services/razorpay');
 const { authenticate } = require('../middleware/auth');
-const { verifyPayment } = require('../services/razorpay');
 
 // GET /api/payments/key — expose Razorpay key to frontend
 router.get('/key', (req, res) => {
@@ -22,7 +21,7 @@ router.post('/create-order', authenticate, async (req, res) => {
       payment_capture: 1
     };
 
-    const order = await razorpay.orders.create(options);
+    const order = await getRazorpay().orders.create(options);
     res.json(order);
   } catch (err) {
     res.status(500).json({ error: err.message });

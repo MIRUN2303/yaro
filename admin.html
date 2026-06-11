@@ -1075,17 +1075,27 @@ function closeSidebar() {
   document.getElementById('sidebar-overlay').classList.remove('open');
 }
 
-// ─── AUTH ───
+// ─── AUTH (Cocopoy-style: always show login first, verify thoroughly) ───
 (async function() {
   if (adminToken) {
     var valid = await YARO_API.verifyToken();
-    if (valid) { showApp(); loadPage('dashboard'); return; }
+    if (valid) {
+      // Also verify with server to be safe
+      try {
+        var serverCheck = await YARO_API.verifyAdminServer();
+        if (serverCheck) { showApp(); loadPage('dashboard'); return; }
+      } catch(e) {}
+    }
+    // Token invalid — clear everything
     localStorage.removeItem('admin_token');
     localStorage.removeItem('sb_token');
     localStorage.removeItem('sb_refresh');
     localStorage.removeItem('sb_user');
     adminToken = null;
   }
+  // Force login screen visibility (defense in depth)
+  document.getElementById('admin-login').classList.remove('hidden');
+  document.getElementById('admin-app').classList.remove('active');
 })();
 
 document.getElementById('adm-login-btn').addEventListener('click', async function() {
@@ -1221,7 +1231,7 @@ async function renderProducts(c) {
     (!items.length ? '<div class="tbl-wrap"><div class="no-data"><span>◉</span>No products yet</div></div>' :
     '<div class="tbl-wrap"><table><thead><tr><th>Image</th><th>Name</th><th>Price</th><th>Stock</th><th>Collection</th><th>Gender</th><th>Status</th><th>Actions</th></tr></thead><tbody>' +
     items.map(function(p) {
-      return '<tr><td>' + (p.images&&p.images[0]?'<img class="thumb" src="'+fixImg(p.images[0])+'">':'-') + '</td><td><strong style="color:rgba(255,255,255,0.85)">' + esc(p.name) + '</strong></td><td>₹' + (p.price||0) + '</td><td>' + (p.stock||0) + '</td><td style="color:rgba(255,255,255,0.45)">' + esc(cm[p.collection_id]||'-') + '</td><td style="color:rgba(255,255,255,0.45)">' + esc(p.gender||'Any') + '</td><td><span class="badge ' + (p.status==='active'?'badge-suc':'badge-warn') + '">' + esc(p.status) + '</span></td><td class="acts"><div class="acts-inner"><button class="btn btn-sm btn-pri" onclick="openProdModal(\'' + p.id + '\')">Edit</button><button class="btn btn-sm btn-del" onclick="delItem(\'products\',\'' + p.id + '\')">Delete</button></div></td></tr>';
+      var thumbSrc = (p.images&&p.images[0]) || (p.colour_data && function(){for(var c in p.colour_data){if(Array.isArray(p.colour_data[c])&&p.colour_data[c].length)return p.colour_data[c][0]}return null}()) || '';      return '<tr><td>' + (thumbSrc?'<img class="thumb" src="'+fixImg(thumbSrc)+'">':'-') + '</td><td><strong style="color:rgba(255,255,255,0.85)">' + esc(p.name) + '</strong></td><td>₹' + (p.price||0) + '</td><td>' + (p.stock||0) + '</td><td style="color:rgba(255,255,255,0.45)">' + esc(cm[p.collection_id]||'-') + '</td><td style="color:rgba(255,255,255,0.45)">' + esc(p.gender||'Any') + '</td><td><span class="badge ' + (p.status==='active'?'badge-suc':'badge-warn') + '">' + esc(p.status) + '</span></td><td class="acts"><div class="acts-inner"><button class="btn btn-sm btn-pri" onclick="openProdModal(\'' + p.id + '\')">Edit</button><button class="btn btn-sm btn-del" onclick="delItem(\'products\',\'' + p.id + '\')">Delete</button></div></td></tr>';
     }).join('') + '</tbody></table></div>');
 }
 
@@ -1286,6 +1296,16 @@ async function loadProd(id) {
 }
 
 async function saveProd(id) {
+  var colourData = window._colourData || {};
+  // Build flat images array from all colour images so product page always has images
+  var flatImages = [];
+  Object.keys(colourData).forEach(function(c) {
+    if (Array.isArray(colourData[c])) {
+      colourData[c].forEach(function(url) {
+        if (flatImages.indexOf(url) < 0) flatImages.push(url);
+      });
+    }
+  });
   var body = {
     collection_id: document.getElementById('f-collection').value || null,
     name: document.getElementById('f-name').value,
@@ -1294,13 +1314,13 @@ async function saveProd(id) {
     price: parseInt(document.getElementById('f-price').value) || 0,
     original_price: parseInt(document.getElementById('f-oprice').value) || null,
     stock: parseInt(document.getElementById('f-stock').value) || 0,
-    images: [],
+    images: flatImages,
     sizes: Array.from(document.querySelectorAll('#f-sizes .size-chip.selected')).map(function(c){return c.getAttribute('data-size')}),
     colours: Array.from(document.querySelectorAll('#f-colours .colour-chip.selected')).map(function(c){return c.getAttribute('data-colour')}),
     gender: document.getElementById('f-gender').value,
     badge: document.getElementById('f-badge').value,
     offer_name: document.getElementById('f-offer').value,
-    colour_data: window._colourData,
+    colour_data: colourData,
     status: document.getElementById('f-status').value
   };
   if (body.status === 'active') {
