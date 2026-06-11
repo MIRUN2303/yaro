@@ -227,4 +227,52 @@ router.put('/:id/cancel-action', adminAuth, async (req, res) => {
   }
 });
 
+// POST /api/orders/:id/cancel (user requests order cancellation)
+router.post('/:id/cancel', authenticate, async (req, res) => {
+  try {
+    // 1. Fetch order
+    const { data: order, error: fetchErr } = await supabase
+      .from('orders')
+      .select('*')
+      .eq('id', req.params.id)
+      .single();
+    
+    if (fetchErr || !order) return res.status(404).json({ error: 'Order not found' });
+    
+    // 2. Ensure order belongs to user
+    if (order.user_id !== req.user.id) {
+      return res.status(403).json({ error: 'Access denied' });
+    }
+
+    // 3. Ensure order is cancelable (created within 24h and status in pending/placed/processing)
+    const hours = (new Date() - new Date(order.created_at)) / (1000 * 60 * 60);
+    if (hours > 24) {
+      return res.status(400).json({ error: 'Orders can only be cancelled within 24 hours of placement' });
+    }
+    if (!['pending', 'placed', 'processing'].includes(order.fulfillment_status)) {
+      return res.status(400).json({ error: 'Order cannot be cancelled at this stage' });
+    }
+
+    // 4. Update order with cancellation request
+    const { reason } = req.body;
+    const cancellation = {
+      status: 'requested',
+      reason: reason || 'User requested cancellation',
+      requested_at: new Date().toISOString()
+    };
+
+    const { data, error } = await supabase
+      .from('orders')
+      .update({ cancellation })
+      .eq('id', req.params.id)
+      .select()
+      .single();
+
+    if (error) throw error;
+    res.json(data);
+  } catch (err) {
+    res.status(500).json({ error: err.message });
+  }
+});
+
 module.exports = router;

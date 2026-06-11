@@ -1716,57 +1716,47 @@
         shipping_address: shippingAddr,
         customer_name: name,
         customer_email: userEmail,
-        customer_phone: phone
+        customer_phone: phone,
+        items: buildOrderItems(cartItems)
       };
-
-      var orderItems = buildOrderItems(cartItems);
-      // Order ID will be returned from createOrder; set it after
 
       // ─── PERSIST ───
       btn.classList.add('loading');
 
       YARO_API.createOrder(orderData).then(function(orderResult) {
+        btn.classList.remove('loading');
         if (!orderResult || orderResult.error) {
-          btn.classList.remove('loading');
           console.error('Create order failed:', orderResult && orderResult.error);
           showToast('Failed to place order. Please try again.', 'error');
           return;
         }
-        var savedOrderId = orderResult.id || orderResult[0] && orderResult[0].id;
-        orderItems.forEach(function(item) { item.order_id = savedOrderId; });
-        YARO_API.createOrderItems(orderItems).then(function(itemsResult) {
-          btn.classList.remove('loading');
-          if (itemsResult && itemsResult.error) {
-            console.error('Order created but items failed:', itemsResult.error);
-          }
 
-          // ─── SUCCESS ───
-          document.getElementById('success-order-id').textContent = orderNumber;
-          document.getElementById('success-total').innerHTML = '<span class="rupee">₹</span>' + total;
-          document.getElementById('success-modal').classList.add('open');
+        // ─── SUCCESS ───
+        document.getElementById('success-order-id').textContent = orderNumber;
+        document.getElementById('success-total').innerHTML = '<span class="rupee">₹</span>' + total;
+        document.getElementById('success-modal').classList.add('open');
 
-          // Clear state
-          if (isBuyNow && buyNowItem) {
-            sessionStorage.removeItem('yaro_buy_now');
-            isBuyNow = false;
-            buyNowItem = null;
-          } else {
-            var placedName = activeBucket;
-            delete buckets[placedName];
-            if (Object.keys(buckets).length === 0) buckets = { 'My Cart': { items: [] } };
-            activeBucket = null;
-            expandedBucket = null;
-            promoApplied = false;
-            promoDiscount = 0;
-            document.getElementById('promo-input').disabled = false;
-            document.getElementById('promo-input').value = '';
-            document.getElementById('promo-msg').className = 'promo-msg';
-            saveBuckets();
-          }
-          renderCart();
-          showToast('Order placed successfully! 🎉', 'success');
-          stopTimer();
-        });
+        // Clear state
+        if (isBuyNow && buyNowItem) {
+          sessionStorage.removeItem('yaro_buy_now');
+          isBuyNow = false;
+          buyNowItem = null;
+        } else {
+          var placedName = activeBucket;
+          delete buckets[placedName];
+          if (Object.keys(buckets).length === 0) buckets = { 'My Cart': { items: [] } };
+          activeBucket = null;
+          expandedBucket = null;
+          promoApplied = false;
+          promoDiscount = 0;
+          document.getElementById('promo-input').disabled = false;
+          document.getElementById('promo-input').value = '';
+          document.getElementById('promo-msg').className = 'promo-msg';
+          saveBuckets();
+        }
+        renderCart();
+        showToast('Order placed successfully! 🎉', 'success');
+        stopTimer();
       }).catch(function(err) {
         btn.classList.remove('loading');
         showToast('Network error. Please try again.', 'error');

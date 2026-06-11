@@ -51,8 +51,7 @@ const YARO_API = (function() {
       }
       return res.json();
     } catch(e) {
-      if (e.name !== 'TypeError' && !e.message.includes('fetch')) throw e;
-      return null; // network error — caller should use fallback
+      return null; // any error — caller should use fallback
     }
   }
 
@@ -142,6 +141,13 @@ const YARO_API = (function() {
 
     async getOrders() {
       return request('/orders');
+    },
+
+    async cancelOrder(id, reason) {
+      return request('/orders/' + id + '/cancel', {
+        method: 'POST',
+        body: JSON.stringify({ reason: reason })
+      });
     },
 
     // ── Homepage ──

@@ -2270,12 +2270,57 @@
           { opacity: 0, x: 30, filter: 'blur(8px)' },
           { opacity: 1, x: 0, filter: 'none', duration: 0.65, delay: 0.2, ease: 'power3.out' }
         );
-      } else {
-        showNoProducts();
-      }
-    }).catch(function(err) {
+      // fallback: if activeProduct was falsy, showNoProducts is already called via early return above
+    }).catch(async function(err) {
       console.error('getProducts error:', err);
-      showNoProducts();
+      try {
+        var singleProd = await YARO_API.getProduct(productId);
+        if (singleProd) {
+          activeProduct = mapProduct(singleProd);
+          productsDB = [activeProduct];
+        }
+      } catch(e2) {
+        console.error('Fallback also failed:', e2);
+      }
+      if (!activeProduct) {
+        showNoProducts();
+        return;
+      }
+      // Render with single product
+      categoryLabel.textContent = activeProduct.category;
+      productBadge.textContent = activeProduct.badge;
+      productBadge.className = 'prod-badge ' + activeProduct.badgeClass;
+      productTitle.textContent = activeProduct.name;
+      productPrice.innerHTML = activeProduct.price.replace(/₹/g, '<span class="rupee">₹</span>');
+      productDesc.textContent = activeProduct.desc || '';
+      document.title = 'YARO | ' + activeProduct.name;
+      if (productGender && activeProduct.gender) {
+        var g = activeProduct.gender;
+        var genderMap = { 'His': 'For the Gents', 'Hers': 'For the Ladies', 'Any': 'For the Soul', 'Mini': 'For the Little', 'Mini-Gent': 'For the Little Gents', 'Mini-Lady': 'For the Little Ladies' };
+        productGender.textContent = genderMap[g] || g;
+      }
+      var firstColourImgs = null;
+      if (activeProduct.colourData) {
+        var ckeys = Object.keys(activeProduct.colourData);
+        for (var ci = 0; ci < ckeys.length; ci++) {
+          if (activeProduct.colourData[ckeys[ci]] && activeProduct.colourData[ckeys[ci]].length) {
+            firstColourImgs = activeProduct.colourData[ckeys[ci]];
+            break;
+          }
+        }
+      }
+      productImages = firstColourImgs || [activeProduct.image, ...activeProduct.additionalImages];
+      activeImageIndex = 0;
+      sizes = activeProduct.sizes && activeProduct.sizes.length ? activeProduct.sizes : ['S','M','L','XL','XXL'];
+      currentSizeIndex = Math.min(1, sizes.length - 1);
+      if (currentSizeIndex < 0) currentSizeIndex = 0;
+      updateSizeDisplay();
+      relatedProducts = [];
+      renderGallery();
+      if (typeof renderColours === 'function') renderColours();
+      renderRelatedItems();
+      renderReviews();
+      renderProductRating();
     });
 
     function showNoProducts() {
