@@ -2504,7 +2504,17 @@ background: url("data:image/svg+xml,%3Csvg viewBox='0 0 400 400' xmlns='http://w
       }
       var admLink = document.getElementById('admin-link');
       if (admLink) {
-        try { admLink.style.display = localStorage.getItem('admin_token') ? 'block' : 'none'; } catch(e) {}
+        try {
+          var at = localStorage.getItem('admin_token');
+          var show = false;
+          if (at) {
+            try {
+              var p = JSON.parse(atob(at.split('.')[1]));
+              show = p.role === 'admin' && p.exp * 1000 > Date.now();
+            } catch(e) { localStorage.removeItem('admin_token'); }
+          }
+          admLink.style.display = show ? 'block' : 'none';
+        } catch(e) {}
       }
       function openMenu() { if (panel) { panel.classList.add('open'); if (btn) btn.classList.add('open'); } }
       function closeMenu() { if (panel) { panel.classList.remove('open'); if (btn) btn.classList.remove('open'); } }

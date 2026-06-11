@@ -234,8 +234,10 @@
       try {
         var data = await YARO_API.signIn(email, password);
         if (data && data.user) {
-          if (data.user.email && data.user.email === 'yarodrops@gmail.com') {
-            try { localStorage.setItem('admin_token', data.admin_token || '1'); } catch(e) {}
+          if (data.admin_token) {
+            try { localStorage.setItem('admin_token', data.admin_token); } catch(e) {}
+          } else {
+            try { localStorage.removeItem('admin_token'); } catch(e) {}
           }
           var params = new URLSearchParams(window.location.search);
           var redirect = params.get('redirect') || 'profile.html';
