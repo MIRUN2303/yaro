@@ -1288,6 +1288,7 @@ async function loadProd(id) {
     if (colours.indexOf(chip.getAttribute('data-colour')) >= 0) chip.classList.add('selected');
   });
   window._colourData = d.colour_data || {};
+  window._origSlug = d.slug;
   renderColourSections();
   document.getElementById('f-gender').value = d.gender || 'Any';
   document.getElementById('f-badge').value = d.badge || '';
@@ -1309,7 +1310,7 @@ async function saveProd(id) {
   var body = {
     collection_id: document.getElementById('f-collection').value || null,
     name: document.getElementById('f-name').value,
-    slug: document.getElementById('f-name').value.toLowerCase().replace(/[^a-z0-9]+/g,'-').replace(/^-|-$/g,'') + (id ? '' : '-' + Date.now().toString(36)),
+    slug: id ? (window._origSlug || document.getElementById('f-name').value.toLowerCase().replace(/[^a-z0-9]+/g,'-').replace(/^-|-$/g,'')) : document.getElementById('f-name').value.toLowerCase().replace(/[^a-z0-9]+/g,'-').replace(/^-|-$/g,'') + '-' + Date.now().toString(36),
     description: document.getElementById('f-desc').value,
     price: parseInt(document.getElementById('f-price').value) || 0,
     original_price: parseInt(document.getElementById('f-oprice').value) || null,
