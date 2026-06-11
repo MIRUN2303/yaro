@@ -38,12 +38,12 @@ const YARO_API = (function() {
     var t = getToken();
     try {
       var res = await fetch(BASE + path, {
+        ...opts,
         headers: {
           'Content-Type': 'application/json',
           ...(t ? { 'Authorization': 'Bearer ' + t } : {}),
           ...(opts.headers || {})
-        },
-        ...opts
+        }
       });
       if (!res.ok) {
         var err = await res.json().catch(function() { return {}; });
