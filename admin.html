@@ -1333,7 +1333,7 @@ async function saveProd(id) {
     if (missing.length) { showToast('Upload at least 1 image for: ' + missing.join(', '), 'error'); return; }
   }
   var r = id ? await YARO_API.updateProduct(id, body) : await YARO_API.createProduct(body);
-  if (r.error) { showToast('Error: ' + (r.error.message || typeof r.error === 'string' ? r.error : JSON.stringify(r.error)), 'error'); return; }
+  if (!r || r.error) { showToast('Error: ' + (r ? (r.error.message || typeof r.error === 'string' ? r.error : JSON.stringify(r.error)) : 'API request failed'), 'error'); return; }
   showToast(id ? 'Product updated successfully ✓' : 'Product created successfully ✓', 'success');
   closeModal(); loadPage('products');
 }
