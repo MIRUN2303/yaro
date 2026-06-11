@@ -143,6 +143,7 @@ router.get('/me', async (req, res) => {
       email: user.email,
       name: profile?.name || user.user_metadata?.name || user.email,
       phone: profile?.phone || '',
+      avatar_url: profile?.avatar_url || user.user_metadata?.avatar_url || '',
       role: profile?.role || 'user'
     });
   } catch (err) {
@@ -159,10 +160,11 @@ router.put('/profile', async (req, res) => {
     const { data: { user }, error: authError } = await supabase.auth.getUser(token);
     if (authError || !user) return res.status(401).json({ error: 'Invalid token' });
 
-    const { name, phone } = req.body;
+    const { name, phone, avatar_url } = req.body;
     const updates = {};
     if (name !== undefined) updates.name = name;
     if (phone !== undefined) updates.phone = phone;
+    if (avatar_url !== undefined) updates.avatar_url = avatar_url;
 
     if (Object.keys(updates).length === 0) {
       return res.status(400).json({ error: 'Nothing to update' });
@@ -180,16 +182,16 @@ router.put('/profile', async (req, res) => {
       if (error.code === 'PGRST116') {
         const { data: newUser, error: insertError } = await supabase
           .from('users')
-          .insert({ id: user.id, email: user.email, name: name || user.email, phone: phone || '' })
+          .insert({ id: user.id, email: user.email, name: name || user.email, phone: phone || '', avatar_url: avatar_url || '' })
           .select()
           .single();
         if (insertError) throw insertError;
-        return res.json({ id: newUser.id, name: newUser.name, email: newUser.email, phone: newUser.phone || '' });
+        return res.json({ id: newUser.id, name: newUser.name, email: newUser.email, phone: newUser.phone || '', avatar_url: newUser.avatar_url || '' });
       }
       throw error;
     }
 
-    res.json({ id: data.id, name: data.name, email: data.email, phone: data.phone || '' });
+    res.json({ id: data.id, name: data.name, email: data.email, phone: data.phone || '', avatar_url: data.avatar_url || '' });
   } catch (err) {
     res.status(500).json({ error: err.message });
   }

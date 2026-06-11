@@ -831,16 +831,15 @@ body:active .cursor-ring, .cursor-ring.clicking { width: 20px; height: 20px; bor
         var data = await YARO_API.me();
         if (data && data.id) {
           document.body.className = 'logged-in';
-          var meta = data.user_metadata || {};
           document.getElementById('prof-email').textContent = data.email || '';
-          document.getElementById('prof-name').value = meta.name || '';
-          document.getElementById('prof-phone').value = meta.phone || '';
-          var displayName = meta.name || data.email.split('@')[0] || 'User';
+          document.getElementById('prof-name').value = data.name || '';
+          document.getElementById('prof-phone').value = data.phone || '';
+          var displayName = data.name || data.email.split('@')[0] || 'User';
           document.getElementById('prof-display-name').textContent = displayName;
           document.getElementById('prof-display-email').textContent = data.email || '';
-          if (meta.avatar_url) { document.getElementById('prof-avatar-img').src = meta.avatar_url; }
+          if (data.avatar_url) { document.getElementById('prof-avatar-img').src = data.avatar_url; }
           else {
-            var initial = (meta.name && meta.name[0].toUpperCase()) || (data.email && data.email[0].toUpperCase()) || 'Y';
+            var initial = (data.name && data.name[0].toUpperCase()) || (data.email && data.email[0].toUpperCase()) || 'Y';
             document.getElementById('prof-avatar-img').src = 'data:image/svg+xml,' + encodeURIComponent('<svg xmlns="http://www.w3.org/2000/svg" width="72" height="72" viewBox="0 0 72 72"><rect width="72" height="72" fill="#1a1a2e"/><text x="36" y="44" text-anchor="middle" fill="#c4b5fd" font-size="28" font-family="Clash Display" font-weight="600">' + initial + '</text></svg>');
           }
           var cid = data.id.substring(0, 8).toUpperCase();

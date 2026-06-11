@@ -190,6 +190,13 @@ const YARO_API = (function() {
       return request('/auth/me');
     },
 
+    async updateProfile(data) {
+      return request('/auth/profile', {
+        method: 'PUT',
+        body: JSON.stringify(data)
+      });
+    },
+
     async verifyToken() {
       var t = localStorage.getItem('admin_token');
       if (!t) return false;
