@@ -182,6 +182,7 @@ const YARO_API = (function() {
     async logout() {
       var result = await request('/auth/logout', { method: 'POST' });
       clearToken();
+      localStorage.removeItem('admin_token');
       return result;
     },
 

@@ -207,6 +207,17 @@ body { min-height: 100vh; display: flex; flex-direction: column; }
   box-shadow: 0 0 12px rgba(196,181,253,0.04);
 }
 .fg input:disabled { opacity: 0.4; cursor: not-allowed; }
+.prof-email-display {
+  display: block;
+  width: 100%;
+  padding: 11px 14px;
+  background: rgba(255,255,255,0.02);
+  border: 1px solid rgba(255,255,255,0.06);
+  border-radius: 10px;
+  color: rgba(255,255,255,0.55);
+  font-size: 13px;
+  font-family: 'Clash Display', sans-serif;
+}
 .fg input[readonly] { opacity: 0.5; cursor: default; }
 
 /* ─── BUTTONS ─── */
@@ -633,7 +644,7 @@ body:active .cursor-ring, .cursor-ring.clicking { width: 20px; height: 20px; bor
             <div class="form-grid">
               <div class="fg full">
                 <label>Email</label>
-                <input type="email" id="prof-email" readonly>
+                <span id="prof-email" class="prof-email-display"></span>
               </div>
               <div class="fg">
                 <label>Full Name</label>
@@ -821,7 +832,7 @@ body:active .cursor-ring, .cursor-ring.clicking { width: 20px; height: 20px; bor
         if (data && data.id) {
           document.body.className = 'logged-in';
           var meta = data.user_metadata || {};
-          document.getElementById('prof-email').value = data.email || '';
+          document.getElementById('prof-email').textContent = data.email || '';
           document.getElementById('prof-name').value = meta.name || '';
           document.getElementById('prof-phone').value = meta.phone || '';
           var displayName = meta.name || data.email.split('@')[0] || 'User';
@@ -893,7 +904,7 @@ body:active .cursor-ring, .cursor-ring.clicking { width: 20px; height: 20px; bor
       btn.disabled = true;
       btn.textContent = 'Verifying...';
       try {
-        var email = document.getElementById('prof-email').value;
+        var email = document.getElementById('prof-email').textContent;
         var result = await YARO_API.signIn(email, pass);
         if (result && result.error) { throw new Error(result.error); }
         var r = await YARO_API.updateProfile(pendingChanges);
@@ -923,7 +934,7 @@ body:active .cursor-ring, .cursor-ring.clicking { width: 20px; height: 20px; bor
     // ─── NEWSLETTER SUBSCRIPTION ───
     async function checkSubscription() {
       try {
-        var email = document.getElementById('prof-email').value;
+        var email = document.getElementById('prof-email').textContent;
         if (!email) return;
         var result = await YARO_API.getSubscribers ? YARO_API.getSubscribers() : null;
         if (!result) return;
@@ -946,7 +957,7 @@ body:active .cursor-ring, .cursor-ring.clicking { width: 20px; height: 20px; bor
     }
 
     document.getElementById('sub-toggle').addEventListener('click', async function() {
-      var email = document.getElementById('prof-email').value;
+      var email = document.getElementById('prof-email').textContent;
       if (!email) return;
       try {
         if (isSubscribed) {
