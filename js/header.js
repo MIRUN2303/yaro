@@ -50,19 +50,6 @@
       }
       link.style.display = '';
       link.classList.add('visible');
-      var mLink = document.getElementById('mobile-admin-link');
-      if (!mLink) {
-        // For mobile view, duplicate the admin link if needed
-        var mobileLink = document.createElement('a');
-        mobileLink.href = 'manage.html';
-        mobileLink.id = 'mobile-admin-link';
-        mobileLink.className = 'admin-nav-link';
-        mobileLink.textContent = 'Admin';
-        nav.appendChild(mobileLink);
-        mLink = mobileLink;
-      }
-      mLink.style.display = '';
-      mLink.classList.add('visible');
       var s = document.createElement('style');
       s.textContent = '.admin-nav-link.visible{display:inline-flex!important;align-items:center;gap:4px;padding:4px 12px!important;background:rgba(196,181,253,0.1);border:1px solid rgba(196,181,253,0.2);border-radius:6px;color:#c4b5fd!important;font-weight:600!important}.admin-nav-link.visible:hover{background:rgba(196,181,253,0.18)!important;border-color:rgba(196,181,253,0.35)!important;color:#d8ccff!important}.admin-nav-link.visible::after{display:none!important}';
       document.head.appendChild(s);
@@ -71,8 +58,6 @@
     function hideAdminLink() {
       var link = document.getElementById('admin-header-link');
       if (link && link.parentNode) { link.parentNode.removeChild(link); }
-      var mLink = document.getElementById('mobile-admin-link');
-      if (mLink && mLink.parentNode) { mLink.parentNode.removeChild(mLink); }
     }
 
     // Initial check
