@@ -2333,12 +2333,16 @@ background: url("data:image/svg+xml,%3Csvg viewBox='0 0 400 400' xmlns='http://w
         if (searchClear) searchClear.classList.add('visible');
       }
 
+      function getProducts() {
+        return document.querySelectorAll('.product-grid .product-card');
+      }
+
       function updateUI() {
         var query = searchInput ? (searchInput.value || '').trim().toLowerCase() : '';
         var visible = 0;
         var totalInCollection = 0;
         
-        products.forEach(function(p) {
+        getProducts().forEach(function(p) {
           var col = p.getAttribute('data-collection') || '';
           var name = (p.querySelector('.prod-name').textContent || '').toLowerCase();
           
@@ -2398,6 +2402,8 @@ background: url("data:image/svg+xml,%3Csvg viewBox='0 0 400 400' xmlns='http://w
           searchInput.focus();
         });
       }
+
+      window.updateUI = updateUI;
 
       // Store Modal overlay opening/closing
       const storeModal = document.getElementById('store-modal');
