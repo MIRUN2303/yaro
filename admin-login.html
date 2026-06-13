@@ -42,7 +42,7 @@
         const data = await res.json();
         if (!res.ok) { errEl.textContent = data.error || 'Invalid credentials'; return; }
         localStorage.setItem('admin_token', data.token);
-        window.location.href = 'admin.html';
+        window.location.href = 'manage.html';
       } catch(e) { console.error('admin login error:', e); errEl.textContent = 'Cannot reach server. Check your connection.'; }
     });
   </script>

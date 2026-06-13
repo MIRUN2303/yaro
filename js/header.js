@@ -35,7 +35,7 @@
   ab.style.cssText = 'display:none;text-align:center;padding:8px 16px;background:rgba(196,181,253,0.06);border-bottom:1px solid rgba(196,181,253,0.08);font-size:11px;color:#c4b5fd;letter-spacing:0.08em;font-family:"Clash Display",sans-serif';
   h.parentNode.insertBefore(ab, h.nextSibling);
 
-  // Show admin link only if a valid admin token exists (like Cocopoy's isAdmin())
+  // Show admin link only if a valid admin token exists
   (function() {
     function showAdminLink() {
       var link = document.getElementById('admin-header-link');
@@ -61,6 +61,84 @@
         }
       }
     } catch(e) {}
+  })();
+
+  // Password confirmation modal before navigating to admin panel
+  (function() {
+    var adminLink = document.getElementById('admin-header-link');
+    if (!adminLink) return;
+    adminLink.addEventListener('click', function(e) {
+      e.preventDefault();
+      if (document.getElementById('admin-confirm-overlay')) return;
+
+      var overlay = document.createElement('div');
+      overlay.id = 'admin-confirm-overlay';
+      overlay.style.cssText = 'position:fixed;inset:0;z-index:99999;background:rgba(0,0,0,0.8);backdrop-filter:blur(12px);display:flex;align-items:center;justify-content:center;font-family:"Clash Display",sans-serif;';
+
+      var modal = document.createElement('div');
+      modal.style.cssText = 'background:rgba(10,8,18,0.95);border:1px solid rgba(255,255,255,0.1);border-radius:20px;padding:40px 36px;width:380px;max-width:90vw;box-shadow:0 30px 80px rgba(0,0,0,0.6);';
+
+      modal.innerHTML =
+        '<div style="font-family:Pilowlava,serif;font-size:22px;letter-spacing:-0.02em;color:#fff;text-align:center;margin-bottom:4px;">YARO</div>' +
+        '<div style="font-size:11px;letter-spacing:3px;text-transform:uppercase;color:#a1a1aa;text-align:center;margin-bottom:28px;">Confirm Access</div>' +
+        '<div style="margin-bottom:16px;">' +
+        '<input type="password" id="admin-confirm-pw" placeholder="Enter your password" style="width:100%;padding:14px 18px;background:rgba(255,255,255,0.04);border:1px solid rgba(255,255,255,0.08);border-radius:12px;color:#fff;font-size:14px;outline:none;font-family:\'Clash Display\',sans-serif;box-sizing:border-box;">' +
+        '</div>' +
+        '<button id="admin-confirm-btn" style="width:100%;padding:14px;border:none;border-radius:100px;background:linear-gradient(135deg,#c4b5fd 0%,#a78bfa 100%);color:#050505;font-family:\'Clash Display\',sans-serif;font-size:14px;font-weight:600;cursor:pointer;letter-spacing:0.5px;">Confirm</button>' +
+        '<div id="admin-confirm-error" style="font-size:12px;color:#ef4444;text-align:center;margin-top:12px;min-height:18px;"></div>' +
+        '<div style="text-align:center;margin-top:14px;"><a href="#" id="admin-confirm-cancel" style="font-size:12px;color:rgba(255,255,255,0.3);text-decoration:none;">Cancel</a></div>';
+
+      overlay.appendChild(modal);
+      document.body.appendChild(overlay);
+
+      document.getElementById('admin-confirm-cancel').addEventListener('click', function(ce) {
+        ce.preventDefault(); overlay.remove();
+      });
+      overlay.addEventListener('click', function(ce) {
+        if (ce.target === overlay) overlay.remove();
+      });
+
+      var pwInput = document.getElementById('admin-confirm-pw');
+      var confirmBtn = document.getElementById('admin-confirm-btn');
+      var errEl = document.getElementById('admin-confirm-error');
+
+      function doConfirm() {
+        var pw = pwInput.value;
+        if (!pw) { errEl.textContent = 'Password required'; return; }
+        confirmBtn.disabled = true;
+        confirmBtn.style.opacity = '0.5';
+        var email = '';
+        try {
+          var t = localStorage.getItem('admin_token');
+          if (t) { var p = JSON.parse(atob(t.split('.')[1])); email = p.email || ''; }
+        } catch(e) {}
+        fetch('/api/auth/admin/login', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ email: email, password: pw })
+        }).then(function(r) { return r.json(); }).then(function(data) {
+          if (data.token) {
+            localStorage.setItem('admin_token', data.token);
+            overlay.remove();
+            window.location.href = 'manage.html';
+          } else {
+            errEl.textContent = data.error || 'Wrong password';
+            confirmBtn.disabled = false;
+            confirmBtn.style.opacity = '1';
+          }
+        }).catch(function() {
+          errEl.textContent = 'Server error. Try again.';
+          confirmBtn.disabled = false;
+          confirmBtn.style.opacity = '1';
+        });
+      }
+
+      confirmBtn.addEventListener('click', doConfirm);
+      pwInput.addEventListener('keydown', function(ke) {
+        if (ke.key === 'Enter') doConfirm();
+      });
+      setTimeout(function() { pwInput.focus(); }, 100);
+    });
   })();
 
   // Load announcement from site settings (deferred for YARO_API availability)

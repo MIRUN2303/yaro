@@ -5,18 +5,18 @@ const TOKEN = localStorage.getItem('admin_token');
 (function() {
   var t = TOKEN;
   if (!t) {
-    if (!window.location.href.includes('admin-login.html')) window.location.href = 'admin-login.html';
+    if (!window.location.href.includes('manage.html')) window.location.href = 'index.html';
     return;
   }
   try {
     var payload = JSON.parse(atob(t.split('.')[1]));
     if (payload.role !== 'admin' || payload.exp * 1000 <= Date.now()) {
       localStorage.removeItem('admin_token');
-      if (!window.location.href.includes('admin-login.html')) window.location.href = 'admin-login.html';
+      if (!window.location.href.includes('manage.html')) window.location.href = 'index.html';
     }
   } catch(e) {
     localStorage.removeItem('admin_token');
-    if (!window.location.href.includes('admin-login.html')) window.location.href = 'admin-login.html';
+    if (!window.location.href.includes('manage.html')) window.location.href = 'index.html';
   }
 })();
 
@@ -59,7 +59,7 @@ for (var i = 0; i < sidebarLinks.length; i++) {
 
 document.getElementById('logout-btn').addEventListener('click', function() {
   localStorage.removeItem('admin_token');
-  window.location.href = '/admin-login.html';
+  window.location.href = 'index.html';
 });
 
 function loadPage(page) {
