@@ -9,6 +9,8 @@ const path = require('path');
 
 const app = express();
 
+app.set('trust proxy', 1);
+
 // ─── MIDDLEWARE ───
 app.use(helmet({
   crossOriginResourcePolicy: { policy: 'cross-origin' },

@@ -35,7 +35,7 @@
   ab.style.cssText = 'display:none;text-align:center;padding:8px 16px;background:rgba(196,181,253,0.06);border-bottom:1px solid rgba(196,181,253,0.08);font-size:11px;color:#c4b5fd;letter-spacing:0.08em;font-family:"Clash Display",sans-serif';
   h.parentNode.insertBefore(ab, h.nextSibling);
 
-  // Show admin link only if a valid admin token exists
+  // Admin link handling
   (function() {
     function showAdminLink() {
       var link = document.getElementById('admin-header-link');
@@ -46,21 +46,40 @@
       s.textContent = '.admin-nav-link.visible{display:inline-flex!important;align-items:center;gap:4px;padding:4px 12px!important;background:rgba(196,181,253,0.1);border:1px solid rgba(196,181,253,0.2);border-radius:6px;color:#c4b5fd!important;font-weight:600!important}.admin-nav-link.visible:hover{background:rgba(196,181,253,0.18)!important;border-color:rgba(196,181,253,0.35)!important;color:#d8ccff!important}.admin-nav-link.visible::after{display:none!important}';
       document.head.appendChild(s);
     }
+
+    function hideAdminLink() {
+      var link = document.getElementById('admin-header-link');
+      if (link) { link.style.display = 'none'; link.classList.remove('visible'); }
+      var mLink = document.getElementById('mobile-admin-link');
+      if (mLink) { mLink.style.display = 'none'; mLink.classList.remove('visible'); }
+    }
+
+    // Initial check
     try {
       var t = localStorage.getItem('admin_token');
-      if (t) {
+      var ut = localStorage.getItem('yaro_token');
+      if (t && ut) {
         try {
           var payload = JSON.parse(atob(t.split('.')[1]));
           if (payload.role === 'admin' && payload.exp * 1000 > Date.now()) {
             showAdminLink();
           } else {
+            hideAdminLink();
             localStorage.removeItem('admin_token');
           }
         } catch(e) {
+          hideAdminLink();
           localStorage.removeItem('admin_token');
         }
+      } else {
+        hideAdminLink();
       }
     } catch(e) {}
+
+    // Listen for logout event to hide admin link
+    if (typeof window !== 'undefined') {
+      window.addEventListener('yaroLogout', hideAdminLink);
+    }
   })();
 
   // Password confirmation modal before navigating to admin panel

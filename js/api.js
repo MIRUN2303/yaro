@@ -183,6 +183,10 @@ const YARO_API = (function() {
       var result = await request('/auth/logout', { method: 'POST' });
       clearToken();
       localStorage.removeItem('admin_token');
+      // Dispatch a custom event to notify UI components of logout
+      if (typeof window !== 'undefined' && window.dispatchEvent) {
+        window.dispatchEvent(new CustomEvent('yaroLogout'));
+      }
       return result;
     },
 
