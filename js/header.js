@@ -23,7 +23,6 @@
     '<a href="contact.html" ' + a('contact') + '>Contact</a>',
     '<a href="profile.html" ' + a('profile') + '>Profile</a>',
     '<a href="orders.html" ' + a('orders') + '>Orders</a>',
-    '<a href="admin.html" id="admin-header-link" class="admin-nav-link" style="display:none">Admin</a>',
     '<a href="cart.html" class="cart-link' + (p === 'cart' ? ' active' : '') + '">Cart <span class="cart-count" id="cart-count">0</span></a>',
     '</nav>'
   ].join('');
@@ -38,10 +37,32 @@
   // Admin link handling
   (function() {
     function showAdminLink() {
+      // Ensure admin link exists; create if missing
+      var nav = document.querySelector('.sh-nav');
       var link = document.getElementById('admin-header-link');
-      if (link) { link.style.display = ''; link.classList.add('visible'); }
+      if (!link) {
+        link = document.createElement('a');
+        link.href = 'manage.html';
+        link.id = 'admin-header-link';
+        link.className = 'admin-nav-link';
+        link.textContent = 'Admin';
+        nav.appendChild(link);
+      }
+      link.style.display = '';
+      link.classList.add('visible');
       var mLink = document.getElementById('mobile-admin-link');
-      if (mLink) { mLink.style.display = ''; mLink.classList.add('visible'); }
+      if (!mLink) {
+        // For mobile view, duplicate the admin link if needed
+        var mobileLink = document.createElement('a');
+        mobileLink.href = 'manage.html';
+        mobileLink.id = 'mobile-admin-link';
+        mobileLink.className = 'admin-nav-link';
+        mobileLink.textContent = 'Admin';
+        nav.appendChild(mobileLink);
+        mLink = mobileLink;
+      }
+      mLink.style.display = '';
+      mLink.classList.add('visible');
       var s = document.createElement('style');
       s.textContent = '.admin-nav-link.visible{display:inline-flex!important;align-items:center;gap:4px;padding:4px 12px!important;background:rgba(196,181,253,0.1);border:1px solid rgba(196,181,253,0.2);border-radius:6px;color:#c4b5fd!important;font-weight:600!important}.admin-nav-link.visible:hover{background:rgba(196,181,253,0.18)!important;border-color:rgba(196,181,253,0.35)!important;color:#d8ccff!important}.admin-nav-link.visible::after{display:none!important}';
       document.head.appendChild(s);
@@ -49,16 +70,15 @@
 
     function hideAdminLink() {
       var link = document.getElementById('admin-header-link');
-      if (link) { link.style.display = 'none'; link.classList.remove('visible'); }
+      if (link && link.parentNode) { link.parentNode.removeChild(link); }
       var mLink = document.getElementById('mobile-admin-link');
-      if (mLink) { mLink.style.display = 'none'; mLink.classList.remove('visible'); }
+      if (mLink && mLink.parentNode) { mLink.parentNode.removeChild(mLink); }
     }
 
     // Initial check
     try {
       var t = localStorage.getItem('admin_token');
-      var ut = localStorage.getItem('yaro_token');
-      if (t && ut) {
+      if (t) {
         try {
           var payload = JSON.parse(atob(t.split('.')[1]));
           if (payload.role === 'admin' && payload.exp * 1000 > Date.now()) {
