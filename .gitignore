@@ -9,3 +9,9 @@ netlify/functions/node_modules/
 
 # Local Netlify folder
 .netlify
+
+# Vercel
+.vercel
+
+.vercel
+.env*

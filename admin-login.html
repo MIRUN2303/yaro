@@ -1,0 +1,50 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Admin Login — YARO</title>
+<link href="https://fonts.cdnfonts.com/css/pilowlava" rel="stylesheet">
+<link href="https://api.fontshare.com/v2/css?f[]=clash-display@200,300,400,500,600,700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="backend/admin/css/admin.css">
+</head>
+<body class="login-page">
+  <div class="login-screen">
+    <div class="login-glass"></div>
+    <div class="login-container">
+      <div class="login-brand">YARO</div>
+      <p class="login-subtitle">Admin Access</p>
+      <form id="login-form">
+        <div class="login-field">
+          <input type="email" id="login-email" placeholder="Admin Email" required>
+        </div>
+        <div class="login-field">
+          <input type="password" id="login-password" placeholder="Password" required>
+        </div>
+        <button type="submit">Sign In</button>
+        <p id="login-error" class="error-msg"></p>
+      </form>
+    </div>
+  </div>
+  <script>
+    document.getElementById('login-form').addEventListener('submit', async function(e) {
+      e.preventDefault();
+      const email = document.getElementById('login-email').value;
+      const password = document.getElementById('login-password').value;
+      const errEl = document.getElementById('login-error');
+      errEl.textContent = '';
+      try {
+        const res = await fetch('/api/auth/admin/login', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ email, password })
+        });
+        const data = await res.json();
+        if (!res.ok) { errEl.textContent = data.error || 'Invalid credentials'; return; }
+        localStorage.setItem('admin_token', data.token);
+        window.location.href = 'admin.html';
+      } catch(e) { console.error('admin login error:', e); errEl.textContent = 'Cannot reach server. Check your connection.'; }
+    });
+  </script>
+</body>
+</html>
