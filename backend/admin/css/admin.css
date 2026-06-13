@@ -212,28 +212,49 @@ body {
 }
 
 .sidebar-footer {
-  padding: 16px 20px;
+  padding: 12px 20px 16px;
   border-top: 1px solid var(--border);
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
 }
 
-#logout-btn {
+.sidebar-footer button {
   width: 100%;
-  padding: 10px;
+  padding: 9px 10px;
   background: transparent;
   border: 1px solid var(--border-light);
   border-radius: 8px;
   color: var(--text-muted);
   cursor: pointer;
-  font-size: 13px;
+  font-size: 12px;
   font-family: var(--font-display);
-  transition: all 0.25s ease;
-  letter-spacing: 0.5px;
+  transition: all 0.2s ease;
+  letter-spacing: 0.4px;
+}
+
+.sidebar-footer button:hover {
+  background: rgba(255,255,255,0.06);
+  color: #fff;
+  border-color: rgba(255,255,255,0.15);
+}
+
+#refresh-btn:hover {
+  background: rgba(99,102,241,0.12);
+  color: #818cf8;
+  border-color: rgba(99,102,241,0.3);
+}
+
+#back-to-store-btn:hover {
+  background: rgba(52,211,153,0.12);
+  color: #34d399;
+  border-color: rgba(52,211,153,0.3);
 }
 
 #logout-btn:hover {
-  background: rgba(239,68,68,0.1);
-  color: var(--danger);
-  border-color: var(--danger);
+  background: rgba(239,68,68,0.12);
+  color: #f87171;
+  border-color: rgba(239,68,68,0.3);
 }
 
 /* ─── MAIN CONTENT ─── */

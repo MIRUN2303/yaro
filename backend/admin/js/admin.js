@@ -57,6 +57,15 @@ for (var i = 0; i < sidebarLinks.length; i++) {
   });
 }
 
+document.getElementById('refresh-btn').addEventListener('click', function() {
+  var current = document.querySelector('#sidebar nav a.active');
+  if (current) loadPage(current.getAttribute('data-page'));
+});
+
+document.getElementById('back-to-store-btn').addEventListener('click', function() {
+  window.location.href = 'store.html';
+});
+
 document.getElementById('logout-btn').addEventListener('click', function() {
   localStorage.removeItem('admin_token');
   window.location.href = 'index.html';
